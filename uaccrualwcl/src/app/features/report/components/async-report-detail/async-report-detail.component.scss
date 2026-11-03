@@ -1,0 +1,31 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+.async-report-detail-container {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .p-card {
+    margin-bottom: 1rem;
+
+    .p-card-body {
+      padding: 1rem;
+    }
+  }
+
+  .p-tag {
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .p-progressbar {
+    margin-top: 0.5rem;
+  }
+
+  .border-round {
+    border-radius: 4px;
+  }
+}

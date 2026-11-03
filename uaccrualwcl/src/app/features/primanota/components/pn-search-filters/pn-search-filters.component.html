@@ -1,0 +1,183 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="space-y-8">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Tipo -->
+    <div class="md:col-span-3">
+      <label for="idTipo" class="field-label">Tipo</label>
+      <select id="idTipo" formControlName="codiceTipo"
+              class="select">
+        <option value="">--- tutti i valori ---</option>
+        <option *ngFor="let tipo of tipiPrimaNota" [value]="tipo.value">{{tipo.label}}</option>
+      </select>
+    </div>
+
+    <!-- Fonte -->
+    <div class="md:col-span-3">
+      <label for="idFonte" class="field-label">Fonte</label>
+      <select id="idFonte" formControlName="codiceFonte"
+              class="select">
+        <option value="">--- tutti i valori ---</option>
+        <option *ngFor="let fonte of fonti" [value]="fonte.value">{{fonte.label}}</option>
+      </select>
+    </div>
+
+    <!-- Evento Contabile -->
+    <div class="md:col-span-3">
+      <label for="idEventoContabile" class="field-label">Evento Contabile</label>
+      <select id="idEventoContabile" formControlName="codiceEvento"
+              class="select">
+        <option value="">--- tutti i valori ---</option>
+        <option *ngFor="let evento of eventiContabili" [value]="evento.value">{{evento.label}}</option>
+      </select>
+    </div>
+
+    <!-- Causale -->
+    <div class="md:col-span-3">
+      <label for="idCausale" class="field-label">Causale</label>
+      <select id="idCausale" formControlName="codiceCausale"
+              class="select">
+        <option value="">--- tutti i valori ---</option>
+        <option *ngFor="let causale of causaliFiltered" [value]="causale.value">{{causale.label}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Numero Provvisorio -->
+    <div class="md:col-span-3">
+      <label for="numeroProvvisorio" class="field-label">Numero Provvisorio</label>
+      <input type="number" id="numeroProvvisorio" formControlName="numeroProvvisorio"
+             class="input">
+    </div>
+
+    <!-- Numero Definitivo -->
+    <div class="md:col-span-3">
+      <label for="numeroDefinitivo" class="field-label">Numero Definitivo</label>
+      <input type="number" id="numeroDefinitivo" formControlName="numeroDefinitivo"
+             class="input">
+    </div>
+
+    <!-- Stato -->
+    <div class="md:col-span-3">
+      <label for="idStato" class="field-label">Stato</label>
+      <select id="idStato" formControlName="codiceStato"
+              class="select">
+        <option value="">--- tutti i valori ---</option>
+        <option *ngFor="let stato of statiPrimaNota" [value]="stato.value">{{stato.label}}</option>
+      </select>
+    </div>
+
+    <!-- Descrizione -->
+    <div class="md:col-span-3">
+      <label for="descrizione" class="field-label">Descrizione</label>
+      <input type="text" id="descrizione" formControlName="descrizione"
+             class="input">
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Codice Conto -->
+    <div class="md:col-span-3">
+      <label for="codiceConto" class="field-label">Codice Conto</label>
+      <input type="text" id="codiceConto" formControlName="codiceConto"
+             class="input">
+    </div>
+
+    <!-- Descrizione Conto -->
+    <div class="md:col-span-6">
+      <label for="descrizioneConto" class="field-label">Descrizione Conto</label>
+      <input type="text" id="descrizioneConto" formControlName="descrizioneConto"
+             class="input">
+    </div>
+
+    <!-- Pulsante Cerca Conto -->
+    <div class="md:col-span-3">
+      <button type="button" (click)="onSearchConto()" class="btn btn-primary btn-lg" style="width:100%">
+        <span class="material-icons-round" style="font-size:16px">search</span> Cerca Conto
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Data Reg. Provvisoria Da -->
+    <div class="md:col-span-6">
+      <label for="dataRegProvvisoriaDa" class="field-label">Data Reg. Provvisoria (Da)</label>
+      <input type="date" id="dataRegProvvisoriaDa" formControlName="dataRegProvvisoriaDa"
+             class="input">
+    </div>
+
+    <!-- Data Reg. Provvisoria A -->
+    <div class="md:col-span-6">
+      <label for="dataRegProvvisoriaA" class="field-label">Data Reg. Provvisoria (A)</label>
+      <input type="date" id="dataRegProvvisoriaA" formControlName="dataRegProvvisoriaA"
+             class="input">
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Data Reg. Definitiva Da -->
+    <div class="md:col-span-6">
+      <label for="dataRegDefinitivaDa" class="field-label">Data Reg. Definitiva (Da)</label>
+      <input type="date" id="dataRegDefinitivaDa" formControlName="dataRegDefinitivaDa"
+             class="input">
+    </div>
+
+    <!-- Data Reg. Definitiva A -->
+    <div class="md:col-span-6">
+      <label for="dataRegDefinitivaA" class="field-label">Data Reg. Definitiva (A)</label>
+      <input type="date" id="dataRegDefinitivaA" formControlName="dataRegDefinitivaA"
+             class="input">
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+    <!-- Importo Da -->
+    <div class="md:col-span-6">
+      <label for="importoDa" class="field-label">Importo (Da)</label>
+      <input type="text" id="importoDa" formControlName="importoDa" amountInput [amountDecimalPlaces]="2"
+             class="input">
+    </div>
+
+    <!-- Importo A -->
+    <div class="md:col-span-6">
+      <label for="importoA" class="field-label">Importo (A)</label>
+      <input type="text" id="importoA" formControlName="importoA" amountInput [amountDecimalPlaces]="2"
+             class="input">
+    </div>
+  </div>
+
+  <!-- Solo prime note non quadrate -->
+  <div class="grid grid-cols-1">
+    <label class="flex items-center gap-2 cursor-pointer select-none w-fit">
+      <input type="checkbox" id="soloNonQuadrate" formControlName="soloNonQuadrate"
+             class="w-4 h-4 accent-primary border-border-light rounded focus:ring-primary cursor-pointer">
+      <span class="text-sm font-semibold text-gray-700">Solo prime note non quadrate</span>
+    </label>
+  </div>
+
+  <!-- Pulsanti -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding-top:16px;margin-top:8px;border-top:1px dashed var(--border-color)">
+    <button type="button" class="btn btn-ghost btn-lg" (click)="onClear()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+    <button type="submit" class="btn btn-primary btn-lg">
+      <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+    </button>
+  </div>
+</form>
+
+<!-- Modale per la ricerca conti ad albero -->
+<div *ngIf="showPdcTreeSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+  <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+    <app-pdc-tree-search-modal
+      [searchTerm]="searchTermForModal"
+      [searchCodice]="searchCodiceForModal"
+      [searchDescrizione]="searchDescrizioneForModal"
+      [autoSelectSingleResult]="true"
+      (pdcSelected)="onPdcSelected($event)"
+      (close)="onModalClosed()">
+    </app-pdc-tree-search-modal>
+  </div>
+</div>

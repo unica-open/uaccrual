@@ -1,0 +1,115 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+.session-expired-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.session-expired-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.session-expired-header {
+  margin-bottom: 30px;
+}
+
+.session-expired-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #1976d2;
+  margin-bottom: 16px;
+}
+
+.session-expired-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.session-expired-body {
+  color: #666;
+  line-height: 1.6;
+}
+
+.session-expired-body p {
+  margin-bottom: 16px;
+}
+
+.session-expired-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.session-expired-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.session-expired-actions .btn-primary {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+}
+
+.session-expired-actions .btn-primary:hover {
+  background-color: #1565c0;
+}
+
+.session-expired-actions .btn-secondary {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+}
+
+.session-expired-actions .btn-secondary:hover {
+  background-color: #f5f5f5;
+}
+
+.session-expired-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  padding: 16px;
+  margin-top: 24px;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.session-expired-info mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.session-expired-info p {
+  margin: 0;
+  font-size: 14px;
+}

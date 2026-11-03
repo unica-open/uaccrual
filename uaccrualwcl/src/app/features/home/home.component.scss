@@ -1,0 +1,191 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.page-home {
+  padding: 22px 32px 28px;
+  max-width: 1500px;
+  flex: 1;
+}
+
+.module-groups-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  align-content: start;
+}
+
+.module-group {
+  margin-bottom: 0;
+  --g-color: oklch(0.42 0.14 258);
+  --g-color-2: oklch(0.32 0.14 258);
+}
+.module-group.is-wide { grid-column: 1 / -1; }
+
+.module-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.module-group-icon {
+  width: 34px; height: 34px;
+  border-radius: var(--r-md);
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--g-color) 14%, transparent);
+  color: var(--g-color);
+}
+.module-group-icon .material-icons-round { font-size: 18px; }
+
+.module-group-meta { line-height: 1.2; }
+
+.module-group-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+.module-group-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  margin-top: 2px;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: calc(50% - 12px);
+}
+.module-group.is-wide .module-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: calc(75% - 12px);
+}
+
+@media (max-width: 1100px) {
+  .module-grid { max-width: 100%; }
+  .module-group.is-wide .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.module-card {
+  background: linear-gradient(140deg, var(--g-color), var(--g-color-2));
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 200ms cubic-bezier(.2,.8,.2,1), box-shadow 200ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 116px;
+  position: relative;
+  text-align: left;
+  color: oklch(0.98 0.01 var(--g-hue, 258));
+  overflow: hidden;
+  isolation: isolate;
+  font-family: inherit;
+}
+
+.module-card-glyph {
+  position: absolute;
+  right: -10px;
+  bottom: -14px;
+  font-size: 80px;
+  color: rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+  z-index: 0;
+}
+
+.module-card:hover .module-card-glyph {
+  color: rgba(255, 255, 255, 0.36);
+  transform: translate(-4px, -4px) rotate(-4deg) scale(1.05);
+}
+
+.module-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -40px auto;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.18), transparent 65%);
+  pointer-events: none;
+  transition: opacity 220ms ease;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+.module-card:hover {
+  box-shadow: 0 16px 36px -8px color-mix(in srgb, var(--g-color) 55%, transparent),
+              0 4px 10px rgba(20, 22, 30, 0.08);
+  transform: translateY(-2px);
+}
+.module-card:hover::after { opacity: 1; }
+.module-card:focus-visible {
+  outline: 2px solid var(--g-color);
+  outline-offset: 3px;
+}
+.module-card > *:not(.module-card-glyph):not(.module-card-arrow) {
+  position: relative;
+  z-index: 1;
+}
+
+.module-card-icon {
+  width: 34px; height: 34px;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  color: white;
+}
+.module-card-icon .material-icons-round { font-size: 18px; }
+
+.module-card-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: white;
+  line-height: 1.25;
+}
+
+.module-card-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.45;
+  margin-top: 2px;
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.module-card-arrow {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.65);
+  opacity: 0;
+  transition: opacity 200ms ease, transform 200ms ease;
+  z-index: 1;
+}
+
+.module-card:hover .module-card-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+  color: white;
+}

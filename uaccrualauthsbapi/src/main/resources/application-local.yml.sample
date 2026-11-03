@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# ===========================================
+# ACCRUALAUTHSBAPI - Local Development Configuration
+# ===========================================
+# Configurazione per ambiente di sviluppo locale
+# Questo file viene caricato quando SPRING_PROFILES_ACTIVE=local
+
+# ===========================================
+# SERVER CONFIGURATION
+# ===========================================
+server:
+  port: 20380
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/ACCRUALAUTH
+    username: accrualauth
+    password: xxx
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
+      pool-name: AuthHikariPool
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+logging:
+  level:
+    root: INFO
+    it.csi.accrual.accrualauthsbapi: DEBUG
+    org.springframework: WARN
+    org.springframework.boot.actuate: INFO
+    org.hibernate: INFO
+    org.postgresql: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{enteCodice}] [%X{requestId}] %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{enteCodice}] [%X{requestId}] %msg%n"
+  file:
+    name: ${LOG_PATH:C:/logs/accrualauthsbapi.log}
+    max-size: 10MB
+    max-history: 30
+
+# ===========================================
+# SPECIFIC CONFIGURATION (MAIL)
+# ===========================================
+# Mail Configuration (SMTP) - Locale
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gestione.accrual@gmail.com
+    password: dev_mail_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Flyway Configuration
+spring:
+  flyway:
+    enabled: false
+
+# App Custom Mail Configuration
+app:
+  mail:
+    username: gestione.accrual@gmail.com
+    token-reset-pwd-expiration: 300000
+    reset-link: http://localhost:4200/accrualwcl/confirm-password-reset?token=
+
+# Security Configuration - Public Endpoints
+security:
+  public-endpoints:
+    - /api/v1/login
+    - /api/v1/token-login
+    - /api/v1/service-login
+    - /api/v1/reset-password
+    - /api/v1/confirm-password-reset
+    - /api/v1/logout
+    - /accrualauthsbapi/**

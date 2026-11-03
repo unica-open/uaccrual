@@ -1,0 +1,95 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Filtri di ricerca</h2>
+      </div>
+      <button *ngIf="searchDone" type="button" class="btn btn-ghost btn-sm" (click)="toggleFilters()">
+        <span class="material-icons-round" style="font-size:14px">{{ filtersCollapsed ? 'expand_more' : 'expand_less' }}</span>
+        {{ filtersCollapsed ? 'Espandi filtri' : 'Comprimi filtri' }}
+      </button>
+    </div>
+
+    <div class="card-body" *ngIf="!filtersCollapsed" [@collapseExpand]>
+      <form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+        <!-- Messaggi di errore validazione -->
+        <div *ngIf="erroriValidazione.length > 0" class="field" style="grid-column:1/-1">
+          <div class="field-hint" style="color:var(--danger)">{{ erroriValidazione[0] }}</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" for="classe">Classe *</label>
+            <select class="select" id="classe" formControlName="classe"
+                    [ngClass]="{'error': searchForm.get('classe')?.invalid && searchForm.get('classe')?.touched}">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let classe of classi" [value]="classe.value">{{classe.label}}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tipo">Tipo</label>
+            <select class="select" id="tipo" formControlName="tipo">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let tipo of tipi" [value]="tipo.value">{{tipo.label}}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="codiceEvento">Evento</label>
+            <select class="select" id="codiceEvento" formControlName="codiceEvento">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let evento of eventi" [value]="evento.value">{{evento.label}}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="codice">Codice *</label>
+            <input class="input" id="codice" formControlName="codice" type="text"/>
+          </div>
+          <div class="field">
+            <label class="field-label" for="descrizione">Descrizione</label>
+            <input class="input" id="descrizione" formControlName="descrizione" type="text"/>
+          </div>
+          <div class="field">
+            <label class="field-label" for="stato">Stato</label>
+            <select class="select" id="stato" formControlName="stato">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let stato of stati" [value]="stato.value">{{stato.label}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding-top:16px;margin-top:8px;border-top:1px dashed var(--border-color)">
+          <button type="button" class="btn btn-ghost btn-lg" (click)="onReset()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sezione Risultati -->
+  <div *ngIf="searching || searchDone" [@fadeSlideIn] class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Risultati della ricerca</h2>
+      </div>
+    </div>
+    <div *ngIf="searching" style="display:flex;justify-content:center;padding:40px">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color:var(--accent)"></div>
+    </div>
+    <div *ngIf="!searching && searchDone">
+      <app-pdc-list></app-pdc-list>
+    </div>
+  </div>
+
+  <a class="back-link" style="margin-top:16px" (click)="onBack()">
+    <span class="material-icons-round">arrow_back</span> Indietro
+  </a>
+</main>

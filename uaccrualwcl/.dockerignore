@@ -1,0 +1,17 @@
+# File e directory da ignorare durante il build del contenitore Docker
+node_modules/
+dist/
+.git/
+.vscode/
+.editorconfig
+.gitattributes
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+*.log
+.DS_Store
+.nyc_output/
+coverage/
+.nyc_output/
+*.tgz

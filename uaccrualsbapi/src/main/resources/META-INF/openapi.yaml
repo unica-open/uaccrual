@@ -1,0 +1,724 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.0.1
+info:
+  title: Accrual API
+  description: API per il backend Accrual.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+tags:
+  - name: business
+paths:
+  /flussi/fonti:
+    get:
+      tags:
+        - business
+      summary: Elenco delle fonti disponibili per i flussi
+      operationId: getFontiFlusso
+      responses:
+        "200":
+          description: Lista delle fonti disponibili.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fonte"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/upload:
+    post:
+      tags:
+        - business
+      summary: Carica un file da fonte esterna
+      operationId: uploadFlusso
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                codice:
+                  type: string
+                  description: Codice identificativo del file.
+                  minLength: 1
+                tipoFile:
+                  type: string
+                  description: Tipo di file (es. STATO_PATRIMONIALE).
+                  minLength: 1
+                note:
+                  type: string
+                  description: Eventuali note aggiuntive.
+                file:
+                  type: string
+                  format: binary
+                  description: Il file da caricare.
+              required:
+                - codice
+                - tipoFile
+                - file
+        required: true
+      responses:
+        "200":
+          description: File caricato con successo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlussoUploadResponse"
+        "400":
+          description: Richiesta non valida. Ad esempio, parametri mancanti o tipo di file non supportato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico del server.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/search:
+    get:
+      tags:
+        - business
+      summary: Ricerca flussi da fonte esterna con filtri e paginazione
+      operationId: searchFlussi
+      parameters:
+        - name: codiceFile
+          in: query
+          description: Filtro per codice del file
+          schema:
+            type: string
+        - name: fonte
+          in: query
+          description: Filtro per fonte del flusso
+          schema:
+            type: string
+        - name: tipoFile
+          in: query
+          description: Filtro per tipo di file
+          schema:
+            type: string
+        - name: dataCaricamento
+          in: query
+          description: Filtro per data di caricamento (formato YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          description: Numero di elementi per pagina
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: offset
+          in: query
+          description: Offset per paginazione
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        "200":
+          description: Lista dei flussi filtrati e paginati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedFlussoSearchResult"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/elabora:
+    post:
+      tags:
+        - business
+      summary: Elabora un flusso specifico da fonte esterna
+      operationId: elaboraFlusso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso da elaborare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Flusso elaborato con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElaboraFlussoResponseDTO"
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/resume-elaborazione:
+    post:
+      tags:
+        - business
+      summary: Riprende l'elaborazione di un flusso dopo conferma utente
+      description: |
+        Questo endpoint viene utilizzato per riprendere l'elaborazione di un flusso che è stato sospeso
+        in attesa di conferma dell'utente. Tipicamente viene chiamato dopo che l'utente ha visualizzato
+        un messaggio di conferma e ha scelto se procedere o annullare l'operazione.
+      operationId: resumeElaborazioneFlusso
+      parameters:
+        - name: resumeToken
+          in: query
+          required: true
+          description: Token di ripresa ottenuto dalla risposta dell'endpoint elaboraFlusso quando è richiesta una conferma
+          schema:
+            type: string
+      requestBody:
+        description: Corpo della richiesta contenente la decisione dell'utente
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userConfirmed:
+                  type: boolean
+                  description: true se l'utente ha confermato l'elaborazione, false se ha annullato
+              required:
+                - userConfirmed
+      responses:
+        "200":
+          description: Elaborazione ripresa con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElaboraFlussoResponseDTO"
+        "404":
+          description: Flusso non trovato o token di ripresa non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: Richiesta non valida
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/download:
+    get:
+      tags:
+        - business
+      summary: Scarica un flusso specifico da fonte esterna
+      operationId: downloadFlusso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso da scaricare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File del flusso scaricato con successo
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/export-results:
+    get:
+      tags:
+        - business
+      summary: Esporta i risultati (log) dell'elaborazione di un flusso specifico
+      operationId: exportResults
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso da cui esportare i risultati
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File ZIP con i risultati dell'elaborazione esportato con successo
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/process-status:
+    get:
+      tags:
+        - business
+      summary: Stato di avanzamento dell'elaborazione di un flusso
+      description: |
+        Restituisce lo stato di avanzamento dell'elaborazione asincrona di un flusso, usato dal frontend
+        per il polling durante l'elaborazione.
+      operationId: getProcessStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso di cui leggere lo stato di elaborazione
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stato di elaborazione del flusso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessStatusResponse"
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}:
+    get:
+      tags:
+        - business
+      summary: Recupera il dettaglio di un flusso da fonte esterna
+      operationId: getFlussoById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID univoco del flusso da recuperare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dettagli del flusso recuperati con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlussoDetail"
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - business
+      summary: Elimina un flusso specifico
+      operationId: deleteFlussoById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID univoco del flusso da eliminare
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Flusso eliminato con successo.
+        "404":
+          description: Flusso non trovato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /notifiche:
+    get:
+      tags:
+        - business
+      summary: Notifiche aperte dell'utente corrente per l'ente corrente
+      operationId: getNotifiche
+      responses:
+        "200":
+          description: Elenco delle notifiche aperte, dalla più recente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notifica"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /notifiche/{id}/letta:
+    put:
+      tags:
+        - business
+      summary: Segna una notifica come letta
+      operationId: setNotificaLetta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della notifica
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Notifica segnata come letta.
+        "404":
+          description: Notifica non trovata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /notifiche/{id}:
+    delete:
+      tags:
+        - business
+      summary: Chiude una notifica, che non sarà più mostrata
+      operationId: deleteNotifica
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della notifica
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Notifica chiusa.
+        "404":
+          description: Notifica non trovata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Notifica:
+      type: object
+      description: Avviso mostrato nel centro notifiche, persistente fra le sessioni dell'utente.
+      properties:
+        id:
+          type: integer
+          format: int64
+        tipo:
+          type: string
+          description: INFO, WARN, ERROR oppure CONFIRM
+        codice:
+          type: string
+          description: Codice messaggio applicativo, es. WEB_CON_0024
+        titolo:
+          type: string
+        messaggio:
+          type: string
+        idFlusso:
+          type: string
+          description: Flusso a cui la notifica si riferisce, se ce n'è uno
+        resumeToken:
+          type: string
+          description: Valorizzato solo per le notifiche di tipo CONFIRM
+        letta:
+          type: boolean
+        data:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        detail:
+          type: object
+        links:
+          type: array
+          items:
+            type: string
+    FlussoSearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del flusso
+        fonte:
+          type: string
+          description: Fonte del flusso
+        tipo:
+          type: string
+          description: Tipo del flusso
+        codice:
+          type: string
+          description: Codice del flusso
+        nome:
+          type: string
+          description: Nome del flusso
+        dataCaricamento:
+          type: string
+          format: date-time
+          description: Data di caricamento del flusso
+        stato:
+          type: string
+          description: Stato del flusso
+      required:
+        - id
+        - fonte
+        - tipo
+        - codice
+        - nome
+        - dataCaricamento
+        - stato
+
+    PagedFlussoSearchResult:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlussoSearchResult'
+        page:
+          type: integer
+          format: int32
+        page_size:
+          type: integer
+          format: int32
+        total_elements:
+          type: integer
+          format: int64
+
+    FlussoElaboraResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indica se l'elaborazione è avvenuta con successo
+          example: true
+        message:
+          type: string
+          description: Messaggio di esito dell'elaborazione
+          example: "Flusso elaborato con successo."
+
+    ElaboraFlussoResponseDTO:
+      type: object
+      properties:
+        flussoElaboraResponse:
+          $ref: '#/components/schemas/FlussoElaboraResponse'
+        needsConfirmation:
+          type: boolean
+          description: Indica se è necessaria una conferma da parte dell'utente per proseguire
+          example: false
+        confirmationCode:
+          type: string
+          description: Codice identificativo della conferma richiesta
+          example: "CF-12345"
+        confirmationMessage:
+          type: string
+          description: Messaggio da mostrare all'utente per la richiesta di conferma
+          example: "Sono state rilevate anomalie. Vuoi procedere comunque?"
+        resumeToken:
+          type: string
+          description: Token per riprendere l'elaborazione dopo la conferma dell'utente
+          example: "eyJpZCI6IjEyMyIsImFjdGlvbiI6InJlcGhlYXNlIn0="
+        tipoMessaggio:
+          type: string
+          description: Tipo di messaggio da presentare al client (es. CONFIRM, SUCCESS, ERROR)
+          example: "CONFIRM"
+        primaNoteDaAnnullare:
+          type: array
+          description: Lista delle prime note esistenti che verranno annullate se l'utente conferma
+          items:
+            $ref: '#/components/schemas/PrimaNotaConfermaInfo'
+
+    PrimaNotaConfermaInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        anno:
+          type: integer
+        numeroProvvisorio:
+          type: string
+        descrizione:
+          type: string
+        causale:
+          type: string
+        stato:
+          type: string
+
+    Fonte:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        codice:
+          type: string
+          description: Codice identificativo della fonte
+        descrizione:
+          type: string
+          description: Descrizione della fonte
+      required:
+        - codice
+        - descrizione
+    EsitoElaborazione:
+      type: object
+      properties:
+        dataElaborazione:
+          type: string
+          format: date-time
+          description: Data e ora dell'elaborazione
+        esito:
+          type: string
+          description: Esito dell'elaborazione (es. SUCCESS, ERROR, INFO)
+        messaggio:
+          type: string
+          description: Messaggio descrittivo dell'esito
+      required:
+        - dataElaborazione
+        - esito
+        - messaggio
+
+    FlussoDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del flusso
+        codice:
+          type: string
+          description: Codice del file
+        nome:
+          type: string
+          description: Nome del file
+        fonte:
+          type: string
+          description: Fonte del flusso
+        tipo:
+          type: string
+          description: Tipo del flusso
+        dataCaricamento:
+          type: string
+          format: date-time
+          description: Data di caricamento del flusso
+        stato:
+          type: string
+          description: Stato del flusso
+        note:
+          type: string
+          description: Note aggiuntive sul flusso
+        esitiElaborazione:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsitoElaborazione'
+          description: Lista degli esiti delle elaborazioni associate al flusso
+      required:
+        - id
+        - codice
+        - nome
+        - fonte
+        - tipo
+        - dataCaricamento
+        - stato
+    FlussoUploadResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "File caricato con successo."
+    ProcessStatusResponse:
+      type: object
+      properties:
+        jobId:
+          type: string
+          description: ID del flusso in elaborazione
+        status:
+          type: string
+          description: Stato di avanzamento
+          enum:
+            - PENDING
+            - IN_PROGRESS
+            - COMPLETED
+            - FAILED
+        progressPercentage:
+          type: integer
+          format: int32
+          description: Percentuale di avanzamento (-1 in caso di errore)
+        currentStep:
+          type: string
+          description: Descrizione del passo corrente
+        message:
+          type: string
+          description: Messaggio per l'utente

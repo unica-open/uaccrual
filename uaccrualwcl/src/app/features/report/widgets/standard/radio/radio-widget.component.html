@@ -1,0 +1,27 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="flex flex-col space-y-2">
+  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+  <div class="flex flex-col space-y-1">
+    <label *ngFor="let option of options" class="flex items-center space-x-2 cursor-pointer">
+      <input
+        type="radio"
+        [name]="label"
+        [value]="option.valore"
+        [checked]="value == option.valore"
+        (change)="onRadioChange($event)"
+        (blur)="onTouched()"
+        [required]="required && value == option.valore"
+        [disabled]="disabled"
+        class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+      />
+      <span class="text-sm text-gray-700 dark:text-gray-300">{{ option.etichetta }}</span>
+    </label>
+  </div>
+</div>

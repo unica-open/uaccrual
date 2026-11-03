@@ -1,0 +1,18 @@
+{
+  "user": {
+    "username": "okokok",
+    "utenteCodice": "COD-okokok",
+    "displayName": "Utente di Sviluppo",
+    "cognome": "Development",
+    "email": "dev@example.com"
+  },
+  "ruolo": "SCRITTURA_COMPLETA",
+  "source": "DEV",
+  "faseBilancio": "APERTO",
+  "annoBilancio": 2025,
+  "enteCodice": "80087670016",
+  "enteDenominazione": "Test Fa Cose",
+  "availableEnti": [
+    { "codice": "80087670016", "denominazione": "Test Fa Cose" }
+  ]
+}

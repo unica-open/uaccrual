@@ -1,0 +1,423 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.0.1
+info:
+  title: Accrual Authentication API
+  version: 1.0.0
+  description: API per la gestione dell'autenticazione e autorizzazione degli utenti nel sistema Accrual.
+servers:
+  - url: /api/v1
+tags:
+  - name: Authentication Management
+    description: Endpoints for managing user Authentication
+
+paths:
+  /login:
+    post:
+      summary: Login con credenziali (codice fiscale + password)
+      operationId: loginWithCredentials
+      tags:
+        - Authentication Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsLoginRequest'
+      responses:
+        '200':
+          description: Login effettuato con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token per l'autenticazione
+                required:
+                  - token
+        '401':
+          description: Credenziali non valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /token-login:
+    post:
+      summary: Login con token OIDC esterno
+      operationId: loginWithExternalToken
+      tags:
+        - Authentication Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenLoginRequest'
+      responses:
+        '200':
+          description: Login effettuato con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token per l'autenticazione
+                required:
+                  - token
+        '401':
+          description: Token non valido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /service-login:
+    post:
+      summary: Login delegato da servizio (SIAC, CSI_JOB)
+      operationId: loginWithService
+      tags:
+        - Authentication Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceLoginRequest'
+      responses:
+        '200':
+          description: Login effettuato con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token per l'autenticazione
+                required:
+                  - token
+        '401':
+          description: Credenziali servizio non valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ExceptionResponse'
+
+  /shibboleth-login:
+    get:
+      summary: Login via Shibboleth (SSO)
+      operationId: shibbolethLogin
+      tags:
+        - Authentication Management
+      parameters:
+        - name: codiceEnte
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Codice dell'ente
+        - name: anno
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 2025
+          description: Anno di bilancio (opzionale)
+        - name: fase
+          in: query
+          required: false
+          schema:
+            type: string
+            example: APERTO
+          description: Fase di bilancio (opzionale)
+        - name: Shib-Iride-IdentitaDigitale
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Identità Shibboleth iniettata da Apache
+      responses:
+        '200':
+          description: Login effettuato con successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token per l'autenticazione
+                required:
+                  - token
+        '401':
+          description: Identità Shibboleth non valida o JWT scaduto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Errore interno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /reset-password:
+    post:
+      summary: Genera un token temporaneo per il reset della password
+      operationId: generateTemporalyTokenForResetPassword
+      tags:
+        - Authentication Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Token generato con successo
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Richiesta non valida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '404':
+          description: Utente non trovato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Errore interno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /confirm-password-reset:
+    post:
+      summary: Conferma il reset della password
+      operationId: confirmPasswordReset
+      tags:
+        - Authentication Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmPasswordResetRequest'
+      responses:
+        '200':
+          description: Password aggiornata con successo
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Dati errati
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '401':
+          description: Token non valido o scaduto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        '500':
+          description: Errore interno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /logout:
+    post:
+      summary: Logout utente
+      operationId: logout
+      tags:
+        - Authentication Management
+      responses:
+        '200':
+          description: Logout effettuato con successo
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Authorization mancante o non valida
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: Errore interno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CredentialsLoginRequest:
+      type: object
+      required:
+        - codice_fiscale
+        - password
+      properties:
+        codice_fiscale:
+          type: string
+          example: SAEPOE99L23F123R
+          description: Codice fiscale dell'utente
+        password:
+          type: string
+          format: password
+          description: Password dell'utente
+        codice_ente:
+          type: string
+          description: Codice dell'ente
+        anno_bilancio:
+          type: integer
+          example: 2025
+          description: Anno di bilancio
+        fase_bilancio:
+          type: string
+          example: APERTO
+          description: Fase di bilancio corrente
+
+    TokenLoginRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Token OIDC esterno
+        codice_ente:
+          type: string
+          description: Codice dell'ente
+        anno_bilancio:
+          type: integer
+          example: 2025
+          description: Anno di bilancio
+        fase_bilancio:
+          type: string
+          example: APERTO
+          description: Fase di bilancio corrente
+
+    ServiceLoginRequest:
+      type: object
+      required:
+        - service_code
+        - service_secret
+      properties:
+        service_code:
+          type: string
+          example: SIAC
+          description: Codice del servizio (es. SIAC, CSI_JOB)
+        service_secret:
+          type: string
+          format: password
+          description: Segreto del servizio
+        shibboleth_identity:
+          type: string
+          example: AAAAAA00A11C000K/Mario/Rossi/Shibboleth/20260407143000/1/abcd1234
+          description: Identità Shibboleth (opzionale, per delegated login utente)
+        codice_ente:
+          type: string
+          description: Codice dell'ente
+        anno_bilancio:
+          type: integer
+          example: 2025
+          description: Anno di bilancio
+        fase_bilancio:
+          type: string
+          example: APERTO
+          description: Fase di bilancio corrente
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - codiceFiscale
+      properties:
+        codiceFiscale:
+          type: string
+          example: SAEPOE99L23F123R
+
+    ConfirmPasswordResetRequest:
+      type: object
+      required:
+        - token
+        - codiceFiscale
+        - password
+        - confirmPassword
+      properties:
+        token:
+          type: string
+        codiceFiscale:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+
+    ExceptionResponse:
+      type: object
+      description: Rappresenta un'eccezione Java serializzata restituita dal backend
+      properties:
+        exceptionMessage:
+          type: string
+          description: Messaggio dell'eccezione
+        exceptionType:
+          type: string
+          description: Tipo dell'eccezione
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              className:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer

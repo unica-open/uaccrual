@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# ===========================================
+# ACCRUALSBSRV - Application Configuration
+# ===========================================
+# Configurazione di base condivisa per tutti gli ambienti
+
+
+# ===========================================
+# APPLICATION IDENTIFICATION
+# ===========================================
+server:
+  servlet:
+    context-path: /accrualsbsrv
+
+spring:
+  application:
+    name: accrualsbsrv
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+application:
+  title: Accrual Service Backend
+  version: 1.0.0
+
+# ===========================================
+# MANAGEMENT / ACTUATOR
+# ===========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+      base-path: /actuator
+    endpoint:
+      health:
+        probes:
+          enabled: true
+
+# ===========================================
+# SECURITY CONFIGURATION
+# ===========================================
+security:
+  public-endpoints:
+    - /api/v1/ping
+    - /swagger-ui/**
+    - /v3/api-docs/**
+
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: DEBUG
+  file:
+    name: logs/accrualsbsrv.log

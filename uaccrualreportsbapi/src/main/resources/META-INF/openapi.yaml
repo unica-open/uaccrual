@@ -1,0 +1,510 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.0.1
+info:
+  title: Accrual Report Service API
+  description: API per la generazione di report BIRT sincroni e asincroni
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  /report:
+    post:
+      tags:
+        - Report
+      summary: Ottieni metadata report
+      description: Estrae i parametri da un template BIRT e restituisce i metadata del report
+      operationId: getReportInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportInfoRequest'
+      responses:
+        '200':
+          description: Metadata report recuperati con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportInfo'
+        '400':
+          description: Template non trovato o non valido
+        '500':
+          description: Errore nella lettura del template
+  /report/generate:
+    post:
+      summary: Genera report in modo sincrono
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  description: Formato del report (es. pdf, xlsx, docx)
+                rptdesign:
+                  type: string
+                  description: Nome del file .rptdesign (deve essere presente nella directory dei report)
+                rptconfig:
+                  type: string
+                  description: Nome del file .rptconfig (opzionale, deve essere presente nella directory dei report se specificato)
+                parameters:
+                  type: object
+                  description: Parametri del report come oggetto JSON
+              required:
+                - rptdesign
+                - format
+      responses:
+        '200':
+          description: Report generato con successo
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Richiesta non valida
+        '504':
+          description: Timeout nella generazione del report
+  /report/generate-async:
+    post:
+      summary: Genera report in modo asincrono
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  description: Formato del report (es. pdf, xlsx, docx)
+                rptdesign:
+                  type: string
+                  description: Nome del file .rptdesign (deve essere presente nella directory dei report)
+                rptconfig:
+                  type: string
+                  description: Nome del file .rptconfig (opzionale, deve essere presente nella directory dei report se specificato)
+                parameters:
+                  type: object
+                  description: Parametri del report come oggetto JSON
+              required:
+                - rptdesign
+                - format
+      responses:
+        '202':
+          description: Richiesta accettata, report in elaborazione
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncReportResponse'
+        '400':
+          description: Richiesta non valida
+        '409':
+          description: Coda piena, riprovare più tardi
+  /report/generate-async/{reportId}:
+    get:
+      summary: Ottieni stato del report asincrono
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Stato del report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncReportStatus'
+        '404':
+          description: Report non trovato
+  /report/{reportId}/download:
+    get:
+      summary: Scarica report asincrono completato
+      operationId: downloadAsyncReport
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report scaricato con successo
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Report non trovato o non ancora completato
+  /ping:
+    get:
+      summary: Endpoint ping
+      description: Semplice endpoint di heartbeat/probe di liveness
+      responses:
+        '200':
+          description: Servizio vivo
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "PONG"
+  /report/search:
+    post:
+      tags:
+        - Report
+      summary: Ricerca report asincroni
+      description: Ricerca i report asincroni con filtri multipli e paginazione
+      operationId: searchAsyncReports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsyncReportSearchRequest'
+      responses:
+        '200':
+          description: Ricerca eseguita con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncReportSearchResponse'
+        '400':
+          description: Parametri di ricerca non validi
+        '500':
+          description: Errore interno del server
+  /report/{reportId}:
+    get:
+      tags:
+        - Report
+      summary: Ottieni dettaglio report
+      description: Recupera il dettaglio completo di un report asincrono
+      operationId: getReportDetail
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          description: ID univoco del report
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Dettaglio report recuperato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncReportDetail'
+        '404':
+          description: Report non trovato
+        '403':
+          description: Accesso non autorizzato al report
+        '500':
+          description: Errore interno del server
+components:
+  schemas:
+    ReportInfo:
+      type: object
+      description: Metadata di un report estratti dal template BIRT
+      properties:
+        template:
+          type: string
+          description: Percorso del template BIRT (echo del request)
+        parametri:
+          type: array
+          description: Lista dei parametri definiti nel template
+          items:
+            $ref: '#/components/schemas/ReportParameter'
+
+    ReportParameter:
+      type: object
+      description: Definizione di un parametro report estratta dal template BIRT
+      properties:
+        nome:
+          type: string
+          description: Nome del parametro (usato nel request di generazione)
+        etichetta:
+          type: string
+          description: Etichetta descrittiva per il frontend
+        tipo:
+          type: string
+          description: Tipo di parametro
+          enum: [TEXT, NUMBER, DATE, COMBO, RADIO, CHECKBOX]
+        obbligatorio:
+          type: boolean
+          description: true se il parametro è obbligatorio
+        valoreDefault:
+          type: object
+          description: Valore di default (se presente nel template)
+        valoriPossibili:
+          type: array
+          description: Opzioni per parametri COMBO/RADIO (se presenti nel template)
+          items:
+            $ref: '#/components/schemas/ParameterOption'
+        hidden:
+          type: boolean
+          description: true se il parametro è nascosto (da BIRT) - non mostrare UI ma includere nel form
+        gruppo:
+          type: string
+          nullable: true
+          description: Nome del gruppo di appartenenza (null se il parametro non è raggruppato)
+
+    ParameterOption:
+      type: object
+      properties:
+        valore:
+          type: object
+          description: Valore dell'opzione
+        etichetta:
+          type: string
+          description: Etichetta descrittiva dell'opzione
+        dipendeDa:
+          type: object
+          nullable: true
+          description: Valore del parametro padre a cui questa opzione è associata (per gruppi cascata). null per opzioni di primo livello.
+
+    ReportInfoRequest:
+      type: object
+      required:
+        - rptdesign
+      properties:
+        rptdesign:
+          type: string
+          description: Percorso del file .rptdesign relativo alla directory dei report
+          example: "reports/mastrino.rptdesign"
+
+    AsyncReportResponse:
+      type: object
+      properties:
+        reportId:
+          type: string
+          format: uuid
+          description: ID univoco del report
+        status:
+          type: string
+          description: Stato attuale del report
+          enum: [PENDING, PROCESSING, COMPLETED, ERROR]
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e ora di creazione della richiesta
+    AsyncReportStatus:
+      type: object
+      properties:
+        reportId:
+          type: string
+          format: uuid
+          description: ID univoco del report
+        status:
+          type: string
+          description: Stato attuale del report
+          enum: [PENDING, PROCESSING, COMPLETED, ERROR]
+        progress:
+          type: integer
+          description: Percentuale di completamento (0-100)
+        downloadUrl:
+          type: string
+          description: URL per scaricare il report (disponibile quando completato)
+        error:
+          type: string
+          description: Messaggio di errore se lo stato è ERROR
+
+    AsyncReportSearchRequest:
+      type: object
+      description: Request per la ricerca di report asincroni con filtri
+      properties:
+        data_elaborazione_da:
+          type: string
+          format: date
+          description: Data inizio intervallo di completamento (opzionale)
+          example: "2024-01-01"
+        data_elaborazione_a:
+          type: string
+          format: date
+          description: Data fine intervallo di completamento (opzionale)
+          example: "2024-12-31"
+        stato:
+          type: string
+          description: Filtro per stato del report (opzionale)
+          enum: [PENDING, PROCESSING, COMPLETED, ERROR]
+          example: "COMPLETED"
+        tipo_report:
+          type: string
+          description: 'Filtro per tipo di report (opzionale). Valori: ACCRUAL-001, ACCRUAL-002, ACCRUAL-003'
+          example: "ACCRUAL-001"
+        formato:
+          type: string
+          description: Filtro per formato del report (opzionale)
+          enum: [pdf, xlsx]
+          example: "pdf"
+        pagina:
+          type: integer
+          description: Numero di pagina (default 0)
+          default: 0
+          minimum: 0
+          example: 0
+        dimensione_pagina:
+          type: integer
+          description: Numero di elementi per pagina (default 20, max 100)
+          default: 20
+          minimum: 1
+          maximum: 100
+          example: 20
+        ordinamento:
+          type: string
+          description: Campo di ordinamento (default completedAt)
+          default: "completedAt"
+          example: "completedAt"
+        direzione_ordinamento:
+          type: string
+          description: Direzione ordinamento (default DESC)
+          default: "DESC"
+          enum: [ASC, DESC]
+          example: "DESC"
+
+    AsyncReportSearchResponse:
+      type: object
+      description: Response paginata per la ricerca di report asincroni
+      properties:
+        report:
+          type: array
+          description: Lista dei report trovati
+          items:
+            $ref: '#/components/schemas/AsyncReportSummary'
+        totale_elementi:
+          type: integer
+          description: Numero totale di elementi trovati
+          example: 150
+        pagina_corrente:
+          type: integer
+          description: Numero di pagina corrente
+          example: 0
+        dimensione_pagina:
+          type: integer
+          description: Dimensione della pagina
+          example: 20
+        totale_pagine:
+          type: integer
+          description: Numero totale di pagine
+          example: 8
+
+    AsyncReportSummary:
+      type: object
+      description: Dettaglio sintetico di un report per la lista
+      properties:
+        report_id:
+          type: string
+          format: uuid
+          description: ID univoco del report
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        rptdesign_file_name:
+          type: string
+          description: Nome del file rptdesign utilizzato
+          example: "ACCRUAL-001_stampa_mastrino.rptdesign"
+        formato:
+          type: string
+          description: Formato del report (pdf, xlsx, docx, html)
+          example: "pdf"
+        file_nome:
+          type: string
+          description: Nome del file generato
+          example: "report_20240115_123456.pdf"
+        stato:
+          type: string
+          description: Stato del report
+          enum: [PENDING, PROCESSING, COMPLETED, ERROR]
+          example: "COMPLETED"
+        data_creazione:
+          type: string
+          format: date-time
+          description: Data e ora di creazione del report
+          example: "2024-01-15T10:30:00"
+        data_completamento:
+          type: string
+          format: date-time
+          description: Data e ora di completamento del report (opzionale)
+          example: "2024-01-15T10:35:00"
+        dimensione_file:
+          type: integer
+          description: Dimensione del file in byte (opzionale)
+          example: 524288
+        progress_percentage:
+          type: integer
+          description: Percentuale di avanzamento (0-100, opzionale)
+          minimum: 0
+          maximum: 100
+          example: 100
+
+    AsyncReportDetail:
+      type: object
+      description: Dettaglio completo di un report asincrono
+      allOf:
+        - $ref: '#/components/schemas/AsyncReportSummary'
+        - type: object
+          properties:
+            rptdesign_file_name:
+              type: string
+              description: Nome del file rptdesign utilizzato
+              example: "reports/mastrino.rptdesign"
+            rptconfig_file_name:
+              type: string
+              description: Nome del file rptconfig utilizzato (opzionale)
+              example: "reports/config.rptconfig"
+            parametri:
+              type: string
+              description: Parametri del report in formato JSON
+              example: '{"anno": 2024, "ente": "001"}'
+            messaggio_errore:
+              type: string
+              description: Messaggio di errore se lo stato è ERROR (opzionale)
+              example: "Timeout durante l'elaborazione"
+            data_avvio:
+              type: string
+              format: date-time
+              description: Data e ora di avvio elaborazione (opzionale)
+              example: "2024-01-15T10:31:00"
+            versione:
+              type: integer
+              description: Versione del record (optimistic locking)
+              example: 1
+            etichette_parametri:
+              type: object
+              additionalProperties:
+                type: string
+              description: Mappa nome_parametro → etichetta leggibile, solo parametri visibili
+              example: {"data_da": "Data Da", "data_a": "Data A"}
+            ente_id:
+              type: integer
+              description: ID dell'ente proprietario del report
+              example: 1
+
+    ReportEsito:
+      type: object
+      description: Messaggio di esito elaborazione
+      properties:
+        codice:
+          type: string
+          description: Codice dell'esito
+          example: "SUCCESS"
+        messaggio:
+          type: string
+          description: Messaggio descrittivo dell'esito
+          example: "Operazione completata con successo"
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp dell'esito
+          example: "2024-01-15T10:35:00"

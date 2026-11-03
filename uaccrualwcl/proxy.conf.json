@@ -1,0 +1,35 @@
+{
+    "/accrualwcl/accrualsbsrv": {
+        "target": "http://accrualsbsrv:10080",
+        "secure": false,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/accrualwcl/accrualsbsrv": ""
+        }
+    },
+    "/accrualwcl/accrualauthsbapi": {
+        "target": "http://accrualauthsbapi:10380",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/accrualwcl/accrualsbapi": {
+        "target": "http://accrualsbapi:10280",
+        "secure": false,
+        "changeOrigin": true,
+        "headers":
+          {"Shib-Iride-IdentitaDigitale":"MRARSS70H17I138F/MARIO/ROSSI/SP//1//"}
+    },
+    "/accrualwcl/accrualreportsbapi": {
+        "target": "http://accrualreportsbapi:10180",
+        "secure": false,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/accrualwcl/accrualreportsbapi": ""
+        },
+        "headers":
+          {
+            "Shib-Iride-IdentitaDigitale":"MRARSS70H17I138F/MARIO/ROSSI/SP//1//",
+            "X-Ente-Codice": "80087670016"
+          }
+    }
+}

@@ -1,0 +1,19 @@
+#!/bin/bash
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# Ottiene la directory dello script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+# Ottiene il percorso di JAVA_HOME dal file di configurazione
+JAVA_HOME=$("$SCRIPT_DIR/get_property.sh" java.home)
+
+if [ $? -ne 0 ]; then
+  echo "Errore durante la lettura di java.home dal file di configurazione."
+  exit 1
+fi
+
+# Imposta la variabile d'ambiente
+export JAVA_HOME
+
+"$SCRIPT_DIR/mvnw" "$@" --settings .mvn/conf/settings.xml

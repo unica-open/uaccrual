@@ -1,0 +1,143 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">info</span>
+        <h2 class="card-title">Dettaglio Flusso</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Codice file</label>
+          <span class="input" style="display:flex;align-items:center;font-family:var(--font-mono)">{{ flusso?.codice }}</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Nome file</label>
+          <span class="input" style="display:flex;align-items:center;font-family:var(--font-mono)">{{ flusso?.nome }}</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Fonte</label>
+          <span class="input" style="display:flex;align-items:center">{{ flusso?.fonte }}</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Tipo file</label>
+          <span class="input" style="display:flex;align-items:center">{{ flusso?.tipo }}</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Data caricamento</label>
+          <span class="input" style="display:flex;align-items:center">{{ flusso?.dataCaricamento | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Stato</label>
+          <span class="input" style="display:flex;align-items:center">{{ flusso?.stato || 'N/D' }}</span>
+        </div>
+        <div class="field" style="grid-column:span 2">
+          <label class="field-label">Note</label>
+          <span class="input" style="display:flex;align-items:center">{{ flusso?.note || 'Nessuna nota' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="(flusso?.esitiElaborazione?.length ?? 0) > 0" class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">assignment_turned_in</span>
+        <h2 class="card-title">Esito Elaborazioni</h2>
+      </div>
+      <span class="badge badge-neutral">{{ flusso?.esitiElaborazione?.length }} messaggi</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Data Elaborazione</th>
+            <th scope="col">Esito</th>
+            <th scope="col">Messaggio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let esito of getEsitiPaginati()">
+            <td>
+              <div class="dt-cell">
+                <span class="dt-date">{{ esito.dataElaborazione | date:'dd/MM/yyyy' }}</span>
+                <span class="dt-time">{{ esito.dataElaborazione | date:'HH:mm' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getEsitoBadgeClass(esito.esito)">
+                <span class="badge-dot"></span>{{ esito.esito }}
+              </span>
+            </td>
+            <td>
+              <span *ngIf="esito.messaggio; else noMsg"
+                    style="font-family:var(--font-mono);font-size:12px;word-break:break-word;white-space:pre-wrap"
+                    [style.color]="esito.esito?.toUpperCase() === 'ERROR' || esito.esito?.toUpperCase() === 'KO' || esito.esito?.toUpperCase() === 'FAILED' ? 'var(--danger)' : 'var(--fg-muted)'">
+                {{ esito.messaggio }}
+              </span>
+              <ng-template #noMsg><span style="color:var(--fg-subtle)">—</span></ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div class="pg-left">
+        <span class="pg-meta">Mostra</span>
+        <div class="select-mini">
+          <select [(ngModel)]="esitiPageSize" (change)="onEsitiPageSizeChange()">
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+          </select>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <span class="pg-meta">di <strong>{{ flusso?.esitiElaborazione?.length }}</strong> messaggi</span>
+      </div>
+      <div class="pg-right">
+        <span class="pg-range">{{ (esitiCurrentPage * esitiPageSize) + 1 }}&ndash;{{ Math.min((esitiCurrentPage + 1) * esitiPageSize, flusso?.esitiElaborazione?.length || 0) }} di {{ flusso?.esitiElaborazione?.length }}</span>
+        <div class="pg-buttons">
+          <button class="pg-btn" [disabled]="esitiCurrentPage === 0" (click)="esitiCurrentPage = 0" title="Prima pagina">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 6-6 6 6 6"/><path d="m19 6-6 6 6 6"/></svg>
+          </button>
+          <button class="pg-btn" [disabled]="esitiCurrentPage === 0" (click)="esitiCurrentPage = esitiCurrentPage - 1" title="Precedente">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+          </button>
+          <ng-container *ngFor="let page of getEsitiPages()">
+            <button *ngIf="page !== -1" class="pg-btn" [class.is-active]="page === esitiCurrentPage" (click)="esitiCurrentPage = page">{{ page + 1 }}</button>
+            <span *ngIf="page === -1" style="padding:0 4px;color:var(--fg-subtle)">...</span>
+          </ng-container>
+          <button class="pg-btn" [disabled]="esitiCurrentPage >= getTotalEsitiPages() - 1" (click)="esitiCurrentPage = esitiCurrentPage + 1" title="Successiva">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+          <button class="pg-btn" [disabled]="esitiCurrentPage >= getTotalEsitiPages() - 1" (click)="esitiCurrentPage = getTotalEsitiPages() - 1" title="Ultima pagina">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 6 6 6-6 6"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+    <a class="back-link" (click)="onBack()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+    <button *ngIf="(flusso?.esitiElaborazione?.length ?? 0) > 0" class="btn btn-secondary btn-lg" (click)="onExport()">
+      <span class="material-icons-round" style="font-size:16px">download</span> Estrai esiti
+    </button>
+    <button *ngIf="flusso?.stato === 'Da elaborare' && (canElabFlusso$ | async)" class="btn btn-primary btn-lg" (click)="onElaborate()">
+      <span class="material-icons-round" style="font-size:16px">play_circle</span> Elabora
+    </button>
+  </div>
+</main>

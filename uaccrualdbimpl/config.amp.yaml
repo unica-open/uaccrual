@@ -1,0 +1,24 @@
+productName: siac
+componentName: accrualdbimpl
+
+stages:
+  build: yes
+
+build:
+  buildFlow:
+  buildTool:
+  buildToolVersion:
+  buildEnvironment:
+  buildOptionString:
+  buildAntOpts: 
+  mavenSettings: 
+
+jobsToCopyFromList: 
+ 
+targetDir: 
+
+artifactsToArchive: 
+
+builds_to_execute:
+  accrualdbimpl:
+    artifactsToPublish:

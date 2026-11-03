@@ -1,0 +1,45 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div *ngIf="shouldShowNode()" class="tree-node">
+  <div class="node-content" [class.selected]="isSelected">
+    <!-- Icona singola cliccabile per espandere/collassare -->
+    <span
+      *ngIf="node.children && node.children.length > 0"
+      class="toggle-icon"
+      (click)="toggleExpand()">
+      <i class="material-icons text-base transition-transform duration-200">
+        {{ isExpanded ? 'expand_more' : 'chevron_right' }}
+      </i>
+    </span>
+    
+    <!-- Placeholder se non ha figli -->
+    <span *ngIf="!(node.children && node.children.length > 0)" class="empty-toggle">
+      <i class="material-icons text-base" style="font-size: 10px;">fiber_manual_record</i>
+    </span>
+
+    <input
+      type="radio"
+      name="conto-selection"
+      [value]="node.id"
+      [checked]="isSelected"
+      (change)="selectAccount()"
+      class="me-2">
+
+    <span class="node-info" (click)="selectAccount()">
+      <strong>{{ node.codice_ufficiale }}</strong> - {{ node.descrizione }}
+      <span *ngIf="isLeaf()" class="badge bg-secondary ms-2">Foglia</span>
+    </span>
+  </div>
+
+  <div *ngIf="node.children && node.children.length > 0 && isExpanded" class="children-container">
+    <app-pdc-tree-node
+      *ngFor="let child of node.children"
+      [node]="child"
+      [searchTerm]="searchTerm"
+      (accountSelected)="accountSelected.emit($event)">
+    </app-pdc-tree-node>
+  </div>
+</div>

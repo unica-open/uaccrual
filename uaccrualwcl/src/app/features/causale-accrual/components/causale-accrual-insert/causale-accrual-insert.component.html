@@ -1,0 +1,249 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="flex-grow w-full max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+
+  <!-- DATI PRINCIPALI CAUSALE -->
+  <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-soft p-1">
+    <div class="px-5 py-4 border-b border-border-light dark:border-border-dark flex items-center space-x-2">
+      <span class="material-icons text-primary text-2xl">edit_note</span>
+      <h2 class="text-xl font-medium text-primary uppercase">Dati Causale</h2>
+    </div>
+
+    <div class="bg-surface-accent-light dark:bg-surface-accent-dark m-4 p-8 rounded border border-border-light dark:border-border-dark">
+      <div class="space-y-6">
+        <!-- Riga 1: Tipo, Descrizione -->
+        <div class="grid grid-cols-12 gap-6">
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Tipo</label>
+            <select
+              class="select"
+              [(ngModel)]="causale.tipo"
+              [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Tipo --</option>
+              <option *ngFor="let tipo of tipiCausale" [ngValue]="tipo">{{ tipo.descrizione }}</option>
+            </select>
+          </div>
+
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Codice</label>
+            <input
+              class="input" style="font-family:var(--font-mono)"
+              [(ngModel)]="causale.codice"
+              type="text"
+              placeholder="Codice causale"/>
+          </div>
+
+          <div class="col-span-12 md:col-span-6">
+            <label class="field-label">Descrizione</label>
+            <input
+              class="input"
+              [(ngModel)]="causale.descrizione"
+              type="text"
+              placeholder="Descrizione della causale"/>
+          </div>
+        </div>
+
+        <!-- Riga 2: Evento, Inizio Validità, Fine Validità, Stato -->
+        <div class="grid grid-cols-12 gap-6">
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Evento</label>
+            <select
+              class="select"
+              [(ngModel)]="causale.evento"
+              [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Evento --</option>
+              <option *ngFor="let evento of eventiCausale" [ngValue]="evento">{{ evento.codice }} - {{ evento.descrizione }}</option>
+            </select>
+          </div>
+
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Inizio Validità *</label>
+            <input
+              class="input"
+              type="date"
+              [(ngModel)]="causale.inizio_validita" />
+          </div>
+
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Fine Validità</label>
+            <input
+              class="input"
+              type="date"
+              [(ngModel)]="causale.fine_validita" />
+          </div>
+
+          <div class="col-span-12 md:col-span-3">
+            <label class="field-label">Stato</label>
+            <select
+              class="select"
+              [(ngModel)]="causale.stato"
+              [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Stato --</option>
+              <option *ngFor="let stato of statiCausale" [ngValue]="stato">{{ stato.codice }} - {{ stato.descrizione }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE AGGIUNGI CONTO -->
+  <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-soft overflow-hidden">
+    <div class="px-5 py-4 border-b border-border-light dark:border-border-dark flex items-center space-x-2 bg-primary/5">
+      <span class="material-icons text-primary text-2xl">add_box</span>
+      <h3 class="text-xl font-medium text-primary uppercase">Aggiungi Conto Collegato</h3>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <!-- Riga 1: Codice Conto, Descrizione Conto, Tasto CERCA -->
+      <div class="grid grid-cols-12 gap-6 items-end">
+        <div class="col-span-12 md:col-span-3">
+          <label class="field-label">Codice Conto</label>
+          <input
+            class="block w-full px-3 py-2 text-sm rounded bg-white dark:bg-surface-dark text-text-main-light dark:text-text-main-dark border-border-light dark:border-border-dark focus:ring-primary focus:border-primary font-mono"
+            [(ngModel)]="nuovoConto.codice"
+            placeholder="Codice conto"/>
+        </div>
+
+        <div class="col-span-12 md:col-span-7">
+          <label class="field-label">Descrizione Conto</label>
+          <input
+            class="input"
+            [(ngModel)]="nuovoConto.descrizione"
+            placeholder="Descrizione conto"/>
+        </div>
+
+        <div class="col-span-12 md:col-span-2">
+          <button type="button" class="btn btn-primary btn-lg" style="width:100%" (click)="cercaConto()">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca Conto
+          </button>
+        </div>
+      </div>
+
+      <!-- Riga 2: Segno, Tipo Importo, Bottoni AZIONI -->
+      <div class="grid grid-cols-12 gap-6 items-center">
+        <div class="col-span-12 md:col-span-4 flex items-center space-x-8 h-full pt-6">
+          <label class="flex items-center space-x-2 cursor-pointer group">
+            <input type="radio" name="segno" value="DARE" [(ngModel)]="nuovoConto.segno" class="text-primary focus:ring-primary h-4 w-4" />
+            <span class="text-sm font-bold text-text-main-light dark:text-text-main-dark group-hover:text-primary transition-colors">DARE</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer group">
+            <input type="radio" name="segno" value="AVERE" [(ngModel)]="nuovoConto.segno" class="text-primary focus:ring-primary h-4 w-4" />
+            <span class="text-sm font-bold text-text-main-light dark:text-text-main-dark group-hover:text-primary transition-colors">AVERE</span>
+          </label>
+        </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <label class="field-label">Tipo Importo</label>
+          <select
+            class="select"
+            [(ngModel)]="nuovoConto.tipoImporto">
+            <option>LORDO</option>
+            <option>IMPONIBILE</option>
+            <option>IMPOSTA</option>
+          </select>
+        </div>
+
+        <div class="col-span-12 md:col-span-4 flex justify-end space-x-3 pt-6">
+          <button
+            class="btn btn-ghost btn-lg"
+            type="button"
+            (click)="resetNuovoConto()">
+            <span class="material-icons-round" style="font-size:16px">close</span> Annulla
+          </button>
+
+          <button
+            class="btn btn-primary btn-lg"
+            type="button"
+            (click)="aggiungiConto()">
+            <span class="material-icons-round" style="font-size:16px">check</span> Conferma
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE TABELLA CONTI COLLEGATI -->
+  <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-soft overflow-hidden">
+    <div class="px-5 py-4 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="material-icons text-primary text-2xl">account_tree</span>
+        <h3 class="text-xl font-medium text-primary uppercase">Conti Collegati</h3>
+      </div>
+      <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
+        {{ conti.length }} {{ conti.length === 1 ? 'ELEMENTO' : 'ELEMENTI' }}
+      </span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+        <thead class="bg-surface-accent-light dark:bg-surface-accent-dark text-left">
+          <tr>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider">Classe</th>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider">Conto</th>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider">Descrizione</th>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider">Segno</th>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider">Tipo Importo</th>
+            <th class="px-6 py-3 text-xs font-bold text-text-main-light dark:text-text-main-dark uppercase tracking-wider text-right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-surface-dark divide-y divide-border-light dark:divide-border-dark text-sm">
+          <tr *ngFor="let conto of conti; let i = index" class="hover:bg-primary/5 transition-colors">
+            <td class="px-6 py-4 text-text-main-light dark:text-text-main-dark font-medium">{{ conto.classe }}</td>
+            <td class="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark font-mono">{{ conto.codice }}</td>
+            <td class="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark">{{ conto.descrizione }}</td>
+            <td class="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark">{{ conto.segno }}</td>
+            <td class="px-6 py-4 text-text-secondary-light dark:text-text-secondary-dark">{{ conto.tipoImporto }}</td>
+            <td class="px-6 py-4 text-right space-x-2">
+              <button class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors" title="Elimina" (click)="rimuoviConto(i)">
+                <span class="material-icons text-[18px]">delete</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!conti || conti.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-text-secondary-light italic">Nessun conto collegato inserito.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PULSANTI DI AZIONE FINALI -->
+  <div class="flex justify-center space-x-4 pt-4">
+    <button (click)="onCancel()"
+            class="btn btn-ghost btn-lg">
+      <span class="material-icons-round" style="font-size:16px">close</span> Annulla
+    </button>
+    <button (click)="onSave()"
+            class="btn btn-secondary btn-lg">
+      <span class="material-icons-round" style="font-size:16px">save</span> Salva
+    </button>
+    <button (click)="onSaveAndExit()"
+            class="btn btn-primary btn-lg">
+      <span class="material-icons-round" style="font-size:16px">check</span> Salva ed Esci
+    </button>
+  </div>
+
+  <!-- Link Indietro -->
+  <div class="pt-4 pb-8 border-t border-border-light dark:border-border-dark">
+    <a class="back-link" (click)="onBack()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+  </div>
+</main>
+
+<!-- Modale di Selezione Conto - FUORI dal main per il corretto overlay -->
+<div *ngIf="showPdcTreeSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+  <div class="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden">
+    <app-pdc-tree-search-modal
+      [searchCodice]="searchCodiceForModal"
+      [searchDescrizione]="searchDescrizioneForModal"
+      [autoSelectSingleResult]="true"
+      (pdcSelected)="onPdcSelected($event)"
+      (close)="onModalClosed()">
+    </app-pdc-tree-search-modal>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<!-- Campo codice padre -->
+<input type="text" id="codicePadre" formControlName="codicePadre">
+
+<!-- Campo codice -->
+<input type="text" id="codice" formControlName="codice">
+
+<!-- Campo codice completo -->
+<input type="text" id="codice_completo" formControlName="codice_completo">
+
+<!-- Campo descrizione -->
+<input type="text" id="descrizione" formControlName="descrizione">
+
+<!-- Campo classe -->
+<input type="text" id="classe" formControlName="id_classe_conto">
+
+<!-- Campo livello -->
+<input type="number" id="livello" formControlName="livello">
+
+<!-- Campo tipo -->
+<input type="text" id="tipo" formControlName="id_tipo_conto">
+
+<!-- Campo stato -->
+<input type="text" id="id_stato_conto" formControlName="id_stato_conto">
+
+<!-- Campo foglia -->
+<input type="checkbox" id="flag_foglia" formControlName="flag_foglia">
+
+<!-- Campo fondo dotazione -->
+<input type="checkbox" id="flag_fondo_dotazione" formControlName="flag_fondo_dotazione">
+
+<!-- Campo a partita -->
+<input type="checkbox" id="flag_a_partita" formControlName="flag_a_partita">
+
+<!-- Campo codice bilancio -->
+<input type="text" id="codice_bilancio" formControlName="codice_bilancio">
+
+<!-- Campo data inizio validità -->
+<input type="text" id="data_inizio_validita" formControlName="data_inizio_validita">
+
+<!-- Campo data fine validità -->
+<input type="text" id="data_fine_validita" formControlName="data_fine_validita">
+
+<!-- Pulsanti -->
+<button type="submit" id="btn-save">Salva</button>
+<button type="button" id="btn-save-exit" (click)="onSubmitAndExit()">Salva ed esci</button>
+<button type="button" id="btn-cancel" (click)="onCancel()">Annulla</button>
+<button type="button" id="btn-back" (click)="onBack()">Indietro</button>
+<button type="button" id="btn-delete" (click)="deletePdc()">Elimina</button>

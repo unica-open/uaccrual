@@ -1,0 +1,610 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE — Tema scuro completo
+   Attivato dalla classe `dark` sull'elemento <html>
+   I colori sono variabili CSS calcolate da ThemeService in base al tema primario.
+   ═══════════════════════════════════════════════════════════════ */
+
+html.dark {
+  /* Material prebuilt theme overrides */
+  --mat-table-background-color: var(--surface-bg);
+  --mat-table-header-headline-color: var(--text-primary);
+  --mdc-filled-text-field-container-color: var(--input-bg);
+  --mdc-filled-text-field-label-text-color: var(--text-secondary);
+  --mdc-filled-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-outline-color: var(--border-color);
+  --mdc-outlined-text-field-hover-outline-color: #555;
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mat-select-panel-background-color: var(--surface-elevated);
+  --mat-select-enabled-trigger-text-color: var(--text-primary);
+  --mat-option-label-text-color: var(--text-primary);
+  --mat-option-hover-state-layer-color: rgba(255,255,255,0.08);
+  --mdc-dialog-container-color: var(--surface-bg);
+  --mdc-dialog-subhead-color: var(--text-primary);
+  --mdc-dialog-supporting-text-color: var(--text-secondary);
+  --mat-dialog-container-elevation-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  --mdc-switch-unselected-track-color: var(--border-color);
+  --mdc-switch-unselected-handle-color: #666;
+  --mat-datepicker-calendar-container-background-color: var(--surface-elevated);
+  --mat-datepicker-calendar-period-button-text-color: var(--text-primary);
+  --mat-datepicker-calendar-body-label-text-color: var(--text-primary);
+  --mat-datepicker-calendar-body-cell-content-color: var(--text-primary);
+  --mat-datepicker-calendar-header-text-color: var(--text-secondary);
+  --mat-datepicker-calendar-arrow-color: var(--text-secondary);
+  --mdc-checkbox-unselected-icon-color: #aaa;
+
+  /* Project design tokens overridden for dark mode */
+  --fg:              var(--text-primary);
+  --fg-muted:        var(--text-muted);
+  --fg-subtle:       var(--text-muted);
+  --surface:         var(--surface-bg);
+  --surface-2:       var(--surface-elevated);
+  --border-strong:   var(--border-color);
+
+  /* Scrollbar */
+  scrollbar-color: #555 var(--surface-bg);
+  scrollbar-width: thin;
+}
+
+/* ═══ Angular Material ═══ */
+html.dark .mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--surface-bg) !important;
+}
+html.dark .mat-mdc-select-panel {
+  background-color: var(--surface-elevated) !important;
+}
+html.dark .mat-datepicker-content {
+  background-color: var(--surface-elevated) !important;
+}
+html.dark .mat-mdc-text-field-wrapper {
+  background-color: var(--input-bg) !important;
+}
+html.dark .mdc-text-field--outlined .mdc-notched-outline__leading,
+html.dark .mdc-text-field--outlined .mdc-notched-outline__trailing,
+html.dark .mdc-text-field--outlined .mdc-notched-outline__notch {
+  border-color: var(--border-color) !important;
+}
+html.dark .mat-button-toggle {
+  background-color: var(--surface-elevated);
+  color: var(--text-secondary);
+}
+html.dark .mat-button-toggle-checked {
+  background-color: rgb(var(--primary-rgb)) !important;
+  color: #fff !important;
+}
+
+/* ═══ Notifiche pannello ═══ */
+html.dark .notif-panel {
+  background: var(--surface-bg);
+  border-color: var(--border-color);
+}
+html.dark .notif-panel-item:hover {
+  background: var(--surface-elevated);
+}
+html.dark .notif-panel-item-title {
+  color: var(--text-primary);
+}
+html.dark .notif-panel-item-sub {
+  color: var(--text-muted);
+}
+html.dark .notif-panel-empty {
+  color: var(--text-muted);
+}
+html.dark .notif-panel-divider {
+  background: var(--border-color);
+}
+html.dark .notif-panel-section-label {
+  color: var(--text-muted);
+}
+
+/* ═══ User dropdown ═══ */
+html.dark .user-dropdown {
+  background: var(--surface-bg);
+  border-color: var(--border-color);
+}
+html.dark .user-dropdown-item {
+  color: var(--text-primary);
+}
+html.dark .user-dropdown-item:hover {
+  background: rgba(var(--primary-rgb), 0.12);
+  color: rgb(var(--primary-rgb));
+}
+html.dark .udi-icon-wrap {
+  background: var(--surface-elevated);
+}
+html.dark .udi-icon-wrap .material-icons-round {
+  color: var(--text-secondary);
+}
+html.dark .user-dropdown-divider {
+  background: var(--border-color);
+}
+html.dark .dropdown-logout {
+  color: #ef5350;
+}
+html.dark .dropdown-logout:hover {
+  background: rgba(239,83,80,0.1);
+  color: #ef5350;
+}
+
+/* ═══ Settings drawer ═══ */
+html.dark .settings-drawer {
+  background: var(--surface-bg);
+}
+html.dark .drawer-header {
+  border-bottom-color: var(--border-color);
+}
+html.dark .drawer-title {
+  color: var(--text-primary);
+}
+html.dark .drawer-close {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+html.dark .drawer-close:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+html.dark .settings-section-title {
+  color: var(--text-muted);
+  border-bottom-color: var(--border-color);
+}
+html.dark .swatch-name {
+  color: var(--text-secondary);
+}
+html.dark .swatch-circle.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+}
+html.dark .custom-color-row {
+  background: var(--surface-elevated);
+  border-color: var(--border-color);
+}
+html.dark .custom-color-label {
+  color: var(--text-primary);
+}
+html.dark .reset-theme-btn {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+html.dark .reset-theme-btn:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+/* ═══ PN Modal (prime note non quadrate) ═══ */
+html.dark .pn-modal {
+  background: var(--surface-bg);
+}
+html.dark .pn-modal-header {
+  border-bottom-color: var(--border-color);
+}
+html.dark .pn-modal-title {
+  color: var(--text-primary);
+}
+html.dark .pn-modal-subtitle {
+  color: var(--text-muted);
+}
+html.dark .pn-modal-close {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+html.dark .pn-modal-close:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+html.dark .pn-table-wrap {
+  border-color: var(--border-color);
+}
+html.dark .pn-table thead {
+  background: var(--surface-elevated);
+}
+html.dark .pn-table thead tr {
+  border-bottom-color: var(--border-color);
+}
+html.dark .pn-table thead th {
+  color: var(--text-secondary);
+}
+html.dark .pn-table tbody tr {
+  border-bottom-color: var(--border-color);
+}
+html.dark .pn-table tbody tr:hover {
+  background: rgba(var(--primary-rgb), 0.06);
+}
+html.dark .pn-table tbody td {
+  color: var(--text-primary);
+}
+html.dark .td-code {
+  color: var(--text-muted);
+}
+html.dark .td-desc {
+  color: var(--text-secondary);
+}
+html.dark .pn-loading {
+  color: var(--text-muted);
+}
+html.dark .pn-empty {
+  color: #4caf50;
+}
+html.dark .pn-error {
+  color: var(--text-secondary);
+}
+html.dark .pn-error .material-icons-round {
+  color: var(--text-muted);
+}
+html.dark .pn-modal-footer {
+  border-top-color: var(--border-color);
+}
+html.dark .pn-footer-btn.secondary {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+html.dark .pn-footer-btn.secondary:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+/* ═══ Action buttons ═══ */
+html.dark .pn-action-btn {
+  border-color: var(--border-color);
+}
+html.dark .pn-action-btn.view-btn {
+  color: var(--text-secondary);
+}
+html.dark .pn-action-btn.view-btn:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+html.dark .pn-action-btn.edit-btn {
+  border-color: rgba(var(--primary-rgb), 0.3);
+}
+html.dark .pn-action-btn.edit-btn:hover {
+  background: rgba(var(--primary-rgb), 0.12);
+}
+html.dark .pn-action-btn.cancel-btn {
+  border-color: rgba(239,68,68,0.3);
+}
+html.dark .pn-action-btn.cancel-btn:hover {
+  background: rgba(239,68,68,0.12);
+}
+html.dark .pn-action-btn.reopen-btn {
+  border-color: rgba(16,185,129,0.3);
+}
+html.dark .pn-action-btn.reopen-btn:hover {
+  background: rgba(16,185,129,0.12);
+}
+
+/* ═══ Stato badge ═══ */
+html.dark .stato-badge {
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
+  border-color: rgba(251,191,36,0.3);
+}
+
+/* ═══ Sfondi sezione (upload div, card wrapper, table wrapper) ═══ */
+html.dark .section-bg,
+html.dark .card-section,
+html.dark .upload-section,
+html.dark .table-wrapper,
+html.dark .table-wrap,
+html.dark .dash-card-section {
+  background-color: var(--section-bg) !important;
+}
+
+/* ═══ Sfondi tabella / header ═══ */
+html.dark .bg-gray-50,
+html.dark .bg-slate-50,
+html.dark .bg-gray-50\/50,
+html.dark .bg-surface-light,
+html.dark .bg-white {
+  background-color: var(--surface-bg) !important;
+}
+html.dark .bg-accent-light {
+  background: var(--surface-elevated) !important;
+}
+html.dark .bg-gray-100 {
+  background: var(--section-bg) !important;
+}
+
+/* ═══ Bordi / divisori ═══ */
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-700 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-color) !important;
+}
+html.dark .border-gray-200,
+html.dark .border-border-light {
+  border-color: var(--border-color) !important;
+}
+
+/* ═══ Input bordi ═══ */
+html.dark input.border-border-light,
+html.dark select.border-border-light,
+html.dark textarea.border-border-light {
+  border-color: var(--border-color) !important;
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary);
+}
+
+/* ═══ Home page ═══ */
+html.dark .section-hdr-title {
+  color: var(--text-primary) !important;
+}
+html.dark .section-hdr-count {
+  color: var(--text-muted) !important;
+}
+html.dark .welcome-sub {
+  color: var(--text-secondary) !important;
+}
+html.dark .env-badge {
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.25);
+  color: #fbbf24;
+}
+
+/* ═══ Topbar — primary accent in dark mode ═══ */
+html.dark .app-topbar {
+  background: rgba(var(--primary-accent-rgb), 0.85) !important;
+}
+
+/* ═══ Context bar (ente, anno, fase) ═══ */
+html.dark .app-ctx-bar {
+  background: var(--surface-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+html.dark .ctx-main-value {
+  color: var(--text-primary) !important;
+}
+html.dark .ctx-label {
+  color: var(--text-muted) !important;
+}
+html.dark .ctx-chevron {
+  color: var(--text-muted) !important;
+}
+html.dark .ctx-divider {
+  background: var(--border-color) !important;
+}
+
+/* ═══ Breadcrumb bar ═══ */
+html.dark .breadcrumb-bar {
+  background: var(--surface-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+/* ═══ Breadcrumb items ═══ */
+html.dark .bc-sep .material-icons-round {
+  color: var(--text-muted) !important;
+}
+html.dark .bc-home .material-icons-round {
+  color: var(--text-secondary) !important;
+}
+html.dark .bc-category {
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .bc-link {
+  color: var(--text-secondary) !important;
+}
+
+/* ═══ Footer ═══ */
+html.dark .app-footer {
+  background: var(--surface-bg) !important;
+  border-top-color: var(--border-color) !important;
+}
+html.dark .app-footer .text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+/* ═══ Ente dropdown ═══ */
+html.dark .ente-dropdown {
+  background: var(--surface-bg) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .ente-dropdown-header {
+  color: var(--text-muted) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+/* ═══ Bottoni Material primary — in dark mode usano primary-accent (più visibile) ═══ */
+html.dark .mat-mdc-raised-button.mat-primary,
+html.dark .mat-mdc-flat-button.mat-primary,
+html.dark .mat-mdc-mini-fab.mat-primary,
+html.dark .mat-mdc-fab.mat-primary {
+  --mdc-filled-button-container-color: rgb(var(--primary-accent-rgb, var(--primary-rgb)));
+  --mdc-filled-button-label-text-color: #fff;
+  background-color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+}
+html.dark .mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: rgb(var(--primary-accent-rgb, var(--primary-rgb)));
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+  --mdc-outlined-button-outline-color: rgba(var(--primary-accent-rgb, var(--primary-rgb)), 0.5);
+}
+html.dark .mat-button-toggle-checked {
+  background-color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+  color: #fff !important;
+}
+html.dark .mdc-checkbox--selected .mdc-checkbox__background {
+  background-color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+  border-color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+}
+
+/* ═══ Link/testo colore primario in dark mode ═══ */
+html.dark .text-blue-600,
+html.dark .hover\:text-blue-800:hover {
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+}
+html.dark a.text-primary,
+html.dark .link-primary {
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb))) !important;
+}
+
+/* ═══ Mockup refactor — dark mode ═══ */
+html.dark .card {
+  background: var(--surface-bg);
+  border-color: var(--border-color);
+}
+html.dark .card-header {
+  border-bottom-color: var(--border-color);
+}
+html.dark .card-title {
+  color: var(--text-primary);
+}
+html.dark .card-icon {
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb)));
+}
+
+html.dark .btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+html.dark .btn-secondary:hover {
+  background: var(--surface-elevated);
+  border-color: var(--text-secondary);
+}
+html.dark .btn-ghost {
+  color: var(--text-muted);
+}
+html.dark .btn-ghost:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+html.dark .table thead th {
+  background: var(--surface-elevated);
+  color: var(--text-muted);
+  border-bottom-color: var(--border-color);
+}
+html.dark .table tbody td {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-color);
+}
+html.dark .table tbody tr:hover {
+  background: rgba(var(--primary-rgb), 0.04);
+}
+
+html.dark .params-bar {
+  background: var(--surface-elevated);
+  border-bottom-color: var(--border-color);
+}
+html.dark .chip {
+  background: var(--surface-bg);
+  border-color: var(--border-color);
+}
+html.dark .chip-key {
+  background: rgba(var(--primary-rgb), 0.15);
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb)));
+}
+html.dark .chip-val {
+  color: var(--text-primary);
+}
+
+html.dark .pagination {
+  background: var(--surface-bg);
+  border-top-color: var(--border-color);
+}
+html.dark .pagination-left {
+  color: var(--text-muted);
+}
+html.dark .page-btn {
+  color: var(--text-muted);
+}
+html.dark .page-btn:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+html.dark .badge-neutral {
+  background: var(--surface-elevated);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+html.dark .icon-btn {
+  color: var(--text-muted);
+}
+html.dark .icon-btn:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+html.dark .row-action {
+  color: var(--text-muted);
+}
+html.dark .row-action:hover {
+  background: rgba(var(--primary-rgb), 0.1);
+  color: rgb(var(--primary-accent-rgb, var(--primary-rgb)));
+}
+
+html.dark .field-label {
+  color: var(--text-primary);
+}
+html.dark .input, html.dark .select {
+  background: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+html.dark .module-group-header .module-group-name {
+  color: var(--text-primary);
+}
+html.dark .page-title {
+  color: var(--text-primary);
+}
+html.dark .page-subtitle {
+  color: var(--text-muted);
+}
+
+html.dark .cell-primary {
+  color: var(--text-primary);
+}
+
+html.dark .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+html.dark .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+html.dark .text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+/* v2 table */
+html.dark .card-head {
+  background: linear-gradient(180deg, var(--surface-bg) 0%, var(--surface-elevated) 100%);
+}
+html.dark .section-bar {
+  background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--section-bg) 100%);
+}
+html.dark .data-table thead th {
+  background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--section-bg) 100%);
+  color: var(--text-muted);
+  border-bottom-color: var(--border-color);
+}
+html.dark .data-table tbody td {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-color);
+}
+html.dark .data-table tbody tr:hover {
+  background: rgba(var(--primary-rgb), 0.04);
+}
+html.dark .card-sub strong {
+  color: var(--text-primary);
+}
+html.dark .chip-v {
+  color: var(--text-primary);
+}
+html.dark .dt-date {
+  color: var(--text-primary);
+}
+html.dark .pb-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+html.dark .select-mini select {
+  background: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}

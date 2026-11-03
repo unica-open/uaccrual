@@ -1,0 +1,76 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border-top: none;
+}
+
+/* Separatore */
+.bc-sep {
+  display: flex; align-items: center; padding: 0 1px;
+  .material-icons-round { font-size: 13px !important; color: #cbd5e1; }
+}
+
+/* Base */
+.bc-item { display: flex; align-items: center; }
+
+/* Home icon */
+.bc-home {
+  cursor: pointer;
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+  .material-icons-round { font-size: 15px !important; color: #94a3b8; }
+  &:hover {
+    background: var(--primary-faint);
+    .material-icons-round { color: var(--primary); }
+  }
+}
+
+/* Categoria pill */
+.bc-category {
+  cursor: pointer;
+  font-size: 8px; font-weight: 900; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #94a3b8;
+  padding: 3px 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  transition: all 0.2s; white-space: nowrap;
+  &:hover {
+    color: var(--primary);
+    border-color: rgba(var(--primary-rgb), 0.25);
+    background: var(--primary-faint);
+  }
+}
+
+/* Pagina intermedia */
+.bc-link {
+  cursor: pointer;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #64748b;
+  padding: 2px 6px; border-radius: 4px;
+  transition: all 0.2s; white-space: nowrap;
+  &:hover { color: var(--primary); background: var(--primary-faint); }
+}
+
+/* Pagina corrente */
+.bc-current {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-faint);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 7px;
+  padding: 3px 11px;
+  white-space: nowrap;
+}

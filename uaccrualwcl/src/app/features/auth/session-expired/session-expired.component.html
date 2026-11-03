@@ -1,0 +1,26 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="session-expired-container">
+  <div class="session-expired-card">
+    <div class="session-expired-header">
+      <mat-icon class="session-expired-icon">{{ icon }}</mat-icon>
+      <h1>{{ title }}</h1>
+    </div>
+
+    <div class="session-expired-body">
+      <p>
+        {{ message }}
+      </p>
+
+      <div class="session-expired-info" *ngIf="infoMessage">
+        <mat-icon>info</mat-icon>
+        <p>
+          <strong>Nota:</strong> {{ infoMessage }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

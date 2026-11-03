@@ -1,0 +1,79 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="flex flex-col space-y-1 relative">
+  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+  
+  <div class="relative">
+    <input
+      type="text"
+      [value]="searchTerm"
+      (input)="onSearch()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      [required]="required"
+      [disabled]="disabled"
+      [placeholder]="placeholder"
+      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+    />
+    
+    <!-- Pulsante clear -->
+    <button
+      *ngIf="searchTerm && !disabled"
+      type="button"
+      (click)="clearSelection()"
+      class="absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+      tabindex="-1"
+    >
+      <span class="material-icons text-sm">close</span>
+    </button>
+    
+    <!-- Loading spinner -->
+    <span *ngIf="loading" class="absolute right-2 top-1/2 transform -translate-y-1/2">
+      <mat-spinner diameter="20"></mat-spinner>
+    </span>
+  </div>
+  
+  <!-- Dropdown risultati -->
+  <div
+    *ngIf="showResults && searchResults.length > 0"
+    class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto"
+  >
+    <ul class="py-1">
+      <li
+        *ngFor="let node of searchResults"
+        (click)="selectItem(node)"
+        class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex items-start space-x-2"
+      >
+        <!-- Icona albero in base al livello -->
+        <span class="material-icons text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          {{ node.livello === 1 ? 'folder' : node.foglia ? 'insert_drive_file' : 'folder_open' }}
+        </span>
+        <div class="flex-1">
+          <div class="font-medium text-gray-900 dark:text-white text-sm">
+            {{ node.codice }}
+          </div>
+          <div class="text-xs text-gray-600 dark:text-gray-400">
+            {{ node.descrizione }}
+          </div>
+          <div *ngIf="node.classe" class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+            Classe: {{ node.classe }}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Messaggio nessun risultato -->
+  <div
+    *ngIf="showResults && searchResults.length === 0 && searchTerm.length >= 2"
+    class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg py-2 px-4 text-sm text-gray-600 dark:text-gray-400"
+  >
+    Nessun conto trovato
+  </div>
+</div>

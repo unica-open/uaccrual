@@ -1,0 +1,72 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Filtri di ricerca</h2>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button *ngIf="searchDone" type="button" class="btn btn-ghost btn-sm" (click)="toggleFilters()">
+          <span class="material-icons-round" style="font-size:14px">{{ filtersCollapsed ? 'expand_more' : 'expand_less' }}</span>
+          {{ filtersCollapsed ? 'Espandi filtri' : 'Comprimi filtri' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body" *ngIf="!filtersCollapsed" [@collapseExpand]>
+      <form [formGroup]="searchForm" (ngSubmit)="cercaFlusso()">
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" for="codiceFile">Codice file</label>
+            <input class="input" id="codiceFile" formControlName="codiceFile" type="text" placeholder="Es. Variazioni_inventariali_20260310"/>
+          </div>
+          <div class="field">
+            <label class="field-label" for="dataCaricamento">Data caricamento</label>
+            <input class="input" id="dataCaricamento" formControlName="dataCaricamento" type="date"/>
+          </div>
+          <div class="field">
+            <label class="field-label" for="fonte">Fonte</label>
+            <select class="select" id="fonte" formControlName="fonte">
+              <option value="">Tutte le fonti</option>
+              <option *ngFor="let f of fonti$ | async" [value]="f.codice">{{ f.descrizione }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tipoFile">Tipo file</label>
+            <select class="select" id="tipoFile" formControlName="tipoFile">
+              <option value="">Tutti i tipi</option>
+              <option *ngFor="let t of tipiFile$ | async" [value]="t.codice">{{ t.codice }} - {{ t.descrizione }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding-top:16px;margin-top:8px;border-top:1px dashed var(--border-color)">
+          <button type="button" class="btn btn-ghost btn-lg" (click)="annullaRicerca()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sezione Risultati -->
+  <div *ngIf="searchDone && currentFilters !== null" [@fadeSlideIn] class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Risultati della ricerca</h2>
+      </div>
+    </div>
+    <app-flusso-search-list [inputFilters]="currentFilters"></app-flusso-search-list>
+  </div>
+
+  <a class="back-link" style="margin-top:16px" (click)="indietro()">
+    <span class="material-icons-round">arrow_back</span> Indietro
+  </a>
+</main>

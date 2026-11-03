@@ -1,0 +1,77 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Accrual - Login</h1>
+      <p>Accedi al sistema di gestione Accrual</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="codiceFiscale">Codice Fiscale</label>
+        <input
+          type="text"
+          id="codiceFiscale"
+          formControlName="codiceFiscale"
+          class="form-control"
+          placeholder="Inserisci il tuo codice fiscale"
+          [class.is-invalid]="submitted && f['codiceFiscale'].errors"
+        />
+        <div *ngIf="submitted && f['codiceFiscale'].errors" class="invalid-feedback">
+          <span *ngIf="f['codiceFiscale'].errors?.['required']">Il codice fiscale è obbligatorio</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Inserisci la tua password"
+          [class.is-invalid]="submitted && f['password'].errors"
+        />
+        <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+          <span *ngIf="f['password'].errors?.['required']">La password è obbligatoria</span>
+        </div>
+      </div>
+
+      <div *ngIf="isDev" class="form-group">
+        <label for="enteCodiceUnivoco">Codice Ente</label>
+        <input
+          type="text"
+          id="enteCodiceUnivoco"
+          formControlName="enteCodiceUnivoco"
+          class="form-control"
+          placeholder="Inserisci il codice ente"
+        />
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading"
+        >
+          <span *ngIf="loading" class="spinner"></span>
+          <span *ngIf="!loading">Accedi</span>
+        </button>
+      </div>
+
+      <div class="login-links">
+        <a routerLink="/reset-password" class="link">
+          Hai dimenticato la password?
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+version: '3.8'
+
+services:
+  accrualwcl:
+    build: .
+    image: accrualwcl:latest
+    ports:
+      - "41080:60080"
+    networks:
+      - accrual-network
+
+networks:
+  accrual-network:
+    external: true

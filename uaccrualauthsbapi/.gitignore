@@ -1,0 +1,76 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.backup
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+*.gz
+
+# Runtime
+target/
+bin/
+.classpath
+.project
+.settings/
+
+# Build artifacts
+dist/
+build/
+*.class
+*.jar
+*.war
+*.ear
+# Temporary files
+**/*.tmp
+**/*.bak
+*.swp
+*~
+**/*.orig
+**/TMP*
+**/*.backup
+**/*.BAK
+
+# Database
+birt_db/
+*.db
+*.sqlite
+
+# Temp
+tmp/
+temp/
+*.tmp
+/logs/
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Application specific
+/src/main/resources/db/temp/
+"temp_birt_extract/"
+"lib/"
+
+# Local configuration files
+buildfiles/local.properties*
+src/main/resources/application-local.yml
+src/main/resources/application-local.yml

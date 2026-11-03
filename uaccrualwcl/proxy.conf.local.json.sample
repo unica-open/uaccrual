@@ -1,0 +1,33 @@
+{
+  "/accrualsbsrv": {
+    "target": "http://localhost:20080",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/accrualsbsrv": "/accrualsbsrv"
+    },
+    "headers": {
+      "Shib-Iride-IdentitaDigitale": "MRARSS70H17I138F/MARIO/ROSSI/SP//1//"
+    },
+    "onProxyRes": "(proxyRes, req, res) => { proxyRes.headers['x-added'] = 'proxy header'; }"
+  },
+  "/accrualauthsbapi": {
+    "target": "http://localhost:20380",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/accrualreportsbapi": {
+    "target": "http://localhost:20180",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/accrualsbapi": {
+    "target": "http://localhost:20280",
+    "secure": false,
+    "changeOrigin": true,
+    "headers":
+      {"Shib-Iride-IdentitaDigitale":"MRARSS70H17I138F/MARIO/ROSSI/SP//1//"}
+  }
+}

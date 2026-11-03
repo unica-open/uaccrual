@@ -1,0 +1,119 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="flex flex-col gap-6 p-4 max-w-5xl mx-auto">
+
+  <!-- Header con Navigazione -->
+  <div class="flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <button
+        class="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        (click)="onBack()">
+        <span class="material-icons text-gray-600 dark:text-gray-300">arrow_back</span>
+      </button>
+      <div class="flex flex-col">
+        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Dettaglio Report</span>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white m-0">{{ reportNome || 'Dettaglio Report' }}</h2>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button
+        *ngIf="isDownloadable()"
+        [disabled]="downloading"
+        class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+        (click)="onDownload()">
+        <span class="material-icons text-base">{{ downloading ? 'hourglass_empty' : 'download' }}</span>
+        Estrai
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <span class="material-icons text-4xl text-primary animate-spin">autorenew</span>
+  </div>
+
+  <!-- Dettaglio Report -->
+  <div *ngIf="!loading && report" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    <!-- Colonna Sinistra: Info Report -->
+    <div class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-md shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-border-light dark:border-border-dark bg-gray-50/50 dark:bg-white/5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Informazioni Report</h3>
+      </div>
+      <div class="p-4 grid grid-cols-2 gap-4">
+        <div>
+          <span class="text-gray-500 text-xs uppercase tracking-wide">ID Report</span>
+          <div class="font-semibold text-gray-900 dark:text-white mt-1">{{ report.report_id }}</div>
+        </div>
+        <div>
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Formato</span>
+          <div class="font-semibold text-gray-900 dark:text-white mt-1">{{ report.formato }}</div>
+        </div>
+        <div class="col-span-2">
+          <span class="text-gray-500 text-xs uppercase tracking-wide">File Nome</span>
+          <div class="font-semibold text-gray-900 dark:text-white mt-1">{{ report.file_nome || '-' }}</div>
+        </div>
+        <div>
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Stato</span>
+          <div class="mt-1">
+            <span [ngClass]="getStatusClass(report.stato)"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+              {{ getStatusLabel(report.stato) }}
+            </span>
+          </div>
+        </div>
+        <div>
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Data Richiesta</span>
+          <div class="text-gray-900 dark:text-white mt-1">{{ formatDate(report.data_creazione) }}</div>
+        </div>
+        <div>
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Data Completamento</span>
+          <div class="text-gray-900 dark:text-white mt-1">{{ formatDate(report.data_completamento || '') }}</div>
+        </div>
+        <div class="col-span-2" *ngIf="report.progress_percentage">
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Progresso</span>
+          <div class="mt-2">
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full transition-all duration-300"
+                   [style.width.%]="report.progress_percentage"></div>
+            </div>
+            <div class="text-right text-xs text-gray-500 mt-1">{{ report.progress_percentage }}%</div>
+          </div>
+        </div>
+        <div class="col-span-2" *ngIf="report.messaggio_errore">
+          <span class="text-gray-500 text-xs uppercase tracking-wide">Errore</span>
+          <div class="mt-1 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-300 text-sm">
+            {{ report.messaggio_errore }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonna Destra: Parametri -->
+    <div class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-md shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-border-light dark:border-border-dark bg-gray-50/50 dark:bg-white/5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Parametri Utilizzati</h3>
+      </div>
+      <div class="p-4">
+        <div *ngIf="getParamKeys().length > 0; else noParams">
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2"
+               *ngFor="let key of getParamKeys()">
+            <span class="text-gray-500 text-sm">{{ etichettaParametro(key) }}</span>
+            <span class="font-semibold text-gray-900 dark:text-white text-sm">{{ formatParamValue(key, getParamValue(key)) }}</span>
+          </div>
+        </div>
+        <ng-template #noParams>
+          <div class="text-gray-500 text-center py-4 text-sm">Nessun parametro</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Lista Esiti (disabilitata: assente nel backend)
+    <div class="col-span-1 md:col-span-2 ... "></div>
+    -->
+
+  </div>
+</div>

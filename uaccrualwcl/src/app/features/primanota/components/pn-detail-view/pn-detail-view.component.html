@@ -1,0 +1,418 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-4 py-4 space-y-6 relative">
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="absolute inset-0 bg-gray-100/75 dark:bg-gray-900/80 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" style="border-color:var(--accent)"></div>
+  </div>
+
+  <!-- Visualizza messaggio di errore se presente -->
+  <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 p-4 rounded-lg text-sm" role="alert">
+    <div class="flex items-start">
+      <span class="mr-2">❌</span>
+      <div>
+        <h3 class="font-medium">Errore</h3>
+        <p>{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons: Indietro -->
+  <div *ngIf="primaNota" style="margin-bottom:16px">
+    <a class="back-link" (click)="onBack()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-card overflow-hidden" *ngIf="primaNota">
+    <div class="border-b border-border-light dark:border-border-dark">
+      <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+        <li class="mr-2" role="presentation">
+          <button class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+                  [ngClass]="selectedTab === 'testata' ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+                  (click)="selectTab('testata')" type="button" role="tab">
+            Testata
+          </button>
+        </li>
+        <li class="mr-2" role="presentation">
+          <button class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+                  [ngClass]="selectedTab === 'conti' ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+                  (click)="selectTab('conti')" type="button" role="tab">
+            Conti Collegati
+          </button>
+        </li>
+        <li class="mr-2" role="presentation">
+          <button class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+                  [ngClass]="selectedTab === 'attributi' ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+                  (click)="selectTab('attributi')" type="button" role="tab">
+            Attributi
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+                  [ngClass]="selectedTab === 'noteCollegate' ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+                  (click)="selectTab('noteCollegate')" type="button" role="tab">
+            Prime Note Collegate
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6">
+      <!-- TESTATA Tab -->
+      <div *ngIf="selectedTab === 'testata'" class="bg-accent-light dark:bg-accent-dark -m-6 p-6">
+        <div class="grid grid-cols-12 gap-x-6 gap-y-4">
+          <!-- Prima riga: Tipo, Fonte, Evento, Causale -->
+          <div class="col-span-3">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Tipo</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.tipoDescrizione || ''"/>
+          </div>
+          <div class="col-span-3">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Fonte</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.fonteDescrizione || ''"/>
+          </div>
+          <div class="col-span-3">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Evento</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.eventoDescrizione || ''"/>
+          </div>
+          <div class="col-span-3">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Causale</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.causaleDescrizione || ''"/>
+          </div>
+
+          <!-- Seconda riga: Numero provvisorio, Data Reg. Provvisoria, Numero definitivo, Data Reg. Definitiva, Stato -->
+          <div class="col-span-2">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Numero Provvisorio</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.numeroProvvisorio || ''"/>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Data Reg. Provvisoria</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.dataRegProvvisoria ? (primaNota.dataRegProvvisoria | date:'dd/MM/yyyy') : ''"/>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Numero Definitivo</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.numeroDefinitivo || ''"/>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Data Reg. Definitiva</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.dataRegDefinitiva ? (primaNota.dataRegDefinitiva | date:'dd/MM/yyyy') : ''"/>
+          </div>
+          <div class="col-span-3">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Stato</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.statoDescrizione || ''"/>
+          </div>
+
+          <!-- Terza riga: Descrizione -->
+          <div class="col-span-12">
+            <label class="block text-sm font-bold text-text-main-light dark:text-text-main-dark mb-1">Descrizione</label>
+            <input
+              class="w-full bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-3 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary"
+              readonly type="text"
+              [value]="primaNota?.descrizione || ''"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTI COLLEGATI Tab -->
+      <div *ngIf="selectedTab === 'conti'">
+        <!-- Loading Spinner -->
+        <div *ngIf="contiLoading" class="flex justify-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
+        </div>
+
+        <div *ngIf="!contiLoading">
+          <div class="px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-border-light dark:border-border-dark bg-white dark:bg-surface-dark">
+            <div class="flex items-center space-x-2">
+              <input type="text" [(ngModel)]="contoFilterValue" placeholder="Filtra per Codice Conto"
+                     class="focus:ring-indigo-500 focus:border-indigo-500 block w-48 shadow-sm sm:text-sm border-gray-300 rounded-md"
+                     (keyup.enter)="applyContoFilter()"/>
+              <button (click)="applyContoFilter()"
+                       class="btn btn-primary btn-sm">
+                Filtra
+              </button>
+              <button *ngIf="contoFilterValue" (click)="resetContoFilter()"
+                       class="btn btn-ghost btn-sm">
+                ✕ Annulla
+              </button>
+            </div>
+            <!-- Page Size Selector -->
+            <div class="flex items-center">
+              <select class="form-select block w-20 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-primary focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                      [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+                <option *ngFor="let option of pageSizeOptions" [value]="option">{{option}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="contiCollegatiDisplay.length > 0" class="overflow-x-auto shadow-md rounded-b-lg">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Conto</th>
+                  <th scope="col" class="px-6 py-3">Descrizione</th>
+                  <th scope="col" class="px-6 py-3 text-right">Dare</th>
+                  <th scope="col" class="px-6 py-3 text-right">Avere</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let conto of contiCollegatiDisplay" class="bg-white dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td class="px-6 py-4">{{conto.codice}}</td>
+                  <td class="px-6 py-4">{{conto.descrizione}}</td>
+                  <td class="px-6 py-4 text-right">{{conto.dare | amountFormat:2}}</td>
+                  <td class="px-6 py-4 text-right">{{conto.avere | amountFormat:2}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-semibold text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-800/50">
+                  <th scope="row" colspan="2" class="px-6 py-3 text-base text-right">Totale prima nota</th>
+                  <td class="px-6 py-3 font-bold text-right">{{getTotalDare() | amountFormat:2}}</td>
+                  <td class="px-6 py-3 font-bold text-right">{{getTotalAvere() | amountFormat:2}}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div *ngIf="contiCollegatiDisplay.length === 0" class="text-center text-gray-500 dark:text-gray-400 mt-4">
+            Nessun conto collegato trovato.
+          </div>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="totalPages > 1" class="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalElements) }} di {{ totalElements }} RISULTATI
+            </span>
+            <nav class="flex items-center space-x-1">
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onContiPageChange(0)">
+                <span class="material-icons text-sm">keyboard_double_arrow_left</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onContiPageChange(currentPage - 1)">
+                <span class="material-icons text-sm">chevron_left</span>
+              </button>
+              <ng-container *ngFor="let page of getPages()">
+                <button *ngIf="page !== -1"
+                        class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded shadow-sm transition-colors"
+                        [ngClass]="{'bg-primary text-white': page === currentPage, 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': page !== currentPage}"
+                        (click)="onContiPageChange(page)">
+                  {{ page + 1 }}
+                </button>
+                <span *ngIf="page === -1" class="px-2 text-gray-400">...</span>
+              </ng-container>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onContiPageChange(currentPage + 1)">
+                <span class="material-icons text-sm">chevron_right</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onContiPageChange(totalPages - 1)">
+                <span class="material-icons text-sm">keyboard_double_arrow_right</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTRIBUTI Tab -->
+      <div *ngIf="selectedTab === 'attributi'">
+        <!-- Loading Spinner -->
+        <div *ngIf="attributiLoading" class="flex justify-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
+        </div>
+
+        <div *ngIf="!attributiLoading">
+          <!-- Page Size Selector -->
+          <div class="px-4 py-3 border-b border-border-light dark:border-border-dark bg-white dark:bg-surface-dark flex items-center">
+            <select class="form-select block w-20 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-primary focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                    [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+              <option *ngFor="let option of pageSizeOptions" [value]="option">{{option}}</option>
+            </select>
+          </div>
+
+          <div *ngIf="attributiPage?.content?.length" class="overflow-x-auto shadow-md rounded-b-lg">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Tipo di Attributo</th>
+                  <th scope="col" class="px-6 py-3">Valore</th>
+                  <th scope="col" class="px-6 py-3">Conto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let attr of attributiPage?.content" class="bg-white dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td class="px-6 py-4">{{attr.tipoAttributoDescrizione || attr.tipoAttributo}}</td>
+                  <td class="px-6 py-4">{{attr.valore}}</td>
+                  <td class="px-6 py-4">{{attr.conto || '-'}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!attributiPage?.content?.length" class="text-center text-gray-500 dark:text-gray-400 mt-4">Nessun attributo collegato.</div>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="totalPages > 1" class="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalElements) }} di {{ totalElements }} RISULTATI
+            </span>
+            <nav class="flex items-center space-x-1">
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onAttributiPageChange(0)">
+                <span class="material-icons text-sm">keyboard_double_arrow_left</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onAttributiPageChange(currentPage - 1)">
+                <span class="material-icons text-sm">chevron_left</span>
+              </button>
+              <ng-container *ngFor="let page of getPages()">
+                <button *ngIf="page !== -1"
+                        class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded shadow-sm transition-colors"
+                        [ngClass]="{'bg-primary text-white': page === currentPage, 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': page !== currentPage}"
+                        (click)="onAttributiPageChange(page)">
+                  {{ page + 1 }}
+                </button>
+                <span *ngIf="page === -1" class="px-2 text-gray-400">...</span>
+              </ng-container>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onAttributiPageChange(currentPage + 1)">
+                <span class="material-icons text-sm">chevron_right</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onAttributiPageChange(totalPages - 1)">
+                <span class="material-icons text-sm">keyboard_double_arrow_right</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIME NOTE COLLEGATE Tab -->
+      <div *ngIf="selectedTab === 'noteCollegate'">
+        <!-- Loading Spinner -->
+        <div *ngIf="primeNoteCollegateLoading" class="flex justify-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
+        </div>
+
+        <div *ngIf="!primeNoteCollegateLoading">
+          <!-- Page Size Selector -->
+          <div class="px-4 py-3 border-b border-border-light dark:border-border-dark bg-white dark:bg-surface-dark flex items-center">
+            <select class="form-select block w-20 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-primary focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+                    [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+              <option *ngFor="let option of pageSizeOptions" [value]="option">{{option}}</option>
+            </select>
+          </div>
+
+          <div *ngIf="primeNoteCollegatePage?.content?.length" class="overflow-x-auto shadow-md rounded-b-lg">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th scope="col" class="px-6 py-3">Relazione</th>
+                  <th scope="col" class="px-6 py-3">Tipo</th>
+                  <th scope="col" class="px-6 py-3">Fonte</th>
+                  <th scope="col" class="px-6 py-3">Evento</th>
+                  <th scope="col" class="px-6 py-3">Causale</th>
+                  <th scope="col" class="px-6 py-3">N. Provv</th>
+                  <th scope="col" class="px-6 py-3">Data Provv</th>
+                  <th scope="col" class="px-6 py-3">N. Def</th>
+                  <th scope="col" class="px-6 py-3">Data Def</th>
+                  <th scope="col" class="px-6 py-3">Stato</th>
+                  <th scope="col" class="px-6 py-3">Descrizione</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pnColl of primeNoteCollegatePage?.content" class="bg-white dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td class="px-6 py-4">{{pnColl.relazione}}</td>
+                  <td class="px-6 py-4">{{pnColl.tipo}}</td>
+                  <td class="px-6 py-4">{{pnColl.fonte}}</td>
+                  <td class="px-6 py-4">{{pnColl.evento}}</td>
+                  <td class="px-6 py-4">{{pnColl.descrizioneCausale}}</td>
+                  <td class="px-6 py-4">{{pnColl.numeroProvvisorio}}</td>
+                  <td class="px-6 py-4">{{pnColl.dataRegProvvisoria | date:'dd/MM/yyyy'}}</td>
+                  <td class="px-6 py-4">{{pnColl.numeroDefinitivo}}</td>
+                  <td class="px-6 py-4">{{pnColl.dataRegDefinitiva | date:'dd/MM/yyyy'}}</td>
+                  <td class="px-6 py-4">{{pnColl.stato}}</td>
+                  <td class="px-6 py-4">{{pnColl.descrizione}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!primeNoteCollegatePage?.content?.length" class="text-center text-gray-500 dark:text-gray-400 mt-4">Nessuna prima nota collegata.</div>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="totalPages > 1" class="px-4 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalElements) }} di {{ totalElements }} RISULTATI
+            </span>
+            <nav class="flex items-center space-x-1">
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onPrimeNoteCollegatePageChange(0)">
+                <span class="material-icons text-sm">keyboard_double_arrow_left</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage === 0" (click)="onPrimeNoteCollegatePageChange(currentPage - 1)">
+                <span class="material-icons text-sm">chevron_left</span>
+              </button>
+              <ng-container *ngFor="let page of getPages()">
+                <button *ngIf="page !== -1"
+                        class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded shadow-sm transition-colors"
+                        [ngClass]="{'bg-primary text-white': page === currentPage, 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': page !== currentPage}"
+                        (click)="onPrimeNoteCollegatePageChange(page)">
+                  {{ page + 1 }}
+                </button>
+                <span *ngIf="page === -1" class="px-2 text-gray-400">...</span>
+              </ng-container>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onPrimeNoteCollegatePageChange(currentPage + 1)">
+                <span class="material-icons text-sm">chevron_right</span>
+              </button>
+              <button class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 disabled:opacity-50"
+                      [disabled]="currentPage >= totalPages - 1" (click)="onPrimeNoteCollegatePageChange(totalPages - 1)">
+                <span class="material-icons text-sm">keyboard_double_arrow_right</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pulsante Indietro -->
+  <div style="padding:8px 0 24px">
+    <a class="back-link" (click)="onBack()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+  </div>
+</main>
+
+<div *ngIf="!primaNota && !isLoading" class="text-center text-lg text-gray-600 p-4">Seleziona una Prima Nota per visualizzarne i dettagli.</div>

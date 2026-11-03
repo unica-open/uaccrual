@@ -1,0 +1,106 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="flex-grow w-full max-w-[1400px] mx-auto px-6 py-6 space-y-6 relative">
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="absolute inset-0 bg-gray-100/75 dark:bg-gray-900/80 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" style="border-color:var(--accent)"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">edit_note</span>
+        <h2 class="card-title">
+          {{ isModifica ? 'Aggiorna Prima Nota' : 'Gestisci Prima Nota' }}
+        </h2>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6">
+      
+      <!-- Tabs Navigation -->
+      <div class="border-b border-border-light dark:border-border-dark mb-6">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+          <li class="mr-2" role="presentation">
+            <button 
+              class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+              [ngClass]="activeTab === 1 ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+              (click)="activeTab = 1" 
+              type="button" 
+              role="tab">
+              Testata
+            </button>
+          </li>
+          <li class="mr-2" role="presentation">
+            <button 
+              class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+              [ngClass]="activeTab >= 2 ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+              [disabled]="activeTab < 2"
+              (click)="activeTab = 2" 
+              type="button" 
+              role="tab">
+              Conti collegati
+            </button>
+          </li>
+          <li class="mr-2" role="presentation">
+            <button 
+              class="inline-block p-4 border-b-2 rounded-t-lg transition-colors duration-200"
+              [ngClass]="activeTab === 3 ? 'border-primary text-primary' : 'border-transparent text-text-muted-light dark:text-text-muted-dark hover:text-gray-600 hover:border-gray-300'"
+              [disabled]="activeTab < 3"
+              (click)="activeTab = 3" 
+              type="button" 
+              role="tab">
+              Attributi
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Tab 1: Testata -->
+      <div *ngIf="activeTab === 1">
+        <app-pn-tab-testata
+          [testataForm]="testataForm"
+          [isModifica]="isModifica"
+          [formPopolato]="formPopolato"
+          (prosegui)="onProseguiDaTestata()"
+          (annulla)="onAnnulla()"
+          (indietro)="onIndietro()">
+        </app-pn-tab-testata>
+      </div>
+
+      <!-- Tab 2: Conti Collegati -->
+      <div *ngIf="activeTab === 2">
+        <app-pn-tab-conti-collegati
+          [conti]="conti"
+          [isModifica]="isModifica"
+          (contiChange)="conti = $event"
+          (prosegui)="onProseguiDaConti()"
+          (salva)="onSalva()"
+          (salvaEdEsci)="onSalvaEdEsci()"
+          (annulla)="onAnnulla()"
+          (indietro)="activeTab = 1">
+        </app-pn-tab-conti-collegati>
+      </div>
+
+      <!-- Tab 3: Attributi -->
+      <div *ngIf="activeTab === 3">
+        <app-pn-tab-attributi
+          [attributi]="attributi"
+          [conti]="conti"
+          [isModifica]="isModifica"
+          (attributiChange)="attributi = $event"
+          (salva)="onSalva()"
+          (salvaEdEsci)="onSalvaEdEsci()"
+          (annulla)="onAnnulla()"
+          (indietro)="activeTab = 2">
+        </app-pn-tab-attributi>
+      </div>
+
+    </div>
+</div>
+</main>

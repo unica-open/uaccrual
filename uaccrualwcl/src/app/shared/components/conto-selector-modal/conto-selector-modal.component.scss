@@ -1,0 +1,63 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Sfondo semi-trasparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Assicura che la modale sia sopra gli altri elementi */
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 80%; /* Larghezza massima della modale */
+  max-height: 80%; /* Altezza massima della modale */
+  overflow: auto; /* Permette lo scroll se il contenuto è troppo grande */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-title {
+  font-size: 1.25rem; /* Tailwind text-xl */
+  font-weight: bold;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-close-button:hover {
+  color: #333;
+}
+
+/* Stili aggiuntivi per il corpo della modale */
+.modal-body {
+  /* Puoi aggiungere stili specifici per il contenuto qui */
+}
+
+/* Ripreso da _base.scss o globals.scss se necessario */
+.btn-primary {
+  @apply py-2.5 px-4 rounded-lg bg-primary text-white font-bold;
+}

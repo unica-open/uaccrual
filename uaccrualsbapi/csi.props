@@ -1,0 +1,4 @@
+CSI_BASE=false
+IMAGE_NAME=siac/accrualsbapi
+PRODUCT_MAIL=massimo.molino@csi.it
+TECHNOLOGY=java

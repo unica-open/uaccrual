@@ -1,0 +1,383 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="app-shell" [style.--sidebar-w]="sidebarCollapsed ? '64px' : '272px'">
+
+  <ng-container *ngIf="!(isPublicRoute$ | async); else publicOnly">
+
+    <app-sidebar-layout (collapseChange)="onSidebarCollapse($event)"></app-sidebar-layout>
+
+    <div class="app-main-area">
+
+      <!-- ══════════════════════════════════════
+           CONTEXT BAR — ente / anno / fase
+      ══════════════════════════════════════ -->
+      <section class="app-ctx-bar">
+
+        <ng-container *ngIf="availableEnti$ | async as enti">
+          <div class="ctx-block"
+               [class.ctx-block--switchable]="enti.length > 1"
+               (click)="enti.length > 1 ? toggleEnteDropdown($event) : null">
+            <div class="ctx-icon-box">
+              <span class="material-icons-round">account_balance</span>
+            </div>
+            <div class="ctx-text">
+              <span class="ctx-label">Ente</span>
+              <div class="ctx-value-row">
+                <span class="ctx-main-value">{{ (currentEnteDenominazione$ | async) || 'N/D' }}</span>
+                <span class="ctx-code-chip">{{ currentEnte$ | async }}</span>
+                <span class="material-icons-round ctx-chevron" *ngIf="enti.length > 1">
+                  {{ enteDropdownOpen ? 'expand_less' : 'expand_more' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="ente-dropdown" *ngIf="enteDropdownOpen && enti.length > 1" (click)="$event.stopPropagation()">
+              <div class="ente-dropdown-header">Seleziona ente</div>
+              <div *ngFor="let ente of enti"
+                   class="ente-option"
+                   [class.active]="(currentEnte$ | async) === ente.codice"
+                   (click)="switchEnte(ente, $event)">
+                <span class="material-icons-round ente-opt-icon">account_balance</span>
+                <div class="ente-opt-info">
+                  <span class="ente-opt-name">{{ ente.denominazione || ente.codice }}</span>
+                  <span class="ente-opt-code">{{ ente.codice }}</span>
+                </div>
+                <span class="material-icons-round ente-opt-check" *ngIf="(currentEnte$ | async) === ente.codice">check</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-block">
+          <div class="ctx-icon-box ctx-icon-box--anno">
+            <span class="material-icons-round">event</span>
+          </div>
+          <div class="ctx-text">
+            <span class="ctx-label">Anno esercizio</span>
+            <span class="ctx-main-value">{{ (annoBilancio$ | async) || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-block">
+          <div class="ctx-icon-box ctx-icon-box--fase">
+            <span class="material-icons-round">flag</span>
+          </div>
+          <div class="ctx-text">
+            <span class="ctx-label">Fase bilancio</span>
+            <span class="ctx-fase-badge" [ngClass]="(faseBilancioClass$ | async) ?? ''">
+              <span class="ctx-fase-dot"></span>
+              {{ (faseBilancio$ | async) || 'N/D' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="ctx-strip-actions">
+          <div class="ctx-divider-sm"></div>
+
+          <div class="notif-bell-wrap" (click)="$event.stopPropagation()">
+            <button class="icon-btn" [class.panel-open]="notifPanelOpen" (click)="toggleNotifPanel($event)" title="Notifiche">
+              <span class="material-icons-round">
+                {{ (incompleteWarning$ | async) || (notificheNonLette$ | async) || elaborationProgress !== null ? 'notifications_active' : 'notifications' }}
+              </span>
+              <span class="tb-notif-count" *ngIf="((incompleteWarning$ | async) && !notifRead) || (notificheNonLette$ | async)">
+                {{ ((incompleteWarning$ | async) && !notifRead ? 1 : 0) + ((notificheNonLette$ | async) || 0) }}
+              </span>
+              <span class="tb-notif-dot tb-notif-dot--progress" *ngIf="elaborationProgress !== null && elaborationProgress! < 100"></span>
+            </button>
+
+            <div class="notif-panel" *ngIf="notifPanelOpen">
+              <div class="notif-panel-header">
+                <div class="notif-panel-header-icon"><span class="material-icons-round">notifications</span></div>
+                <span class="notif-panel-header-text">Notifiche</span>
+                <span class="notif-panel-header-sub">Centro avvisi</span>
+              </div>
+              <div class="notif-panel-section-label"><span class="material-icons-round">receipt_long</span>Prime Note</div>
+              <ng-container *ngIf="incompleteWarning$ | async; else pnNoWarn">
+                <div class="notif-panel-item" (click)="openIncompleteModal($event)">
+                  <div class="notif-panel-icon warn"><span class="material-icons-round">warning_amber</span></div>
+                  <div class="notif-panel-item-body">
+                    <div class="notif-panel-item-title">Prime note non quadrate</div>
+                    <div class="notif-panel-item-sub">Verificare la quadratura</div>
+                  </div>
+                  <span class="notif-badge-sm" *ngIf="!notifRead">1</span>
+                </div>
+              </ng-container>
+              <ng-template #pnNoWarn>
+                <div class="notif-panel-empty"><span class="material-icons-round">check_circle</span>Nessun avviso</div>
+              </ng-template>
+              <div class="notif-panel-divider" style="margin:6px 0"></div>
+              <div class="notif-panel-section-label"><span class="material-icons-round">sync_alt</span>Flusso di Alimentazione</div>
+              <ng-container *ngIf="elaborationProgress !== null">
+                <div class="notif-panel-item" style="flex-direction:column;gap:8px;cursor:default;pointer-events:none;">
+                  <div style="display:flex;align-items:center;gap:8px;width:100%">
+                    <span class="material-icons-round notif-panel-icon" [style.color]="'#22c55e'"
+                          [style.animation]="elaborationProgress! < 100 ? 'spin 1s linear infinite' : 'none'">
+                      {{ elaborationProgress! < 100 ? 'autorenew' : 'check_circle' }}
+                    </span>
+                    <div class="notif-panel-item-body">
+                      <div class="notif-panel-item-title">{{ elaborationProgress! < 100 ? 'Elaborazione in corso...' : 'Elaborazione completata' }}</div>
+                      <div class="notif-panel-item-sub">{{ elaborationProgress! | number:'1.0-0' }}%</div>
+                    </div>
+                  </div>
+                  <div style="width:100%;height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden">
+                    <div [style.width.%]="elaborationProgress" style="background:#22c55e;height:100%;border-radius:3px;transition:width .28s ease"></div>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="(notifiche$ | async) as notifiche">
+                <div class="notif-panel-item" *ngFor="let n of notifiche" (click)="openNotifica(n, $event)">
+                  <div class="notif-panel-icon" [ngClass]="notificaIconClass(n.tipo)">
+                    <span class="material-icons-round">{{ notificaIcon(n.tipo) }}</span>
+                  </div>
+                  <div class="notif-panel-item-body">
+                    <div class="notif-panel-item-title">{{ n.titolo }}</div>
+                    <div class="notif-panel-item-sub">{{ n.messaggio }}</div>
+                  </div>
+                  <span class="notif-badge-sm" *ngIf="!n.letta">1</span>
+                  <button class="icon-btn notif-dismiss" title="Chiudi la notifica"
+                          (click)="dismissNotifica(n, $event)">
+                    <span class="material-icons-round">close</span>
+                  </button>
+                </div>
+                <div class="notif-panel-empty" *ngIf="notifiche.length === 0 && elaborationProgress === null">
+                  <span class="material-icons-round">check_circle</span>Nessun avviso
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <button class="icon-btn" title="Manuale" (click)="openManual()">
+            <span class="material-icons-round">help_outline</span>
+          </button>
+
+          <div class="ctx-divider-sm"></div>
+
+          <div class="ctx-user">
+            <div class="ctx-avatar">{{ initials$ | async }}</div>
+            <div class="ctx-user-info">
+              <strong>{{ displayName$ | async }}</strong>
+              <span>{{ utenteCodice$ | async }}</span>
+              <span>{{ ruolo$ | async }}</span>
+            </div>
+            <button class="ctx-icon-btn" title="Impostazioni" (click)="openSettings($event)">
+              <span class="material-icons-round">settings</span>
+            </button>
+            <button class="ctx-icon-btn" title="Esci" (click)="logout()">
+              <span class="material-icons-round">logout</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb-bar" *ngIf="hasBreadcrumbs$ | async" aria-label="Breadcrumb">
+        <app-sidebar></app-sidebar>
+      </nav>
+
+      <!-- Main content -->
+      <main class="app-content">
+        <app-page-notification-banner></app-page-notification-banner>
+        <router-outlet></router-outlet>
+      </main>
+
+      <footer class="app-footer">
+        <span>{{ version }}</span>
+      </footer>
+
+    </div>
+
+  </ng-container>
+
+  <ng-template #publicOnly>
+    <main style="grid-column: 1 / -1">
+      <router-outlet></router-outlet>
+    </main>
+  </ng-template>
+
+</div>
+
+<!-- ═══ SETTINGS DRAWER ═══ -->
+<ng-container *ngIf="settingsOpen">
+  <div class="settings-overlay" (click)="closeSettings()"></div>
+  <div class="settings-drawer" (click)="$event.stopPropagation()">
+    <div class="drawer-header">
+      <span class="drawer-title">Impostazioni</span>
+      <button class="drawer-close" (click)="closeSettings()">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="settings-section">
+        <div class="settings-section-title">Personalizza Tema</div>
+        <div class="theme-preview">
+          <div class="theme-preview-dot"></div>
+          <span class="theme-preview-label">Colore Principale</span>
+          <div class="theme-preview-dot"></div>
+        </div>
+        <div class="color-presets">
+          <div *ngFor="let preset of themePresets" class="color-swatch" (click)="applyPreset(preset.color)">
+            <div class="swatch-circle" [style.background]="preset.color"
+                 [class.active]="themeService.color === preset.color">
+              <span class="material-icons-round">check</span>
+            </div>
+            <span class="swatch-name">{{ preset.name }}</span>
+          </div>
+        </div>
+        <button class="reset-theme-btn" (click)="resetTheme()">
+          <span class="material-icons-round">restart_alt</span>
+          Ripristina predefinito
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- ═══ MODALE PRIME NOTE NON QUADRATE ═══ -->
+<ng-container *ngIf="incompleteModalOpen">
+  <div class="pn-modal-overlay" (click)="closeIncompleteModal()"></div>
+  <div class="pn-modal" (click)="$event.stopPropagation()">
+    <div class="pn-modal-header">
+      <div class="pn-modal-title-row">
+        <span class="material-icons-round pn-modal-icon">warning_amber</span>
+        <div>
+          <div class="pn-modal-title">Prime Note Non Quadrate</div>
+          <div class="pn-modal-subtitle">Verificare e correggere le prime note con errori di quadratura</div>
+        </div>
+      </div>
+      <button class="pn-modal-close" (click)="closeIncompleteModal()">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="pn-modal-body">
+      <div class="pn-loading" *ngIf="incompleteListLoading$ | async">
+        <span class="material-icons-round pn-loading-icon">autorenew</span>Caricamento in corso...
+      </div>
+      <ng-container *ngIf="!(incompleteListLoading$ | async) && (incompleteListError$ | async)">
+        <div class="pn-error">
+          <span class="material-icons-round">cloud_off</span>
+          <div>Impossibile caricare la lista.</div>
+          <a (click)="goToPrimaNotaSearch()" class="pn-error-link">Vai alla ricerca completa →</a>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!(incompleteListLoading$ | async) && !(incompleteListError$ | async)">
+        <div class="pn-empty" *ngIf="(incompleteList$ | async)?.length === 0; else pnTable">
+          <span class="material-icons-round">check_circle</span>Nessuna prima nota non quadrata trovata
+        </div>
+        <ng-template #pnTable>
+          <div class="pn-table-wrap">
+            <table class="pn-table">
+              <thead><tr>
+                <th>Anno</th><th>N. Provv.</th><th>Data Reg.</th>
+                <th>Descrizione</th><th>Causale</th><th>Stato</th><th>Azioni</th>
+              </tr></thead>
+              <tbody>
+                <tr *ngFor="let item of incompleteList$ | async">
+                  <td>{{ item.anno }}</td>
+                  <td class="td-code">{{ item.numeroProvvisorio }}</td>
+                  <td>{{ item.dataRegProvvisoria | date:'dd/MM/yy' }}</td>
+                  <td class="td-desc">{{ item.descrizione }}</td>
+                  <td class="td-code">{{ item.causale }}</td>
+                  <td class="td-code">{{ item.stato }}</td>
+                  <td class="td-actions">
+                    <div class="flex items-center justify-end space-x-1">
+                      <button class="btn-icon-view p-1 rounded-full transition-colors"
+                              title="Visualizza" (click)="viewPrimaNota(item)">
+                        <span class="material-icons text-[20px]">visibility</span>
+                      </button>
+                      <button *ngIf="item.isAggiornabile"
+                              class="btn-icon-edit p-1 rounded-full transition-colors"
+                              title="Aggiorna" (click)="editPrimaNota(item)">
+                        <span class="material-icons text-[20px]">edit</span>
+                      </button>
+                      <button *ngIf="item.isValidabile"
+                              class="btn-icon-validate p-1 rounded-full transition-colors"
+                              title="Valida" (click)="validaPrimaNota(item)">
+                        <span class="material-icons text-[20px]">check_circle</span>
+                      </button>
+                      <button *ngIf="item.isAnnullabile"
+                              class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                              title="Annulla" (click)="annullaPrimaNota(item)">
+                        <span class="material-icons text-[20px]">delete</span>
+                      </button>
+                      <button *ngIf="item.isRiapribile"
+                              class="text-purple-600 hover:text-purple-800 p-1 rounded-full hover:bg-purple-50 transition-colors"
+                              title="Riapri" (click)="riapriPrimaNota(item)">
+                        <span class="material-icons text-[20px]">refresh</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </ng-container>
+    </div>
+    <div class="pn-modal-footer">
+      <button class="pn-footer-btn secondary" (click)="closeIncompleteModal()">Chiudi</button>
+      <button class="pn-footer-btn primary" (click)="goToPrimaNotaSearch()">
+        <span class="material-icons-round">search</span>Ricerca completa
+      </button>
+    </div>
+  </div>
+</ng-container>
+
+<!-- ═══ MODALE CONFERMA ELABORAZIONE FLUSSO ═══ -->
+<ng-container *ngIf="flussoConfirmModalOpen && pendingFlussoConfirmation">
+  <div class="pn-modal-overlay" (click)="closeFlussoConfirmModal()"></div>
+  <div class="pn-modal" (click)="$event.stopPropagation()">
+    <div class="pn-modal-header">
+      <div class="pn-modal-title-row">
+        <span class="material-icons-round pn-modal-icon">warning_amber</span>
+        <div>
+          <div class="pn-modal-title">Conferma Annullamento Prime Note</div>
+          <div class="pn-modal-subtitle">Attenzione: verranno annullate le prime note di apertura esistenti</div>
+        </div>
+      </div>
+      <button class="pn-modal-close" (click)="closeFlussoConfirmModal()">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="pn-modal-body">
+      <div class="pn-error" style="color:var(--text-primary);background:var(--surface-2);border-radius:8px;padding:16px;gap:12px;margin-bottom:16px;">
+        <span class="material-icons-round" style="color:#f59e0b;">info_outline</span>
+        <div>{{ pendingFlussoConfirmation.confirmationMessage }}</div>
+      </div>
+      <ng-container *ngIf="pendingFlussoConfirmation.primaNoteDaAnnullare?.length">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">
+          Prime note che verranno annullate ({{ pendingFlussoConfirmation.primaNoteDaAnnullare!.length }})
+        </div>
+        <div class="pn-table-wrap">
+          <table class="pn-table">
+            <thead><tr><th>Anno</th><th>N.</th><th>Descrizione</th><th>Causale</th><th>Stato</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let pn of pendingFlussoConfirmation.primaNoteDaAnnullare">
+                <td>{{ pn.anno }}</td>
+                <td class="td-code">{{ pn.numeroProvvisorio }}</td>
+                <td class="td-desc">{{ pn.descrizione }}</td>
+                <td class="td-code">{{ pn.causale }}</td>
+                <td class="td-code">{{ pn.stato }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </div>
+    <div class="pn-modal-footer">
+      <button class="pn-footer-btn secondary" (click)="refuseFlussoElaborazione()">No, annulla</button>
+      <button class="pn-footer-btn primary" (click)="confirmFlussoElaborazione()">
+        <span class="material-icons-round">check</span>Sì, annulla e ricrea
+      </button>
+    </div>
+  </div>
+</ng-container>
+
+<p-toast position="top-right"></p-toast>

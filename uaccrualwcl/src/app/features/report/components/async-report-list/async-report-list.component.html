@@ -1,0 +1,107 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="table-wrap" *ngIf="currentFilters">
+  <div class="params-bar">
+    <span class="params-bar-label">Filtri attivi</span>
+    <ng-container *ngIf="currentFilters.data_elaborazione_da">
+      <span class="chip"><span class="chip-key">Data Da</span><span class="chip-val">{{ currentFilters.data_elaborazione_da }}</span></span>
+    </ng-container>
+    <ng-container *ngIf="currentFilters.data_elaborazione_a">
+      <span class="chip"><span class="chip-key">Data A</span><span class="chip-val">{{ currentFilters.data_elaborazione_a }}</span></span>
+    </ng-container>
+    <ng-container *ngIf="currentFilters.stato">
+      <span class="chip"><span class="chip-key">Stato</span><span class="chip-val">{{ getStatusLabel(currentFilters.stato) }}</span></span>
+    </ng-container>
+    <ng-container *ngIf="currentFilters.tipo_report">
+      <span class="chip"><span class="chip-key">Tipo Report</span><span class="chip-val">{{ reportNameMap[currentFilters.tipo_report] || currentFilters.tipo_report }}</span></span>
+    </ng-container>
+    <ng-container *ngIf="currentFilters.formato">
+      <span class="chip"><span class="chip-key">Formato</span><span class="chip-val">{{ formatoLabelMap[currentFilters.formato] || currentFilters.formato }}</span></span>
+    </ng-container>
+  </div>
+
+  <div *ngIf="loading" style="display:flex;justify-content:center;padding:40px">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color:var(--accent)"></div>
+  </div>
+
+  <table class="table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th scope="col">Report</th>
+        <th scope="col">Formato</th>
+        <th scope="col">Data Creazione</th>
+        <th scope="col">Stato</th>
+        <th scope="col">Progresso</th>
+        <th class="col-actions" scope="col">Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let report of reports">
+        <td>
+          <span class="cell-primary">{{ getReportName(report) }}</span>
+          <div class="cell-mono" style="margin-top:2px;font-size:11px">{{ report.report_id }}</div>
+        </td>
+        <td>{{ report.formato }}</td>
+        <td>{{ report.data_creazione | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-info': report.stato === 'PENDING',
+            'badge-warning': report.stato === 'PROCESSING',
+            'badge-success': report.stato === 'COMPLETED',
+            'badge-danger': report.stato === 'ERROR'
+          }"><span class="badge-dot"></span>{{ report.stato }}</span>
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div *ngIf="report.stato === 'PROCESSING'" style="flex:1;background:var(--surface-3);border-radius:999px;height:6px;max-width:100px">
+              <div style="background:var(--accent);height:6px;border-radius:999px" [style.width.%]="report.progress_percentage || 0"></div>
+            </div>
+            <span class="cell-mono">{{ report.progress_percentage || '-' }}{{ report.progress_percentage ? '%' : '' }}</span>
+          </div>
+        </td>
+        <td class="col-actions">
+          <button class="row-action" title="Visualizza" (click)="onViewDetail(report.report_id)">
+            <span class="material-icons-round" style="font-size:15px">visibility</span>
+          </button>
+          <button *ngIf="isDownloadable(report)" class="row-action" title="Scarica" (click)="onDownload(report.report_id, report.formato)">
+            <span class="material-icons-round" style="font-size:15px">download</span>
+          </button>
+          <button *ngIf="isCancelable(report)" class="row-action" title="Annulla" style="color:var(--warning)">
+            <span class="material-icons-round" style="font-size:15px">cancel</span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <div class="pagination-left">
+      <span>Righe per pagina</span>
+      <select class="select" style="width:76px;height:32px" [(ngModel)]="pageSize" (change)="onPageChange({first:0,rows:pageSize})">
+        <option *ngFor="let option of pageSizes" [value]="option">{{option}}</option>
+      </select>
+      <span>{{ (currentPage * pageSize) + 1 }}–{{ Math.min((currentPage + 1) * pageSize, totalElements) }} di {{ totalElements }}</span>
+    </div>
+    <div class="pagination-right">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange({first:0,rows:pageSize})">
+        <span class="material-icons-round" style="font-size:14px">keyboard_double_arrow_left</span>
+      </button>
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange({first:(currentPage - 1) * pageSize,rows:pageSize})">
+        <span class="material-icons-round" style="font-size:14px">chevron_left</span>
+      </button>
+      <ng-container *ngFor="let page of getPages()">
+        <button *ngIf="page !== -1" class="page-btn" [class.active]="page === currentPage" (click)="onPageChange({first: page * pageSize, rows: pageSize})">{{ page + 1 }}</button>
+        <span *ngIf="page === -1" style="padding:0 4px;color:var(--fg-subtle)">...</span>
+      </ng-container>
+      <button class="page-btn" [disabled]="currentPage >= totalPages - 1" (click)="onPageChange({first:(currentPage + 1) * pageSize,rows:pageSize})">
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+      </button>
+      <button class="page-btn" [disabled]="currentPage >= totalPages - 1" (click)="onPageChange({first:(totalPages - 1) * pageSize,rows:pageSize})">
+        <span class="material-icons-round" style="font-size:14px">keyboard_double_arrow_right</span>
+      </button>
+    </div>
+  </div>
+</div>

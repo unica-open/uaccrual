@@ -1,0 +1,301 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<!-- File: pdc-form.component.html -->
+<main class="flex-grow w-full max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+
+  <div *ngIf="form" class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-card overflow-hidden">
+    <div class="px-6 py-5 border-b border-border-light dark:border-border-dark flex items-center gap-2">
+      <span class="material-icons text-primary text-2xl">edit</span>
+      <h2 class="text-xl font-semibold text-primary dark:text-blue-400 uppercase">{{ isUpdateMode ? 'Aggiorna Conto' : 'Inserisci Conto' }}</h2>
+    </div>
+    <div class="p-6 bg-accent-light dark:bg-accent-dark">
+
+  <div *ngIf="isLoading" class="flex justify-center items-center py-10">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-8">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+      <!-- Codice Padre (sola lettura) -->
+      <div class="flex items-center gap-2">
+        <label for="codicePadre" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap w-24">Conto padre</label>
+        <input
+          type="text"
+          id="codicePadre"
+          formControlName="codicePadre"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-48 shadow-sm"
+          readonly
+          required>
+      </div>
+
+      <!-- Codice -->
+      <div class="flex items-center gap-2">
+        <label for="codice" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Codice *</label>
+        <input
+          type="text"
+          id="codice"
+          formControlName="codice"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-32 shadow-sm"
+          [readonly]="isUpdateMode"
+          required>
+        <div *ngIf="form.get('codice')?.invalid && form.get('codice')?.touched" class="text-red-500 text-sm mt-1">
+          <div *ngIf="form.get('codice')?.errors?.['required']">Il codice è obbligatorio</div>
+          <div *ngIf="form.get('codice')?.errors?.['pattern']">Il codice contiene caratteri non validi</div>
+        </div>
+      </div>
+
+      <!-- Livello (sola lettura) -->
+      <div class="flex items-center gap-2">
+        <label for="livello" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Livello</label>
+        <input
+          type="number"
+          id="livello"
+          formControlName="livello"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-16 shadow-sm"
+          readonly
+          required>
+      </div>
+
+      <!-- Codice completo (sola lettura) -->
+      <div class="flex items-center gap-2">
+        <label for="codice_completo" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Codice completo</label>
+        <input
+          type="text"
+          id="codice_completo"
+          formControlName="codice_completo"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-64 shadow-sm"
+          readonly
+          required>
+      </div>
+    </div>
+
+    <!-- Descrizione -->
+    <div class="flex items-center gap-2">
+      <label for="descrizione" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap w-24">Descrizione *</label>
+      <input
+        type="text"
+        id="descrizione"
+        formControlName="descrizione"
+        class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-full max-w-2xl shadow-sm"
+        required>
+      <div *ngIf="form.get('descrizione')?.invalid && form.get('descrizione')?.touched" class="text-red-500 text-sm mt-1">
+        <div *ngIf="form.get('descrizione')?.errors?.['required']">La descrizione è obbligatoria</div>
+        <div *ngIf="form.get('descrizione')?.errors?.['maxlength']">La descrizione supera i 200 caratteri</div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+      <!-- Classe (Sola lettura) -->
+      <div class="flex items-center gap-2">
+        <label for="classe" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap w-24">Classe</label>
+        <div class="relative">
+          <select
+            id="classe"
+            formControlName="id_classe_conto"
+            class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-64 shadow-sm"
+            [disabled]="true"
+            required>
+            <option *ngFor="let classe of classi" [value]="classe.codice">
+              {{ classe.codice }} - {{ classe.descrizione }} {{ classe.segno ? '(' + classe.segno + ')' : '' }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tipo (modificabile) -->
+      <div class="flex items-center gap-2">
+        <label for="tipo" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap w-24">Tipo</label>
+        <div class="relative">
+          <select
+            id="tipo"
+            formControlName="id_tipo_conto"
+            class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-64 shadow-sm"
+            [disabled]="!isUpdateMode"
+            required>
+            <option *ngFor="let tipo of tipi" [value]="tipo.codice">
+              {{ tipo.codice }} - {{ tipo.descrizione }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-12 gap-y-4">
+      <!-- Foglia (non modificabile) -->
+      <div class="flex items-center gap-2">
+        <label for="flag_foglia" class="text-sm font-bold text-text-muted-light dark:text-text-muted-dark whitespace-nowrap w-24">Foglia</label>
+        <input
+          type="checkbox"
+          id="flag_foglia"
+          formControlName="flag_foglia"
+          class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary shadow-sm"
+          [disabled]="true">
+      </div>
+
+      <!-- Fondo dotazione (modificabile) -->
+      <div class="flex items-center gap-2">
+        <label for="flag_fondo_dotazione" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Fondo Dotazione</label>
+        <input
+          type="checkbox"
+          id="flag_fondo_dotazione"
+          formControlName="flag_fondo_dotazione"
+          class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary shadow-sm">
+      </div>
+
+      <!-- A partita (Checkbox) -->
+      <div class="flex items-center gap-2">
+        <label for="flag_a_partita" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">A Partita</label>
+        <input
+          type="checkbox"
+          id="flag_a_partita"
+          formControlName="flag_a_partita"
+          class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary shadow-sm">
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+      <!-- Codice ITAS1 -->
+      <div class="flex items-center gap-2">
+        <label for="codice_bilancio" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap w-32">Codice ITAS1</label>
+        <input
+          type="text"
+          id="codice_bilancio"
+          formControlName="codice_bilancio"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-40 shadow-sm">
+      </div>
+
+      <!-- Stato (modificabile in modalità aggiornamento) -->
+      <div class="flex items-center gap-2">
+        <label for="id_stato_conto" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Stato</label>
+        <div class="relative w-32">
+          <select
+            id="id_stato_conto"
+            formControlName="id_stato_conto"
+            [class.bg-gray-100]="!isUpdateMode"
+            [attr.readonly]="!isUpdateMode ? 'readonly' : null"
+            [style.pointer-events]="!isUpdateMode ? 'none' : 'auto'"
+            class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-full shadow-sm"
+            required>
+            <option value="">Seleziona uno stato</option>
+            <option *ngFor="let stato of stati" [value]="stato.codice">
+              {{ stato.codice }} - {{ stato.descrizione }}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="form.get('id_stato_conto')?.invalid && form.get('id_stato_conto')?.touched" class="text-red-500 text-sm mt-1">
+          <div *ngIf="form.get('id_stato_conto')?.errors?.['required']">Lo stato è obbligatorio</div>
+        </div>
+      </div>
+
+      <!-- Data inizio validità -->
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-bold text-text-main-light dark:text-text-main-dark">Validità:</span>
+        <label for="data_inizio_validita" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap ml-2">Inizio *</label>
+        <input
+          type="date"
+          id="data_inizio_validita"
+          formControlName="data_inizio_validita"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-40 shadow-sm"
+          required>
+        <div *ngIf="form.get('data_inizio_validita')?.invalid && form.get('data_inizio_validita')?.touched" class="text-red-500 text-sm mt-1">
+          <div *ngIf="form.get('data_inizio_validita')?.errors?.['required']">La data di inizio validità è obbligatoria</div>
+          <div *ngIf="form.get('data_inizio_validita')?.errors?.['invalidDate']">Data non valida</div>
+        </div>
+      </div>
+
+      <!-- Data fine validità -->
+      <div class="flex items-center gap-2">
+        <label for="data_fine_validita" class="text-sm font-bold text-text-main-light dark:text-text-main-dark whitespace-nowrap">Fine</label>
+        <input
+          type="date"
+          id="data_fine_validita"
+          formControlName="data_fine_validita"
+          class="bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded px-2 py-1.5 text-sm text-text-main-light dark:text-text-main-dark focus:outline-none focus:border-primary w-40 shadow-sm">
+        <div *ngIf="form.get('data_fine_validita')?.invalid && form.get('data_fine_validita')?.touched" class="text-red-500 text-sm mt-1">
+          <div *ngIf="form.get('data_fine_validita')?.errors?.['invalidDate']">Data non valida</div>
+        </div>
+        <div *ngIf="form.hasError('endDateBeforeStartDate') && form.get('data_fine_validita')?.touched" class="text-red-500 text-sm mt-1">
+          <div>La data di fine validità deve essere maggiore o uguale alla data di inizio validità</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezione Relazioni tipo FONDO -->
+    <div class="border border-text-muted-light/40 p-4 rounded-sm mt-8" *ngIf="fondi && fondi.length > 0">
+      <h3 class="text-sm font-bold uppercase mb-4 text-text-main-light dark:text-text-main-dark">TIPO RELAZIONE "FONDO"</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="font-bold border-b border-transparent">
+              <th class="pb-2 pr-4 w-32">Classe</th>
+              <th class="pb-2 pr-4 w-24">Tipo</th>
+              <th class="pb-2 pr-4 w-20">Livello</th>
+              <th class="pb-2 pr-4 w-24">Segmento</th>
+              <th class="pb-2 pr-4 w-32">Codice</th>
+              <th class="pb-2">Descrizione</th>
+            </tr>
+          </thead>
+          <tbody class="text-text-main-light dark:text-text-main-dark">
+            <tr *ngFor="let fondo of fondi">
+              <td class="py-2 pr-4">{{fondo.pdc_classe?.descrizione || ''}}</td>
+              <td class="py-2 pr-4">{{fondo.pdc_tipo?.descrizione || ''}}</td>
+              <td class="py-2 pr-4 text-center">{{fondo.livello}}</td>
+              <td class="py-2 pr-4 text-center">{{fondo.segmento || ''}}</td>
+              <td class="py-2 pr-4">{{fondo.codice}}</td>
+              <td class="py-2">{{fondo.descrizione}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sezione Relazioni tipo Corrispondenza tra Piano dei Conti 118 e Accrual -->
+    <div class="border border-text-muted-light/40 p-4 rounded-sm mt-6" *ngIf="correlazioni && correlazioni.length > 0">
+      <h3 class="text-sm font-bold uppercase mb-4 text-text-main-light dark:text-text-main-dark">TIPO RELAZIONE "Corrispondenza tra Piano dei Conti 118 e Accrual"</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="font-bold border-b border-transparent">
+              <th class="pb-2 pr-4 w-32">Classe</th>
+              <th class="pb-2 pr-4 w-24">Tipo</th>
+              <th class="pb-2 pr-4 w-20">Livello</th>
+              <th class="pb-2 pr-4 w-40">Codice</th>
+              <th class="pb-2">Descrizione</th>
+            </tr>
+          </thead>
+          <tbody class="text-text-main-light dark:text-text-main-dark">
+            <tr *ngFor="let correlazione of correlazioni">
+              <td class="py-2 pr-4">{{correlazione.pdc_classe?.descrizione || ''}}</td>
+              <td class="py-2 pr-4">{{correlazione.pdc_tipo?.descrizione || ''}}</td>
+              <td class="py-2 pr-4 text-center">{{correlazione.livello}}</td>
+              <td class="py-2 pr-4">{{correlazione.codice}}</td>
+              <td class="py-2">{{correlazione.descrizione}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pulsanti Operativi -->
+    <div class="flex items-center justify-center gap-24 pt-12">
+      <button type="button" (click)="onCancel()" class="px-6 py-2 border border-primary text-primary font-medium text-sm rounded uppercase hover:bg-primary/5 transition-colors shadow-sm">
+        ANNULLA
+      </button>
+      <button type="submit" class="px-6 py-2 bg-primary border border-primary text-white font-medium text-sm rounded uppercase hover:bg-primary-hover transition-colors shadow-sm">
+        SALVA
+      </button>
+      <button type="button" (click)="onSubmitAndExit()" class="px-6 py-2 bg-primary border border-primary text-white font-medium text-sm rounded uppercase hover:bg-primary-hover transition-colors shadow-sm">
+        SALVA ED ESCI
+      </button>
+    </div>
+
+    <div class="flex items-center gap-4 py-2 pb-6 mt-4">
+      <a class="back-link" (click)="onBack()"><span class="material-icons-round">arrow_back</span> Indietro</a>
+    </div>
+  </form>
+</div>
+</div>
+</main>

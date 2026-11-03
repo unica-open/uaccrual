@@ -1,0 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+.label {
+  @apply block text-xs font-semibold text-slate-500 uppercase mb-1;
+}
+
+.input {
+  @apply w-full bg-slate-50 border border-slate-200 rounded-lg text-sm
+  px-3 py-2 focus:ring-primary focus:border-primary;
+}
+
+.radio {
+  @apply flex items-center gap-2 text-sm font-medium;
+}
+
+.btn-primary {
+  @apply flex-1 py-2.5 rounded-lg bg-primary text-white font-bold;
+}
+
+.btn-secondary {
+  @apply flex-1 py-2.5 rounded-lg border border-slate-300 font-bold text-slate-600;
+}
+
+.badge {
+  @apply text-[10px] font-bold uppercase bg-slate-100 px-2 py-0.5 rounded;
+}

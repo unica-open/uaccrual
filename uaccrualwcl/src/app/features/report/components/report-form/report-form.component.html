@@ -1,0 +1,182 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="flex-grow w-full max-w-[1200px] mx-auto px-4 py-4 space-y-6">
+
+  <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-card overflow-hidden">
+    <div class="px-4 py-3 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <a class="back-link" style="margin-right:8px" (click)="indietro()">
+          <span class="material-icons-round">arrow_back</span> Indietro
+        </a>
+        <span class="material-icons text-primary text-xl">description</span>
+        <h1 class="text-lg font-semibold text-primary dark:text-blue-400">{{ reportNome || reportInfo?.nome }}</h1>
+        <span *ngIf="reportCodice" class="text-xs text-text-secondary-light dark:text-text-secondary-dark bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{{ reportCodice }}</span>
+      </div>
+    </div>
+
+    <div class="p-6 bg-accent-light dark:bg-accent-dark">
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 space-y-4">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="text-text-secondary-light dark:text-text-secondary-dark">Caricamento parametri in corso...</p>
+      </div>
+
+      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-800 p-4 mb-6 rounded-lg text-sm" role="alert">
+        <div class="flex items-start">
+          <span class="mr-2 text-xl">&#10060;</span>
+          <div class="flex-1">
+            <h3 class="font-medium mb-1">Errore nel caricamento</h3>
+            <p>{{ error }}</p>
+            <button
+              type="button"
+              (click)="indietro()"
+              class="mt-2 text-sm underline text-red-700 hover:text-red-900">
+              Torna alla lista report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="successMessage" class="bg-green-50 border border-green-200 text-green-800 p-4 mb-6 rounded-lg text-sm" role="alert">
+        <div class="flex items-start">
+          <span class="mr-2 text-xl">&#9989;</span>
+          <div>
+            <h3 class="font-medium mb-1">Operazione completata</h3>
+            <p>{{ successMessage }}</p>
+            <button
+              type="button"
+              (click)="indietro()"
+              class="mt-2 text-sm underline text-green-700 hover:text-green-900">
+              Torna alla lista report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form *ngIf="!loading && reportForm && reportInfo" [formGroup]="reportForm" class="space-y-6">
+
+        <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-card overflow-hidden">
+          <div class="px-4 py-3 border-b border-border-light dark:border-border-dark flex items-center gap-2">
+            <span class="material-icons text-primary text-xl">tune</span>
+            <h3 class="flex items-center font-semibold text-primary dark:text-blue-400 text-sm uppercase">Parametri Report</h3>
+          </div>
+          <div class="p-6 bg-accent-light dark:bg-accent-dark">
+            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
+              Compila i parametri per la generazione del report. I campi contrassegnati con <span class="text-red-500">*</span> sono obbligatori.
+            </p>
+
+            <div class="space-y-6">
+              <ng-container *ngFor="let section of sections; trackBy: trackBySection">
+                <div [ngSwitch]="section.type">
+
+                  <div *ngSwitchCase="'spacer'" class="h-0"></div>
+
+                  <div *ngSwitchCase="'ungrouped'" class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <ng-container *ngFor="let param of section.parameters; trackBy: trackByParam">
+                      <input *ngIf="isParamHidden(param)" type="hidden" [formControlName]="param.nome">
+                      <div *ngIf="!isParamHidden(param)"
+                           class="md:col-span-6"
+                           [class]="getParamCssClass(param) ?? ''">
+                        <ng-container *ngComponentOutlet="
+                          resolveComponent(param);
+                          inputs: getWidgetInputs(param)
+                        " />
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div *ngSwitchCase="'group'" class="border-2 border-border-light dark:border-border-dark rounded-lg relative">
+                    <div class="absolute -top-3 left-4 bg-surface-light dark:bg-surface-dark px-2">
+                      <span class="text-sm font-semibold text-primary dark:text-blue-400 uppercase">{{ section.groupName }}</span>
+                    </div>
+                    <div class="p-6 pt-8 grid grid-cols-1 md:grid-cols-12 gap-6">
+                      <ng-container *ngFor="let param of section.parameters; trackBy: trackByParam">
+                        <input *ngIf="isParamHidden(param)" type="hidden" [formControlName]="param.nome">
+                        <div *ngIf="!isParamHidden(param)"
+                             class="md:col-span-6"
+                             [class]="getParamCssClass(param) ?? ''">
+                          <ng-container *ngComponentOutlet="
+                            resolveComponent(param);
+                            inputs: getWidgetInputs(param)
+                          " />
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+
+                </div>
+              </ng-container>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded shadow-card overflow-hidden">
+          <div class="px-4 py-3 border-b border-border-light dark:border-border-dark flex items-center gap-2">
+            <span class="material-icons text-primary text-xl">description</span>
+            <h3 class="flex items-center font-semibold text-primary dark:text-blue-400 text-sm uppercase">Formato Output</h3>
+          </div>
+          <div class="p-6 bg-accent-light dark:bg-accent-dark">
+            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-4">
+              Seleziona il formato del report da generare
+            </p>
+            <div class="flex space-x-4">
+              <mat-button-toggle-group [(value)]="selectedFormato" class="formato-toggle">
+                <mat-button-toggle *ngFor="let formato of formatiDisponibili" [value]="formato.value">
+                  {{ formato.label }}
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+          </div>
+        </div>
+
+        <mat-datepicker #sharedDatePicker></mat-datepicker>
+
+        <div class="flex items-center space-x-4 pt-4 border-t border-border-light dark:border-border-dark">
+          <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="generaReportSync()"
+            [disabled]="submitting || reportForm.invalid"
+            class="flex items-center space-x-2">
+            <span class="material-icons">picture_as_pdf</span>
+            <span>Stampa</span>
+          </button>
+
+          <button
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="generaReportAsync()"
+            [disabled]="submitting || reportForm.invalid"
+            class="flex items-center space-x-2">
+            <span class="material-icons">schedule</span>
+            <span>Stampa Asincrona</span>
+          </button>
+
+          <button
+            type="button"
+            mat-button
+            (click)="annulla()"
+            [disabled]="submitting"
+            class="text-text-secondary-light dark:text-text-secondary-dark">
+            Annulla
+          </button>
+
+          <button
+            type="button"
+            mat-button
+            (click)="indietro()"
+            [disabled]="submitting"
+            class="text-text-secondary-light dark:text-text-secondary-dark">
+            Indietro
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</main>

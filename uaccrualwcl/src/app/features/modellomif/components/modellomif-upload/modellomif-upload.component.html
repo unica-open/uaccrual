@@ -1,0 +1,149 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">description</span>
+        <h2 class="card-title">Popolamento Modello MEF</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Descrizione -->
+      <div style="margin-bottom:24px;line-height:1.6">
+        <p style="font-size:13.5px;color:var(--fg);margin-bottom:12px">
+          Questa funzionalità consente di scaricare il modello di raccordo per gli Enti Locali
+          (<strong>Mod 2-a_Raccordo PdC eettDlgs118_2011_PdC unico</strong>) precompilato con i dati Accrual.
+        </p>
+        <p style="font-size:13.5px;color:var(--fg);margin-bottom:8px">Il modello verrà generato in formato Excel e conterrà:</p>
+        <ul style="padding-left:20px;font-size:13px;color:var(--fg-muted);display:flex;flex-direction:column;gap:4px">
+          <li><strong>Foglio 1:</strong> Saldo contabile per le voci del PdC 118/2011 (Colonna H)</li>
+          <li><strong>Foglio 2:</strong> Eventuali rettifiche/integrazioni per le voci del segmento A (Colonna L)</li>
+          <li><strong>Fogli 3-5:</strong> Saldi Bilancio ITAS per l'anno precedente</li>
+        </ul>
+      </div>
+
+      <!-- SELEZIONE ANNO -->
+      <div style="display:flex;align-items:center;gap:20px;padding:16px 20px;background:var(--surface-2);border-radius:var(--r-md);margin-bottom:24px">
+        <div class="field" style="flex:1;margin-bottom:0">
+          <label class="field-label" for="anno">Anno di riferimento</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="material-icons-round" style="font-size:18px;color:var(--fg-subtle);flex-shrink:0">calendar_today</span>
+            <p-select
+              [options]="anniDisponibili"
+              [(ngModel)]="annoSelezionato"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleziona Anno"
+              [style]="{'width': '200px'}"
+              [disabled]="anniLoading || anniDisponibili.length === 0"
+              id="anno"
+              styleClass="anno-select">
+            </p-select>
+          </div>
+          <p *ngIf="!anniLoading && anniDisponibili.length === 0" class="field-hint" style="color:var(--danger);margin-top:4px">
+            Nessun anno disponibile per questo ente.
+          </p>
+        </div>
+        <span class="field-hint">Anni configurati per l'entità contabile dell'ente corrente.</span>
+      </div>
+
+      <!-- Anteprima Template -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;gap:12px">
+          <button type="button" class="btn btn-secondary btn-sm" (click)="togglePreview()">
+            <span class="material-icons-round" style="font-size:14px">{{ showPreview ? 'visibility_off' : 'visibility' }}</span>
+            {{ showPreview ? 'Nascondi' : 'Visualizza' }} Anteprima Template
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="downloadTemplate()">
+            <span class="material-icons-round" style="font-size:14px">download</span>
+            Scarica Template Vuoto
+          </button>
+        </div>
+
+        <!-- Anteprima come tabella HTML -->
+        <div *ngIf="showPreview" style="margin-top:16px">
+
+          <div *ngIf="previewLoading" style="display:flex;align-items:center;justify-content:center;padding:32px">
+            <span style="color:var(--fg-subtle);font-size:13px">Caricamento anteprima...</span>
+          </div>
+
+          <div *ngIf="!previewLoading && previewData">
+            <!-- Tabs per selezionare i fogli -->
+            <div style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--border-color);padding-bottom:4px;margin-bottom:12px">
+              <button *ngFor="let foglio of templateStructure.fogli; let i = index"
+                      (click)="selectFoglio(i)"
+                      class="btn btn-sm"
+                      [class.btn-primary]="activeFoglio === i"
+                      [class.btn-ghost]="activeFoglio !== i"
+                      style="font-size:11px;height:30px;padding:0 12px">
+                {{ foglio.nome }}
+              </button>
+            </div>
+
+            <ng-container *ngFor="let foglio of templateStructure.fogli; let i = index">
+              <div *ngIf="activeFoglio === i">
+                <div style="padding:12px 16px;background:var(--accent-soft);border-radius:var(--r-sm);margin-bottom:12px">
+                  <strong style="font-size:13px;color:var(--accent)">{{ foglio.nome }}</strong>
+                  <p style="font-size:12px;color:var(--fg-muted);margin-top:2px">{{ foglio.descrizione }}</p>
+                  <div style="display:flex;gap:16px;margin-top:6px;font-size:12px;color:var(--fg-subtle)">
+                    <span><strong>Righe totali:</strong> {{ foglio.righeTotali }}</span>
+                    <span *ngIf="foglio.colonneDaPopolare.length > 0"><strong>Colonne da popolare:</strong> {{ foglio.colonneDaPopolare.join(', ') }}</span>
+                  </div>
+                </div>
+
+                <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+                  <table class="table" style="font-size:12px">
+                    <thead>
+                      <tr>
+                        <th style="width:48px;position:sticky;left:0;z-index:2;background:var(--surface-2)">Riga</th>
+                        <ng-container *ngFor="let col of previewData[foglio.nome]?.[0]; let j = index">
+                          <th [class.pop-col]="isColonnaDaPopolare(foglio, j + 1)" style="min-width:120px">
+                            <div style="display:flex;gap:4px;align-items:center">
+                              <span class="cell-mono" style="font-size:9px">{{ getColumnLetter(j + 1) }}</span>
+                              <span>{{ col || '---' }}</span>
+                              <span *ngIf="isColonnaDaPopolare(foglio, j + 1)" class="badge badge-info" style="font-size:9px;padding:1px 5px">pop</span>
+                            </div>
+                          </th>
+                        </ng-container>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let row of previewData[foglio.nome]?.slice(1); let rowIndex = index">
+                        <tr>
+                          <td class="cell-mono" style="position:sticky;left:0;background:inherit;width:48px">{{ rowIndex + 1 }}</td>
+                          <ng-container *ngFor="let cell of row; let j = index">
+                            <td [class.pop-col]="isColonnaDaPopolare(foglio, j + 1)" [class.cell-mono]="j < 3">
+                              {{ cell || '---' }}
+                            </td>
+                          </ng-container>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="padding:8px 16px;background:var(--surface-2);border-top:1px solid var(--border-color);font-size:12px;color:var(--fg-subtle)">
+                  Mostrati i primi 25 righe del foglio "{{ foglio.nome }}"
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- AZIONI -->
+      <div class="form-actions" style="justify-content:center;border-top:none;padding-top:0">
+        <button type="button" class="btn btn-primary btn-lg" (click)="scaricaModello()" [disabled]="loading || !annoSelezionato">
+          <span class="material-icons-round" style="font-size:16px" [class.animate-spin]="loading">file_download</span>
+          {{ loading ? 'Generazione in corso...' : 'Scarica Modello MEF' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</main>

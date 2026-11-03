@@ -1,0 +1,477 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "accrualwcl-ng": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "standalone": false
+        },
+        "@schematics/angular:directive": {
+          "standalone": false
+        },
+        "@schematics/angular:pipe": {
+          "standalone": false
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets"
+              }
+            ],
+            "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ng",
+			  "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "600kB",
+                  "maximumError": "1.2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kB",
+                  "maximumError": "12kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+			"production-ext": {
+              "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-ng",
+			  "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "600kB",
+                  "maximumError": "1.2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kB",
+                  "maximumError": "12kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "test": {
+              "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ng",
+			  "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.tst.ts"
+                }
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "local": {
+              "assets": [
+                      { "glob": "**/*", "input": "public" },
+                      { "glob": "**/*", "input": "src/assets", "output": "/assets" }
+                    ],
+              "baseHref": "/accrualwcl/",
+              "outputPath": "dist/accrualwcl-ng",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "docker": {
+              "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ng",
+			  "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+			"tu": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-tu-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.tu.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"tu-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-tu-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.tu.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"ni-pl-test": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ni-pl-test-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.ni-pl-test.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": true,
+			  "outputHashing": "all"
+			},
+			"integ": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-integ-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.integ.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"integ-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-integ-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.integ.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"forn1": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-f1-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.forn1.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"forn1-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-f1-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.forn1.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"coll": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.coll.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"coll-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.coll.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"forn2": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-f2-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.forn2.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"forn2-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-f2-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.forn2.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-rp": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-rp-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-rp.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-rp-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-rp-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-rp.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-cmto": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-cmto-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-cmto.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-cmto-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-cmto-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-cmto.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-int": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-int-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-int.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"prod-int-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-int-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.prod-int.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"consip": {
+			  "baseHref": "/accrualwcl/",
+			  "outputPath": "dist/accrualwcl-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.consip.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			},
+			"consip-ext": {
+			  "baseHref": "/accrualwcl-ext/",
+			  "outputPath": "dist/accrualwcl-ext-ng",
+			  "fileReplacements": [
+				{
+				  "replace": "src/environments/environment.ts",
+				  "with": "src/environments/environment.consip.ts"
+				}
+			  ],
+			  "optimization": true,
+			  "extractLicenses": true,
+			  "sourceMap": false,
+			  "outputHashing": "all"
+			}
+
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "accrualwcl-ng:build:production"
+            },
+            "development": {
+              "buildTarget": "accrualwcl-ng:build:development",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "test": {
+              "buildTarget": "accrualwcl-ng:build:test",
+              "proxyConfig": "proxy.conf.test.json"
+            },
+            "dev-local": {
+              "buildTarget": "accrualwcl-ng:build:local",
+              "proxyConfig": "proxy.conf.dev.json"
+            },
+            "docker": {
+              "buildTarget": "accrualwcl-ng:build:docker",
+              "proxyConfig": "proxy.conf.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets"
+              }
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
+}

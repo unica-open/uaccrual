@@ -1,0 +1,121 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="table-wrap">
+  <div *ngIf="loading" style="display:flex;justify-content:center;padding:32px">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color:var(--accent)"></div>
+  </div>
+
+  <table class="data-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th scope="col" style="text-align:center;width:40px">
+          <label class="checkbox">
+            <input type="checkbox" #selectAllCheckbox [checked]="isAllSelected()" (change)="onToggleAll($event)"/>
+            <span></span>
+          </label>
+        </th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Fonte</th>
+        <th scope="col">Causale</th>
+        <th scope="col">N. Provv.</th>
+        <th scope="col">Data Provv.</th>
+        <th scope="col">Stato</th>
+        <th scope="col">N. Def.</th>
+        <th scope="col">Data Def.</th>
+        <th scope="col">Dare</th>
+        <th scope="col">Avere</th>
+        <th scope="col">Descrizione</th>
+        <th class="col-actions" scope="col">Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of results">
+        <td style="text-align:center">
+          <label class="checkbox">
+            <input type="checkbox" [checked]="selectedItems.has(item.id)" (change)="onToggleItem(item.id, $event)"/>
+            <span></span>
+          </label>
+        </td>
+        <td>{{item.tipo}}</td>
+        <td>{{item.fonte}}</td>
+        <td>{{item.causale}}</td>
+        <td><span style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted)">{{item.numeroProvvisorio}}</span></td>
+        <td>{{item.dataRegProvvisoria | date:'dd/MM/yyyy'}}</td>
+        <td>{{item.stato}}</td>
+        <td><span style="font-family:var(--font-mono);font-size:12px;color:var(--fg-muted)">{{item.numeroDefinitivo}}</span></td>
+        <td>{{item.dataRegDefinitiva | date:'dd/MM/yyyy'}}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums">{{item.totaleDare | amountFormat:2}}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums">{{item.totaleAvere | amountFormat:2}}</td>
+        <td>{{item.descrizione}}</td>
+        <td class="col-actions">
+          <button class="row-act act-view" title="Visualizza" (click)="onViewDetail(item)">
+            <span class="material-icons-round">visibility</span>
+          </button>
+          <button *ngIf="item.isAggiornabile" class="row-act act-edit" title="Aggiorna"
+                  [routerLink]="['../modifica', item.anno, item.numeroProvvisorio]" [queryParams]="{ from: 'results' }">
+            <span class="material-icons-round">edit</span>
+          </button>
+          <button *ngIf="item.isValidabile && canValidate" class="row-act act-validate" title="Valida" (click)="onValida(item)">
+            <span class="material-icons-round">check_circle</span>
+          </button>
+          <button *ngIf="item.isAnnullabile" class="row-act act-delete" title="Annulla" (click)="onAnnulla(item)">
+            <span class="material-icons-round">delete</span>
+          </button>
+          <button *ngIf="item.isRiapribile" class="row-act act-restore" title="Riapri" (click)="onRiapri(item)">
+            <span class="material-icons-round">refresh</span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <div class="pg-left">
+      <span class="pg-meta">Mostra</span>
+      <div class="select-mini">
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+          <option *ngFor="let option of pageSizeOptions" [value]="option">{{option}}</option>
+        </select>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <span class="pg-meta">di <strong>{{ totalElements }}</strong> risultati</span>
+      <span *ngIf="selectedItems.size > 0" style="margin-left:8px;color:var(--accent);font-weight:600;font-size:12px">({{ selectedItems.size }} selezionati)</span>
+    </div>
+    <div class="pg-right">
+      <span class="pg-range">{{ ((currentPage ?? 0) * (pageSize ?? 20)) + 1 }}–{{ Math.min(((currentPage ?? 0) + 1) * (pageSize ?? 20), totalElements ?? 0) }} di {{ totalElements }}</span>
+      <div class="pg-buttons">
+        <button class="pg-btn" [disabled]="(currentPage ?? 0) === 0" (click)="onCustomPageChange(0)" title="Prima pagina">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 6-6 6 6 6"/><path d="m19 6-6 6 6 6"/></svg>
+        </button>
+        <button class="pg-btn" [disabled]="(currentPage ?? 0) === 0" (click)="onCustomPageChange((currentPage ?? 0) - 1)" title="Precedente">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+        </button>
+        <ng-container *ngFor="let page of getPages()">
+          <button *ngIf="page !== -1" class="pg-btn" [class.is-active]="page === (currentPage ?? 0)" (click)="onCustomPageChange(page)">{{ page + 1 }}</button>
+          <span *ngIf="page === -1" style="padding:0 4px;color:var(--fg-subtle)">...</span>
+        </ng-container>
+        <button class="pg-btn" [disabled]="(currentPage ?? 0) >= (totalPages - 1)" (click)="onCustomPageChange((currentPage ?? 0) + 1)" title="Successiva">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <button class="pg-btn" [disabled]="(currentPage ?? 0) >= (totalPages - 1)" (click)="onCustomPageChange(totalPages - 1)" title="Ultima pagina">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 6 6 6-6 6"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 16px">
+    <button *ngIf="canValidate" class="btn btn-secondary btn-lg" [disabled]="selectedItems.size === 0" (click)="onMassValidate()">
+      <span class="material-icons-round" style="font-size:16px">check_circle</span> Valida
+    </button>
+    <button class="btn btn-secondary btn-lg" (click)="onExport()">
+      <span class="material-icons-round" style="font-size:16px">download</span> Estrai
+    </button>
+    <button *ngIf="canInsert" class="btn btn-primary btn-lg" (click)="onInsert()">
+      <span class="material-icons-round" style="font-size:16px">add_circle</span> Inserisci
+    </button>
+  </div>
+</div>

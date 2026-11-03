@@ -1,0 +1,15 @@
+# Imposta il comportamento di default: Git rileva se è un file di testo
+# e normalizza sempre i fine riga a LF (Unix-style) nel repository.
+* text=auto eol=lf
+
+# Eccezioni: Specifica i file che DEVONO avere fine riga Windows (CRLF).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+
+db/ export-ignore
+wcl/ export-ignore  
+sbsrv/ export-ignore
+README.md export-ignore
+

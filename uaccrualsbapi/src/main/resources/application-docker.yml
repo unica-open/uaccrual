@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# ===========================================
+# ACCRUALSBAPI - Docker Environment Configuration
+# ===========================================
+# Configurazione specifica per ambiente Docker
+# Questo file viene caricato quando SPRING_PROFILES_ACTIVE=docker
+
+# ===========================================
+# DEVELOPMENT AUTHENTICATION
+# ===========================================
+dev:
+  auth:
+    enabled: true
+
+# ===========================================
+# JWT CONFIGURATION
+# ===========================================
+jwt:
+  secret: accrual-dev-secret-key-for-jwt-token-generation
+  expiration: 86400000
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+spring:
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/ACCRUAL
+    username: accrual
+    password: xxxx
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+logging:
+  level:
+    root: INFO
+    it.csi.accrual.accrualsbapi: DEBUG
+    org.springframework: WARN

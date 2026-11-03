@@ -1,0 +1,155 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="px-6 pb-6">
+
+  <app-message-display
+    [showMessage]="showNoContiResult"
+    messageType="info"
+    messageTitle="Informazione"
+    messageText="WEB_INF_0003 – Nessun conto trovato."
+    [showCloseButton]="false">
+  </app-message-display>
+
+  <div class="border border-border-light dark:border-border-dark rounded-lg mb-6 overflow-hidden">
+    <button type="button" (click)="toggleAccordion()"
+      class="w-full px-4 py-3 text-left font-semibold uppercase text-sm flex items-center justify-between"
+      style="background:var(--accent-soft);color:var(--accent);border-bottom:1px solid var(--border-color)">
+      <span>AGGIUNGI</span>
+      <span class="material-icons text-sm transition-transform duration-200" [ngClass]="{'rotate-180': accordionEspanso}">expand_more</span>
+    </button>
+
+    <div *ngIf="accordionEspanso" class="p-6" style="background:var(--surface)">
+      <div class="form-grid" style="grid-template-columns: 1fr 1fr auto">
+        <div class="field">
+          <label class="field-label">Codice Conto</label>
+          <input type="text" [(ngModel)]="nuovoContoCodice" placeholder="Inserisci codice per filtrare" class="input"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Descrizione Conto</label>
+          <input type="text" [(ngModel)]="nuovoContoDescrizione" placeholder="Inserisci descrizione per filtrare" class="input"/>
+        </div>
+        <div class="field" style="justify-content:flex-end">
+          <button type="button" (click)="onSearchConto()" class="btn btn-primary btn-lg">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+          </button>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:12px">
+        <div class="field" style="display:flex;flex-direction:row;align-items:flex-end;gap:16px">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="dareAvere" value="D" [(ngModel)]="nuovoContoDareAvere" style="accent-color:var(--accent);cursor:pointer"/>
+            <span style="font-size:13px;font-weight:600">Dare</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="dareAvere" value="A" [(ngModel)]="nuovoContoDareAvere" style="accent-color:var(--accent);cursor:pointer"/>
+            <span style="font-size:13px;font-weight:600">Avere</span>
+          </label>
+        </div>
+        <div class="field">
+          <label class="field-label">Importo *</label>
+          <input type="text" [(ngModel)]="nuovoContoImporto" amountInput [amountDecimalPlaces]="2" placeholder="0,00" class="input"/>
+        </div>
+      </div>
+
+      <div class="form-actions" style="justify-content:flex-start;border-top:none;margin-top:0;padding-top:8px">
+        <button type="button" class="btn btn-ghost btn-lg" (click)="onAnnullaConto()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="onConfermaConto()"><span class="material-icons-round" style="font-size:16px">check</span> Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Conto</th>
+          <th scope="col">Descrizione</th>
+          <th scope="col">Dare/Avere</th>
+          <th scope="col" style="text-align:right">Importo</th>
+          <th class="col-actions" scope="col">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let conto of getContiPagina(); let i = index">
+          <td>{{ conto.codice }}</td>
+          <td style="word-break:break-word">{{ conto.descrizione }}</td>
+          <td>
+            <span class="badge" [ngClass]="conto.dare > 0 ? 'badge-info' : 'badge-neutral'">{{ conto.dare > 0 ? 'Dare' : 'Avere' }}</span>
+          </td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">{{ (conto.dare > 0 ? conto.dare : conto.avere) | amountFormat:2 }}</td>
+          <td class="col-actions">
+            <button type="button" class="row-act act-edit" title="Modifica" (click)="modificaConto((currentPage * pageSize) + i)">
+              <span class="material-icons-round">edit</span>
+            </button>
+            <button type="button" class="row-act act-delete" title="Elimina" (click)="rimuoviConto((currentPage * pageSize) + i)">
+              <span class="material-icons-round">delete</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="getContiPagina().length === 0">
+          <td colspan="5" style="text-align:center;color:var(--fg-subtle);padding:24px">Nessun conto inserito. Utilizzare il form "AGGIUNGI" per inserire un conto.</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr style="font-weight:600">
+          <td colspan="3" style="padding:14px 16px"><strong>Totale</strong></td>
+          <td style="padding:14px 16px;text-align:right"><strong>Dare: {{ totaleDare | amountFormat:2 }}</strong></td>
+          <td style="padding:14px 16px;text-align:right"><strong>Avere: {{ totaleAvere | amountFormat:2 }}</strong></td>
+        </tr>
+        <tr *ngIf="totaleDare !== totaleAvere && conti.length > 0">
+          <td colspan="5" style="text-align:center;padding:8px 16px;font-size:12px;font-weight:600;color:var(--danger);background:var(--danger-soft)">
+            <span class="material-icons" style="font-size:14px;vertical-align:middle">warning</span> Attenzione: Totale Dare e Avere non coincidono
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div *ngIf="isModifica && conti.length > 0" class="pagination" style="margin-top:12px">
+    <div class="pagination-left">
+      <span>Righe per pagina</span>
+      <select class="select" style="width:76px;height:32px" (change)="onPageSizeChange($event)" [value]="pageSize">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+      </select>
+      <span>{{ getDisplayRange() }}</span>
+    </div>
+    <div class="pagination-right">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="previousPage()">
+        <span class="material-icons-round" style="font-size:14px">chevron_left</span>
+      </button>
+      <span style="padding:0 8px;font-size:12px;color:var(--fg-subtle)">Pagina {{ currentPage + 1 }} di {{ getTotalPages() }}</span>
+      <button class="page-btn" [disabled]="isLastPage()" (click)="nextPage()">
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;padding-top:16px;margin-top:12px;border-top:1px dashed var(--border-color)">
+    <a class="back-link" (click)="onIndietro()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+    <div style="flex:1;display:flex;justify-content:flex-end;gap:10px">
+      <button type="button" class="btn btn-ghost btn-lg" (click)="onAnnulla()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+      <button type="button" class="btn btn-secondary btn-lg" (click)="onSalva()" [disabled]="!isScritturaValida()"><span class="material-icons-round" style="font-size:16px">save</span> Salva</button>
+      <button type="button" class="btn btn-primary btn-lg" (click)="onSalvaEdEsci()" [disabled]="!isScritturaValida()"><span class="material-icons-round" style="font-size:16px">check</span> Salva ed Esci</button>
+      <button type="button" class="btn btn-primary btn-lg" (click)="onProsegui()" [disabled]="!isScritturaValida()"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Prosegui</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showPdcTreeSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50" role="dialog" aria-modal="true">
+  <div class="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+    <app-pdc-tree-search-modal
+      [searchTerm]="''"
+      [searchCodice]="searchCodiceForModal"
+      [searchDescrizione]="searchDescrizioneForModal"
+      [autoSelectSingleResult]="true"
+      (pdcSelected)="onContoSelezionato($event)"
+      (close)="onModalClosed()">
+    </app-pdc-tree-search-modal>
+  </div>
+</div>

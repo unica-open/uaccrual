@@ -1,0 +1,24 @@
+productName: siac
+componentName: accrualreport
+
+stages:
+  build: yes
+
+build:
+  buildFlow:
+  buildTool:
+  buildToolVersion:
+  buildEnvironment:
+  buildOptionString:
+  buildAntOpts: 
+  mavenSettings: 
+
+jobsToCopyFromList: 
+ 
+targetDir: 
+
+artifactsToArchive: 
+
+builds_to_execute:
+  accrualreport:
+    artifactsToPublish:

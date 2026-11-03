@@ -1,0 +1,25 @@
+productName: uaccrual
+componentName: uaccrualcommonsrv
+
+stages:
+  build: yes
+
+build:
+  buildFlow: sequential
+  buildTool: maven
+  buildToolVersion: maven_3_8_1
+  buildEnvironment: jdk_17_0_8
+  buildOptionString: "package"
+  buildAntOpts: 
+  mavenSettings: 
+  instanceDependent: no
+  packageType: generic_software
+
+
+builds_to_execute:
+  default:
+    repartPublish:
+      - uaccrualcommonsrv:
+          publishJavadoc: yes
+          publishSources: yes
+          publishArtifact: yes

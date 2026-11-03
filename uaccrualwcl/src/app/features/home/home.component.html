@@ -1,0 +1,41 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page page-home">
+  <div class="module-groups-grid">
+    <div *ngFor="let group of groupedActions"
+         class="module-group"
+         [class.is-wide]="group.actions.length >= 3"
+         [style.--g-color]="group.theme.color"
+         [style.--g-color-2]="group.theme.color2"
+         [style.--g-hue]="group.theme.hue">
+
+      <header class="module-group-header">
+        <div class="module-group-icon">
+          <span class="material-icons-round">{{ group.categoryIcon }}</span>
+        </div>
+        <div class="module-group-meta">
+          <div class="module-group-title">{{ group.actions.length }} moduli</div>
+          <div class="module-group-name">{{ group.category }}</div>
+        </div>
+      </header>
+
+      <div class="module-grid">
+        <button *ngFor="let action of group.actions" class="module-card"
+                (click)="navigateTo(action.routerLink)">
+          <div class="module-card-icon">
+            <span class="material-icons-round">{{ action.icon }}</span>
+          </div>
+          <div>
+            <div class="module-card-title">{{ action.title }}</div>
+            <div class="module-card-desc">{{ action.description }}</div>
+          </div>
+          <span class="module-card-arrow material-icons-round">arrow_forward</span>
+          <span class="module-card-glyph material-icons-round" aria-hidden="true">{{ action.icon }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,112 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<form [formGroup]="testataForm" class="px-6 pb-6 space-y-6">
+
+  <div class="grid grid-cols-12 gap-6">
+
+    <div class="col-span-3">
+      <label for="tipo" class="field-label">Tipo *</label>
+      <select id="tipo" formControlName="tipo" class="select">
+        <option value="">--- seleziona ---</option>
+        <option *ngFor="let tipo of tipi" [value]="tipo.value">{{ tipo.label }}</option>
+      </select>
+      <div *ngIf="isFieldInvalid('tipo')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('tipo'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+
+    <div class="col-span-3">
+      <label for="fonte" class="field-label">Fonte *</label>
+      <select id="fonte" formControlName="fonte" (change)="onFonteChange(testataForm.get('fonte')?.value)" class="select">
+        <option value="">--- seleziona ---</option>
+        <option *ngFor="let fonte of fonti" [value]="fonte.value">{{ fonte.label }}</option>
+      </select>
+      <div *ngIf="isFieldInvalid('fonte')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('fonte'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+
+    <div class="col-span-3">
+      <label for="evento" class="field-label">Evento contabile *</label>
+      <select id="evento" formControlName="evento" (change)="onEventoChange(testataForm.get('evento')?.value)" class="select">
+        <option value="">--- seleziona ---</option>
+        <option *ngFor="let evento of eventi" [value]="evento.value">{{ evento.label }}</option>
+      </select>
+      <div *ngIf="isFieldInvalid('evento')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('evento'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+
+    <div class="col-span-3">
+      <label for="causale" class="field-label">Causale *</label>
+      <select id="causale" formControlName="causale" class="select">
+        <option value="">--- seleziona ---</option>
+        <option *ngFor="let causale of causali" [value]="causale.value">{{ causale.label }}</option>
+      </select>
+      <div *ngIf="isFieldInvalid('causale')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('causale'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-6">
+
+    <div class="col-span-2">
+      <label for="numeroProvvisorio" class="field-label">Numero Provvisorio</label>
+      <input type="text" id="numeroProvvisorio" formControlName="numeroProvvisorio" readonly class="input" style="background:var(--surface-2);color:var(--fg-muted);cursor:not-allowed"/>
+    </div>
+
+    <div class="col-span-2">
+      <label for="dataRegProvvisoria" class="field-label">Data reg. provvisoria *</label>
+      <input type="date" id="dataRegProvvisoria" formControlName="dataRegProvvisoria" class="input"/>
+      <div *ngIf="isFieldInvalid('dataRegProvvisoria')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('dataRegProvvisoria'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+
+    <div class="col-span-2">
+      <label for="numeroDefinitivo" class="field-label">Numero Definitivo</label>
+      <input type="text" id="numeroDefinitivo" formControlName="numeroDefinitivo" readonly class="input" style="background:var(--surface-2);color:var(--fg-muted);cursor:not-allowed"/>
+    </div>
+
+    <div class="col-span-2">
+      <label for="dataRegDefinitiva" class="field-label">Data reg. definitiva</label>
+      <input type="date" id="dataRegDefinitiva" formControlName="dataRegDefinitiva" readonly class="input" style="background:var(--surface-2);color:var(--fg-muted);cursor:not-allowed"/>
+    </div>
+
+    <div class="col-span-3">
+      <label for="stato" class="field-label">Stato *</label>
+      <select id="stato" formControlName="stato" (change)="onStatoChange(testataForm.get('stato')?.value)" [attr.disabled]="!statoEditabile ? 'disabled' : null" class="select">
+        <option value="">--- seleziona ---</option>
+        <option *ngFor="let stato of stati" [value]="stato.value">{{ stato.label }}</option>
+      </select>
+      <div *ngIf="isFieldInvalid('stato')" class="text-red-500 text-xs mt-1">
+        <span *ngFor="let error of getFieldErrors('stato'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <label for="descrizione" class="field-label">Descrizione *</label>
+    <input type="text" id="descrizione" formControlName="descrizione" maxlength="500" class="input"/>
+    <div class="flex justify-end mt-1">
+      <span class="text-xs" style="color:var(--fg-subtle)">{{ testataForm.get('descrizione')?.value?.length || 0 }}/500</span>
+    </div>
+    <div *ngIf="isFieldInvalid('descrizione')" class="text-red-500 text-xs mt-1">
+      <span *ngFor="let error of getFieldErrors('descrizione'); let last = last">{{ error }}<span *ngIf="!last">, </span></span>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;padding-top:16px;margin-top:8px;border-top:1px dashed var(--border-color)">
+    <a class="back-link" (click)="onIndietro()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+    <div style="flex:1;display:flex;justify-content:flex-end;gap:10px">
+      <button type="button" class="btn btn-ghost btn-lg" (click)="onAnnulla()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+      <button type="button" class="btn btn-primary btn-lg" [disabled]="testataForm.invalid" (click)="onProsegui()"><span class="material-icons-round" style="font-size:16px">arrow_forward</span> Prosegui</button>
+    </div>
+  </div>
+</form>

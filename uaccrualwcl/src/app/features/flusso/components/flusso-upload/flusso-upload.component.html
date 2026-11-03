@@ -1,0 +1,59 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">cloud_upload</span>
+        <h2 class="card-title">Caricamento Flusso</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" for="codice">Codice file *</label>
+            <input class="input" id="codice" formControlName="codice" type="text" placeholder="Inserisci codice file" style="font-family:var(--font-mono)" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="tipoFile">Tipo *</label>
+            <select class="select" id="tipoFile" formControlName="tipoFile">
+              <option value="">-- Seleziona Tipo File --</option>
+              <option *ngFor="let tipo of (tipiFile$ | async)" [value]="tipo.codice">{{ tipo.codice }} - {{ tipo.descrizione }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="note">Note</label>
+            <input class="input" id="note" formControlName="note" type="text" placeholder="Inserisci eventuali note" />
+          </div>
+          <div class="field">
+            <label class="field-label">File *</label>
+            <label class="input" style="display:flex;align-items:center;cursor:pointer;gap:8px">
+              <span class="material-icons-round" style="font-size:16px;color:var(--accent)">attach_file</span>
+              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">
+                {{ selectedFile?.name || 'Seleziona file' }}
+              </span>
+              <input type="file" hidden (change)="onFileSelected($event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions" style="justify-content:center">
+          <button type="button" class="btn btn-ghost btn-lg" (click)="onCancel()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="uploadForm.invalid || !selectedFile || loading">
+            <span class="material-icons-round" style="font-size:16px">cloud_upload</span>
+            {{ loading ? 'Caricamento…' : 'Carica' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <a class="back-link" style="margin-top:16px" (click)="onBack()">
+    <span class="material-icons-round">arrow_back</span> Indietro
+  </a>
+</main>

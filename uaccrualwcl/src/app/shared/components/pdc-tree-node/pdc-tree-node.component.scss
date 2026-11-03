@@ -1,0 +1,71 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+.tree-node {
+  margin: 0.25rem 0;
+  padding: 0;
+
+  .node-content {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    &.selected {
+      background-color: #e7f3ff;
+      font-weight: 500;
+    }
+  }
+
+  .toggle-icon {
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-right: 0.25rem;
+    color: #6c757d;
+
+    &:hover {
+      color: #495057;
+    }
+  }
+
+  .empty-toggle {
+    width: 24px;
+    margin-right: 0.25rem;
+    color: #ccc;
+    display: inline-block;
+  }
+
+  .folder-icon {
+    color: #ffc107; // Colore giallo per la cartella
+    margin-right: 0.25rem;
+  }
+
+  .node-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    
+    .badge {
+      font-size: 0.75em;
+    }
+  }
+
+  .children-container {
+    margin-left: 1.5rem;
+    border-left: 1px solid #dee2e6;
+    padding-left: 0.5rem;
+  }
+}
+
+// Stile per i radio button
+input[type="radio"] {
+  margin: 0;
+  vertical-align: middle;
+}

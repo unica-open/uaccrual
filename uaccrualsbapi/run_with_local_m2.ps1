@@ -1,0 +1,1 @@
+docker run --rm -v ${PWD}:/usr/src/mymaven -v ${PWD}/.m2:/root/.m2 -p 8080:8080 -p 9009:9009 -it -w /usr/src/mymaven docker-base.ecosis.csi.it/maven:3.9.2-j17-csi-r1 mvn spring-boot:run ""--settings .mvn/conf/settings.xml"" "-Dspring-boot.run.jvmArguments=""-Dspring.profiles.active=dev""  ""-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9009"""

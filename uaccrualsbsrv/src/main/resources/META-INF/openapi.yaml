@@ -1,0 +1,4497 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.0.1
+info:
+  title: Accrual API
+  description: API per il backend Accrual.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+tags:
+  - name: system
+  - name: security
+  - name: business
+  - name: test
+paths:
+  /ping:
+    get:
+      tags:
+        - system
+      summary: Servizio di ping per verifica disponibilità
+      description: |
+        Servizio di controllo della disponibilità del backend che restituisce una risposta immediata
+        per confermare che il sistema è attivo e in grado di ricevere ed elaborare richieste HTTP.
+        Questo endpoint effettua una verifica di base della connettività e della funzionalità del servizio
+        senza eseguire alcuna operazione complessa né accedere a risorse esterne come database o sistemi di caching.
+        A differenza dell'endpoint /status, non fornisce dettagli sullo stato interno del sistema né metriche operative.
+        È ideale per sistemi di monitoraggio semplici, health check di load balancer e test di connettività di rete.
+      operationId: ping
+      responses:
+        "200":
+          description: |
+            Risposta positiva al ping. Indica che il servizio è attivo, disponibile e in grado di elaborare richieste.
+            La risposta contiene un messaggio di conferma (solitamente "pong") che certifica la capacità del sistema
+            di rispondere a richieste HTTP di base. L'header someheader è incluso come esempio per testare la corretta
+            gestione degli header di risposta da parte del client.
+          headers:
+            someheader:
+              description: Header di esempio utilizzato per verificare la corretta gestione degli header di risposta.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                pingResponse:
+                  summary: Esempio di risposta al ping con conferma di disponibilità
+                  value:
+                    message: "pong"
+        "503":
+          description: |
+            Servizio non disponibile. Il sistema è temporaneamente offline o in stato di malfunzionamento critico.
+            Questo codice di stato indica che il servizio non è attualmente in grado di elaborare alcuna richiesta,
+            né semplici ping né operazioni complesse. Potrebbe essere necessario un intervento manuale per ripristinare
+            la funzionalità. I sistemi di load balancing solitamente rimuovono temporaneamente il servizio dal pool
+            fino al ripristino della funzionalità.
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: |
+            Si è verificato un errore imprevisto durante il tentativo di ping del servizio.
+            La risposta contiene dettagli sull'errore che possono essere utili per la diagnosi del problema.
+            Questo potrebbe indicare un problema interno al servizio o un'anomalia nella gestione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+  /soggetti:
+    get:
+      tags:
+        - business
+      summary: Elenco dei soggetti
+      description: |
+        Recupera un elenco dei soggetti (persone fisiche o giuridiche) appartenenti all'ente specificato.
+        La risposta include informazioni dettagliate su ogni soggetto come codice, descrizione,
+        codice fiscale/partita IVA, stato, tipo e informazioni sull'ente di appartenenza.
+        I soggetti rappresentano le entità coinvolte nei processi contabili come fornitori, clienti, ecc.
+      operationId: getSoggetti
+      parameters:
+        - name: fields
+          in: query
+          description: |
+            Elenco di campi specifici da includere nella risposta, separati da virgola (es. 'codice,descrizione,codice_fiscale').
+            Se omesso, vengono restituiti tutti i campi disponibili.
+            Questo parametro permette di ridurre la quantità di dati trasmessi quando sono necessari solo alcuni campi.
+          schema:
+            type: string
+        - name: customHeader
+          in: header
+          description: Header personalizzato per testare la gestione degli header HTTP.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista dei soggetti che appartengono all'ente specificato.
+            Ogni elemento include tutti i dettagli del soggetto come codice, descrizione, codice fiscale/partita IVA,
+            stato, tipo e informazioni sull'ente di appartenenza.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Soggetto"
+              examples:
+                soggettiResponse:
+                  summary: Esempio di risposta con lista di soggetti
+                  value:
+                    - id: 1
+                      codice: "SGT001"
+                      descrizione: "Soggetto 1 - Fornitore Principale"
+                      codice_fiscale: "RSSMRA80A01H501A"
+                      partita_iva: "01234567890"
+                      email: "fornitore@esempio.com"
+                      pa: false
+                      istituto_di_credito: false
+                      ente:
+                        id: 1
+                        codice_fiscale: "ENTE001"
+                        denominazione: "Comune di Esempio"
+                      stato:
+                        id: 1
+                        codice: "ATTIVO"
+                        descrizione: "Attivo"
+                      tipo:
+                        id: 1
+                        codice: "FORNITORE"
+                        descrizione: "Fornitore"
+        "400":
+          description: |
+            Richiesta non valida. Il codice ente fornito non è valido o non rispetta il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero dei soggetti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /soggetti/{codice}:
+    get:
+      tags:
+        - business
+      summary: Dettaglio di un soggetto specifico
+      description: |
+        Recupera le informazioni complete di un soggetto specifico identificato dal suo codice univoco.
+        La risposta include tutti i dettagli del soggetto come codice, descrizione, codice fiscale/partita IVA,
+        stato, tipo, informazioni sull'ente di appartenenza e attributi come indirizzo email, indicazione se è PA o istituto di credito.
+        L'operazione verifica che il soggetto appartenga all'ente specificato e che sia attivo.
+      operationId: getSoggettoByCodice
+      parameters:
+        - name: codice
+          in: path
+          required: true
+          description: Codice univoco del soggetto da recuperare (es. 'SGT001', 'FORNITORE001', ecc.).
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: |
+            Elenco di campi specifici da includere nella risposta, separati da virgola (es. 'codice,descrizione,codice_fiscale').
+            Se omesso, vengono restituiti tutti i campi disponibili.
+            Questo parametro permette di ridurre la quantità di dati trasmessi quando sono necessari solo alcuni campi.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: |
+            Soggetto trovato con successo. La risposta contiene tutti i dettagli del soggetto richiesto,
+            inclusi informazioni sull'ente di appartenenza, stato e tipo del soggetto.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Soggetto"
+              examples:
+                soggettoResponse:
+                  summary: Esempio di risposta con dettaglio soggetto
+                  value:
+                    id: 1
+                    codice: "SGT001"
+                    descrizione: "Soggetto 1 - Fornitore Principale"
+                    codice_fiscale: "RSSMRA80A01H501A"
+                    partita_iva: "01234567890"
+                    email: "fornitore@esempio.com"
+                    pa: false
+                    istituto_di_credito: false
+                    ente:
+                      id: 1
+                      codice_fiscale: "ENTE001"
+                      denominazione: "Comune di Esempio"
+                    stato:
+                      id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Attivo"
+                    tipo:
+                      id: 1
+                      codice: "FORNITORE"
+                      descrizione: "Fornitore"
+        "404":
+          description: |
+            Soggetto non trovato. Non esiste un soggetto con il codice specificato appartenente all'ente indicato,
+            oppure il soggetto è inattivo o cancellato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Richiesta non valida. Il codice soggetto fornito non è valido o non rispetta il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero del soggetto.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /soggetti/codiceFiscale/{codiceFiscale}:
+    get:
+      tags:
+        - business
+      summary: Dettaglio di un soggetto tramite codice fiscale
+      description: |
+        Recupera le informazioni complete di un soggetto specifico identificato dal suo codice fiscale.
+        La risposta include tutti i dettagli del soggetto come codice, descrizione, codice fiscale/partita IVA,
+        stato, tipo, informazioni sull'ente di appartenenza e attributi come indirizzo email, indicazione se è PA o istituto di credito.
+        L'operazione verifica che il soggetto appartenga all'ente specificato e che sia attivo.
+        Questo endpoint è particolarmente utile quando si conosce il codice fiscale ma non il codice interno del soggetto.
+      operationId: getSoggettoByCodiceFiscale
+      parameters:
+        - name: codiceFiscale
+          in: path
+          required: true
+          description: Codice fiscale del soggetto da recuperare (può essere un codice fiscale persona fisica o partita IVA persona giuridica).
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: |
+            Elenco di campi specifici da includere nella risposta, separati da virgola (es. 'codice,descrizione,codice_fiscale').
+            Se omesso, vengono restituiti tutti i campi disponibili.
+            Questo parametro permette di ridurre la quantità di dati trasmessi quando sono necessari solo alcuni campi.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: |
+            Soggetto trovato con successo. La risposta contiene tutti i dettagli del soggetto richiesto,
+            inclusi informazioni sull'ente di appartenenza, stato e tipo del soggetto.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Soggetto"
+              examples:
+                soggettoResponse:
+                  summary: Esempio di risposta con dettaglio soggetto
+                  value:
+                    id: 1
+                    codice: "SGT001"
+                    descrizione: "Soggetto 1 - Fornitore Principale"
+                    codice_fiscale: "RSSMRA80A01H501A"
+                    partita_iva: "01234567890"
+                    email: "fornitore@esempio.com"
+                    pa: false
+                    istituto_di_credito: false
+                    ente:
+                      id: 1
+                      codice_fiscale: "ENTE001"
+                      denominazione: "Comune di Esempio"
+                    stato:
+                      id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Attivo"
+                    tipo:
+                      id: 1
+                      codice: "FORNITORE"
+                      descrizione: "Fornitore"
+        "404":
+          description: |
+            Soggetto non trovato. Non esiste un soggetto con il codice fiscale specificato appartenente all'ente indicato,
+            oppure il soggetto è inattivo o cancellato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Richiesta non valida. Il codice fiscale fornito non è valido o non rispetta il formato atteso (11 cifre per persona fisica, 11 cifre per partita IVA).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero del soggetto.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /azioni:
+    get:
+      tags:
+        - security
+      summary: Elenco azioni associate all'utente corrente
+      description: |
+        Recupera l'elenco delle azioni (permessi) associate all'utente autenticato.
+        Sia l'identità dell'utente che il codice ente corrente vengono estratti automaticamente dal token JWT.
+      operationId: getAzioni
+      parameters:
+        - name: group_by
+          in: query
+          required: false
+          description: |
+            Criterio di raggruppamento delle azioni.
+            Se omesso o vuoto, restituisce una lista piatta di azioni.
+            Se impostato a `gruppo`, restituisce le azioni raggruppate per GruppoAzione.
+          schema:
+            type: string
+            enum: [gruppo]
+            default: ""
+      responses:
+        "200":
+          description: |
+            Elenco delle azioni (permessi) associate all'utente specificato.
+            Se group_by è omesso: lista piatta di Azione.
+            Se group_by=gruppo: lista di GruppoAzione con azioni annidate.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/Azione"
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/GruppoAzione"
+              examples:
+                azioniResponseFlat:
+                  summary: Lista piatta (default)
+                  value:
+                    - id: 1
+                      codice: "PDC_CREATE"
+                      descrizione: "Permesso di creare nuovi piani dei conti"
+                      ordine: 1
+                      path: "/pdc/crea"
+                      gruppo_azione:
+                        id: 1
+                        codice: "PDC"
+                        descrizione: "Gestione Piani dei Conti"
+                    - id: 2
+                      codice: "PDC_READ"
+                      descrizione: "Permesso di leggere i piani dei conti"
+                      ordine: 2
+                      path: "/pdc"
+                      gruppo_azione:
+                        id: 1
+                        codice: "PDC"
+                        descrizione: "Gestione Piani dei Conti"
+                azioniGroupedResponse:
+                  summary: Raggruppate per gruppo (group_by=gruppo)
+                  value:
+                    - id: 1
+                      codice: "PDC"
+                      descrizione: "Gestione Piani dei Conti"
+                      azioni:
+                        - id: 1
+                          codice: "PDC_CREATE"
+                          descrizione: "Permesso di creare nuovi piani dei conti"
+                          ordine: 1
+                          path: "/pdc/crea"
+                        - id: 2
+                          codice: "PDC_READ"
+                          descrizione: "Permesso di leggere i piani dei conti"
+                          ordine: 2
+                          path: "/pdc"
+                    - id: 2
+                      codice: "SOGGETTI"
+                      descrizione: "Gestione Soggetti"
+                      azioni:
+                        - id: 3
+                          codice: "SOG_READ"
+                          descrizione: "Permesso di leggere i soggetti"
+                          ordine: 1
+                          path: "/soggetti"
+        "404":
+          description: |
+            Utente non trovato. Non esiste un utente associato al codice fiscale estratto dal JWT,
+            oppure l'utente non ha alcuna azione (permesso) associata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero delle azioni associate all'utente.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc:
+    get:
+      tags:
+        - business
+      summary: Elenco paginato e ordinato dei piani dei conti
+      description: |
+        Recupera un elenco paginato e ordinabile dei piani dei conti (PDC) appartenenti all'ente specificato.
+        La risposta include informazioni dettagliate su ogni conto come codice, descrizione, struttura gerarchica,
+        stato, tipo, classe e famiglia. La paginazione permette di gestire grandi volumi di dati in modo efficiente.
+        Il filtro predefinito mostra solo i conti attivi e ricercabili nell'anno corrente.
+      operationId: getPdcList
+      parameters:
+        - name: sort
+          in: query
+          description: |
+            Criteri di ordinamento nel formato 'campo,direzione' (es. 'codice,asc', 'descrizione,desc').
+            I campi disponibili per l'ordinamento sono: codice, descrizione, livello, data di inserimento, ecc.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: |
+            Numero massimo di elementi da restituire per pagina. Valore predefinito: 20.
+            Se si desidera ottenere tutti i risultati possibili, utilizzare il valore speciale -1.
+            Utilizzato per controllare la dimensione della risposta e ottimizzare le prestazioni.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            minimum: -1
+            maximum: 2147483647  # Integer.MAX_VALUE
+        - name: offset
+          in: query
+          description: |
+            Numero di elementi da saltare prima di iniziare a restituire i risultati.
+            Utilizzato per navigare tra le pagine dei risultati (es. offset=20 per la seconda pagina con limit=20).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista paginata dei piani dei conti che soddisfano i criteri richiesti.
+            Ogni elemento include tutti i dettagli del conto come codice, descrizione, struttura gerarchica,
+            stato, tipo, classe, famiglia e informazioni sull'ente di appartenenza.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedPdc"
+              examples:
+                pagedPdcResponse:
+                  summary: Esempio di risposta con lista paginata di PDC
+                  value:
+                    data:
+                      - id: 1
+                        codice: "1.1.1"
+                        codice_ufficiale: "1.1.1"
+                        descrizione: "Conto di entrata primario"
+                        livello: 3
+                        foglia: true
+                        modificabile: true
+                        eliminabile: true
+                        inseribile_figlio: false
+                        ente:
+                          id: 1
+                          codice_fiscale: "ENTE001"
+                          denominazione: "Comune di Esempio"
+                        pdc_famiglia:
+                          id: 1
+                          codice: "ACCRUAL-A"
+                          descrizione: "Famiglia A - Entrate"
+                          modificabile: true
+                          ricercabile: true
+                        pdc_classe:
+                          id: 1
+                          codice: "EP"
+                          descrizione: "Entrata/Spesa"
+                        pdc_tipo:
+                          id: 1
+                          codice: "CONTO"
+                          descrizione: "Conto standard"
+                        pdc_stato:
+                          id: 1
+                          codice: "ATTIVO"
+                          descrizione: "Attivo"
+                    page: 0
+                    page_size: 20
+                    total_elements: 1
+        default:
+          description: Si è verificato un errore imprevisto durante l'elaborazione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - business
+      summary: Crea un nuovo piano dei conti
+      description: |
+        Crea un nuovo conto nel piano dei conti (PDC) per l'ente specificato.
+        Il nuovo conto verrà inserito nella struttura gerarchica del PDC con i dettagli forniti.
+        Durante la creazione vengono calcolati automaticamente alcuni campi derivati come il codice ufficiale
+        e il livello gerarchico in base al conto padre (se specificato).
+        Il sistema esegue tutte le validazioni necessarie prima di salvare il nuovo conto.
+      operationId: createPdc
+      parameters:
+      requestBody:
+        description: |
+          Oggetto contenente i dettagli del nuovo piano dei conti da creare.
+          Devono essere forniti almeno i campi obbligatori come codice, descrizione, famiglia, tipo, classe e stato.
+          Il campo 'pdcPadre' è opzionale e serve per indicare il conto genitore nella struttura gerarchica.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pdc"
+        required: true
+      responses:
+        "201":
+          description: |
+            Nuovo piano dei conti creato con successo. La risposta contiene tutti i dettagli del conto appena creato,
+            inclusi i valori calcolati automaticamente come il codice ufficiale e il livello gerarchico.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pdc"
+              examples:
+                pdcResponse:
+                  summary: Esempio di risposta con PDC creato
+                  value:
+                    id: 1
+                    codice: "1.1.1"
+                    codice_ufficiale: "1.1.1"
+                    descrizione: "Conto di entrata primario"
+                    livello: 3
+                    foglia: true
+                    modificabile: true
+                    eliminabile: true
+                    inseribile_figlio: false
+                    ente:
+                      id: 1
+                      codice_fiscale: "ENTE001"
+                      denominazione: "Comune di Esempio"
+                    pdc_famiglia:
+                      id: 1
+                      codice: "ACCRUAL-A"
+                      descrizione: "Famiglia A - Entrate"
+                      modificabile: true
+                      ricercabile: true
+                    pdc_classe:
+                      id: 1
+                      codice: "EP"
+                      descrizione: "Entrata/Spesa"
+                    pdc_tipo:
+                      id: 1
+                      codice: "CONTO"
+                      descrizione: "Conto standard"
+                    pdc_stato:
+                      id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Attivo"
+        "400":
+          description: |
+            Richiesta non valida. I dati forniti non soddisfano i requisiti di validazione.
+            Potrebbe trattarsi di campi obbligatori mancanti, valori non validi o violazione di vincoli di business.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Conflitto durante la creazione del conto. Potrebbe trattarsi di un codice già esistente
+            o di un tentativo di creare un conto in una posizione gerarchica non consentita.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante la creazione del piano dei conti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/search:
+    post:
+      tags:
+        - business
+      summary: Ricerca avanzata dei piani dei conti
+      description: |
+        Effettua una ricerca avanzata dei piani dei conti (PDC) utilizzando criteri di filtro specifici.
+        A differenza dell'endpoint GET /pdc, questo endpoint permette di applicare filtri complessi
+        utilizzando un oggetto di filtro strutturato che può includere condizioni multiple su diversi campi.
+        La ricerca restituisce una lista paginata e ordinabile dei conti che soddisfano tutti i criteri specificati.
+        I risultati sono limitati all'ente specificato e includono solo conti attivi e ricercabili per l'anno corrente.
+      operationId: searchPdc
+      parameters:
+        - name: sort
+          in: query
+          description: |
+            Criteri di ordinamento nel formato 'campo,direzione' (es. 'codice,asc', 'descrizione,desc').
+            I campi disponibili per l'ordinamento sono: codice, descrizione, livello, data di inserimento, ecc.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: |
+            Numero massimo di elementi da restituire per pagina. Valore predefinito: 20.
+            Se si desidera ottenere tutti i risultati possibili, utilizzare il valore speciale -1.
+            Utilizzato per controllare la dimensione della risposta e ottimizzare le prestazioni.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            minimum: -1
+            maximum: 2147483647  # Integer.MAX_VALUE
+        - name: offset
+          in: query
+          description: |
+            Numero di elementi da saltare prima di iniziare a restituire i risultati.
+            Utilizzato per navigare tra le pagine dei risultati (es. offset=20 per la seconda pagina con limit=20).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+      requestBody:
+        description: |
+          Oggetto contenente i criteri di filtro per la ricerca avanzata dei piani dei conti.
+          Ogni campo nell'oggetto filtro rappresenta una condizione che i risultati devono soddisfare.
+          Tutte le condizioni sono combinate con un operatore logico AND (devono essere soddisfatte contemporaneamente).
+          I filtri disponibili includono: famiglia, codice evento, classe, tipo, stato, descrizione, ecc.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PdcFilter'
+            examples:
+              pdcFilterExample:
+                summary: Esempio di risposta con risultati della ricerca PDC
+                value:
+                  famiglia: "ACCRUAL-A"
+                  codice_evento: "APE_ATT"
+                  pdc_classe_codice: "EP"
+                  pdc_stato_codice: "ATTIVO"
+                  descrizione: "contanti"
+                  livello: 3
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista paginata dei piani dei conti che soddisfano tutti i criteri di ricerca specificati.
+            Ogni elemento include tutti i dettagli del conto come codice, descrizione, struttura gerarchica,
+            stato, tipo, classe, famiglia e informazioni sull'ente di appartenenza.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedPdc"
+              examples:
+                pagedPdcResponse:
+                  summary: Esempio di risposta con risultati della ricerca PDC
+                  value:
+                    data:
+                      - id: 1
+                        codice: "1.1.1"
+                        codice_ufficiale: "1.1.1"
+                        descrizione: "Conto di entrata primario"
+                        livello: 3
+                        foglia: true
+                        modificabile: true
+                        eliminabile: true
+                        inseribile_figlio: false
+                        ente:
+                          id: 1
+                          codice_fiscale: "ENTE001"
+                          denominazione: "Comune di Esempio"
+                        pdc_famiglia:
+                          id: 1
+                          codice: "ACCRUAL-A"
+                          descrizione: "Famiglia A - Entrate"
+                          modificabile: true
+                          ricercabile: true
+                        pdc_classe:
+                          id: 1
+                          codice: "EP"
+                          descrizione: "Entrata/Spesa"
+                        pdc_tipo:
+                          id: 1
+                          codice: "CONTO"
+                          descrizione: "Conto standard"
+                        pdc_stato:
+                          id: 1
+                          codice: "ATTIVO"
+                          descrizione: "Attivo"
+                    page: 0
+                    page_size: 20
+                    total_elements: 1
+        "400":
+          description: |
+            Richiesta non valida. I criteri di filtro forniti non soddisfano i requisiti di validazione.
+            Potrebbe trattarsi di campi di filtro non validi o valori non conformi ai tipi attesi.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante l'elaborazione della ricerca.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/export:
+    post:
+      tags:
+        - business
+      summary: Esportazione CSV dei piani dei conti
+      description: |
+        Esporta i risultati della ricerca dei piani dei conti (PDC) in formato CSV (Comma-Separated Values).
+        L'endpoint accetta gli stessi criteri di filtro dell'endpoint /pdc/search e restituisce un file CSV
+        contenente tutti i conti che soddisfano i criteri specificati, senza paginazione.
+        Il file CSV è codificato in UTF-8 e utilizza il punto e virgola (;) come separatore, compatibile con Excel italiano.
+        Il file viene scaricato automaticamente dal browser con nome "pdc_export_YYYY-MM-DD.csv".
+      operationId: exportPdcList
+      parameters:
+        - name: sort
+          in: query
+          description: |
+            Criteri di ordinamento nel formato 'campo,direzione' (es. 'codice,asc', 'descrizione,desc').
+            I campi disponibili per l'ordinamento sono: codice_ufficiale, descrizione, livello, ecc.
+          schema:
+            type: string
+      requestBody:
+        description: |
+          Oggetto contenente i criteri di filtro per l'esportazione dei piani dei conti.
+          Ogni campo nell'oggetto filtro rappresenta una condizione che i risultati devono soddisfare.
+          Tutte le condizioni sono combinate con un operatore logico AND (devono essere soddisfatte contemporaneamente).
+          I filtri disponibili includono: famiglia, codice evento, classe, tipo, stato, descrizione, ecc.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PdcFilter'
+            examples:
+              pdcFilterExample:
+                summary: Esempio di filtro per esportazione PDC
+                value:
+                  famiglia: "ACCRUAL-A"
+                  codice_evento: "APE_ATT"
+                  pdc_classe_codice: "EP"
+                  pdc_stato_codice: "ATTIVO"
+                  descrizione: "contanti"
+      responses:
+        "200":
+          description: |
+            File CSV contenente i risultati della ricerca esportati.
+            Il file include un header con i nomi dei campi e una riga per ogni conto PdC.
+            Formato: Codice Ufficiale;Codice;Descrizione;Classe;Tipo;Stato;Livello;Inizio Validità;Fine Validità
+          headers:
+            Content-Disposition:
+              description: Header che indica il download del file con nome "pdc_export_YYYY-MM-DD.csv"
+              schema:
+                type: string
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+              example: |
+                Codice Ufficiale;Codice;Descrizione;Classe;Tipo;Stato;Livello;Inizio Validità;Fine Validità
+                ACCR.0;ACCR.0;PIANO DEI CONTI;PATRIMONIALE;SINTETICO;A-Attivo;1;2025-01-01;
+                ACCR.0.001;ACCR.0.1;ATTIVITA' FINANZIARIE;PATRIMONIALE;SINTETICO;A-Attivo;2;2025-01-01;
+        "400":
+          description: |
+            Richiesta non valida. I criteri di filtro forniti non soddisfano i requisiti di validazione.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: |
+            Errore interno durante la generazione del CSV.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante l'esportazione.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/search-tree:
+    post:
+      tags:
+        - business
+      summary: Ricerca avanzata dei piani dei conti in formato gerarchico
+      description: |
+        Effettua una ricerca avanzata dei piani dei conti (PDC) utilizzando criteri di filtro specifici
+        e restituisce i risultati in formato gerarchico (albero).
+        A differenza dell'endpoint GET /pdc, questo endpoint permette di applicare filtri complessi
+        utilizzando un oggetto di filtro strutturato che può includere condizioni multiple su diversi campi.
+        La ricerca restituisce una lista gerarchica dei conti che soddisfano tutti i criteri specificati.
+        I risultati sono limitati all'ente specificato e includono solo conti attivi e ricercabili per l'anno corrente.
+      operationId: searchPdcTree
+      parameters:
+      requestBody:
+        description: |
+          Oggetto contenente i criteri di filtro per la ricerca avanzata dei piani dei conti in formato gerarchico.
+          Ogni campo nell'oggetto filtro rappresenta una condizione che i risultati devono soddisfare.
+          Tutte le condizioni sono combinate con un operatore logico AND (devono essere soddisfatte contemporaneamente).
+          I filtri disponibili includono: famiglia, codice evento, classe, tipo, stato, descrizione, ecc.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PdcTreeFilter'
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista gerarchica dei piani dei conti che soddisfano tutti i criteri di ricerca specificati.
+            Ogni elemento include tutti i dettagli del conto come codice, descrizione, struttura gerarchica,
+            stato, tipo, classe, famiglia e informazioni sull'ente di appartenenza.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdcTreeResult"
+  /pdc/{codiceUfficiale}/{codiceClasse}/{codiceFamiglia}:
+    get:
+      tags:
+        - business
+      summary: Dettaglio di un piano dei conti specifico
+      description: |
+        Recupera le informazioni complete di un piano dei conti (PDC) specifico identificato dalla sua chiave logica univoca
+        composta da codice ufficiale, classe e famiglia.
+        La risposta include tutti i dettagli del conto come codice, descrizione, struttura gerarchica (conto padre),
+        stato, tipo, classe, famiglia, informazioni sull'ente di appartenenza e attributi come modificabilità ed eliminabilità.
+        L'operazione verifica che il conto appartenga all'ente specificato e che sia attivo e ricercabile.
+      operationId: getPdcByCodiceUfficialeClasseFamiglia
+      parameters:
+        - name: codiceUfficiale
+          in: path
+          required: true
+          description: Codice ufficiale del piano dei conti da recuperare (es. '1.1.1', '2.3.4.5', ecc.).
+          schema:
+            type: string
+        - name: codiceClasse
+          in: path
+          required: true
+          description: Codice della classe del piano dei conti da recuperare (es. 'AP', 'SP', ecc.).
+          schema:
+            type: string
+        - name: codiceFamiglia
+          in: path
+          required: true
+          description: Codice della famiglia del piano dei conti da recuperare (es. 'ACCRUAL-UTENTE', ecc.).
+          schema:
+            type: string
+        - name: fields
+          in: query
+          description: |
+            Elenco di campi specifici da includere nella risposta, separati da virgola (es. 'codice,descrizione,ente').
+            Se omesso, vengono restituiti tutti i campi disponibili.
+            Questo parametro permette di ridurre la quantità di dati trasmessi quando sono necessari solo alcuni campi.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: |
+            Piano dei conti trovato con successo. La risposta contiene tutti i dettagli del conto richiesto,
+            inclusi i riferimenti gerarchici (conto padre), informazioni sull'ente, stato, tipo, classe e famiglia.
+            Vengono anche forniti indicatori booleani per determinare se il conto è modificabile, eliminabile o se è possibile inserire sottoconti.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pdc"
+              examples:
+                pdcResponse:
+                  summary: Esempio di risposta con dettaglio PDC
+                  value:
+                    id: 1
+                    codice: "1.1.1"
+                    codice_ufficiale: "1.1.1"
+                    descrizione: "Conto di entrata primario"
+                    livello: 3
+                    foglia: true
+                    modificabile: true
+                    eliminabile: true
+                    inseribile_figlio: false
+                    ente:
+                      id: 1
+                      codice_fiscale: "ENTE001"
+                      denominazione: "Comune di Esempio"
+                    pdc_famiglia:
+                      id: 1
+                      codice: "ACCRUAL-A"
+                      descrizione: "Famiglia A - Entrate"
+                      modificabile: true
+                      ricercabile: true
+                    pdc_classe:
+                      id: 1
+                      codice: "EP"
+                      descrizione: "Entrata/Spesa"
+                    pdc_tipo:
+                      id: 1
+                      codice: "CONTO"
+                      descrizione: "Conto standard"
+                    pdc_stato:
+                      id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Attivo"
+        "404":
+          description: |
+            Piano dei conti non trovato. Non esiste un conto con la combinazione specificata di codice ufficiale, classe e famiglia
+            appartenente all'ente indicato, oppure il conto è inattivo, non ricercabile o cancellato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Richiesta non valida. I parametri forniti (codice ufficiale, classe o famiglia) non sono validi o non rispettano il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero del piano dei conti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - business
+      summary: Aggiorna un piano dei conti esistente
+      description: |
+        Aggiorna i dettagli di un piano dei conti (PDC) esistente identificato dal suo codice univoco.
+        L'aggiornamento può modificare vari attributi del conto come descrizione, stato, tipo, classe, famiglia, ecc.
+        Il sistema esegue tutte le validazioni necessarie prima di applicare le modifiche e tiene conto
+        di eventuali vincoli di business come la fase operativa del bilancio, la possibilità di modifica
+        in base alla famiglia del conto e altri controlli di integrità.
+        Viene utilizzato il meccanismo di optimistic locking tramite il campo 'version' per evitare
+        conflitti di aggiornamento quando più utenti modificano contemporaneamente lo stesso conto.
+      operationId: updatePdcByTripleKey
+      parameters:
+        - name: codiceUfficiale
+          in: path
+          required: true
+          description: Codice ufficiale del piano dei conti da aggiornare (es. '1.1.1', '2.3.4.5', ecc.).
+          schema:
+            type: string
+        - name: codiceClasse
+          in: path
+          required: true
+          description: Codice della classe del piano dei conti da aggiornare (es. 'AP', 'SP', ecc.).
+          schema:
+            type: string
+        - name: codiceFamiglia
+          in: path
+          required: true
+          description: Codice della famiglia del piano dei conti da aggiornare (es. 'ACCRUAL-UTENTE', ecc.).
+          schema:
+            type: string
+      requestBody:
+        description: |
+          Oggetto contenente i nuovi valori per i campi del piano dei conti.
+          Possono essere aggiornati uno o più campi contemporaneamente.
+          Il campo 'version' è obbligatorio e deve corrispondere alla versione corrente del record
+          per garantire la consistenza dei dati durante l'aggiornamento concorrente.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pdc"
+        required: true
+      responses:
+        "200":
+          description: |
+            Piano dei conti aggiornato con successo. La risposta contiene tutti i dettagli del conto
+            dopo l'applicazione delle modifiche, inclusi eventuali aggiornamenti automatici ai campi
+            derivati come il codice ufficiale in caso di modifiche alla struttura gerarchica.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pdc"
+              examples:
+                pdcResponse:
+                  summary: Esempio di risposta con PDC aggiornato
+                  value:
+                    id: 1
+                    codice: "1.1.1"
+                    codice_ufficiale: "1.1.1"
+                    descrizione: "Conto di entrata primario - AGGIORNATO"
+                    livello: 3
+                    foglia: true
+                    modificabile: true
+                    eliminabile: true
+                    inseribile_figlio: false
+                    version: 2
+                    ente:
+                      id: 1
+                      codice_fiscale: "ENTE001"
+                      denominazione: "Comune di Esempio"
+                    pdc_famiglia:
+                      id: 1
+                      codice: "ACCRUAL-A"
+                      descrizione: "Famiglia A - Entrate"
+                      modificabile: true
+                      ricercabile: true
+                    pdc_classe:
+                      id: 1
+                      codice: "EP"
+                      descrizione: "Entrata/Spesa"
+                    pdc_tipo:
+                      id: 1
+                      codice: "CONTO"
+                      descrizione: "Conto standard"
+                    pdc_stato:
+                      id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Attivo"
+        "404":
+          description: |
+            Piano dei conti non trovato. Non esiste un conto con il codice specificato appartenente all'ente indicato,
+            oppure il conto è inattivo, non ricercabile o cancellato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Richiesta non valida. I dati forniti non soddisfano i requisiti di validazione.
+            Potrebbe trattarsi di campi obbligatori mancanti, valori non validi, violazione di vincoli di business
+            o versione del record non corrispondente (indicando che il record è stato modificato da un altro utente).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Conflitto durante l'aggiornamento del conto. Potrebbe trattarsi di un tentativo di aggiornare
+            un record che è stato modificato da un altro utente nel frattempo (version mismatch),
+            o di un tentativo di modificare un conto in una posizione gerarchica non consentita.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante l'aggiornamento del piano dei conti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - business
+      summary: Elimina (annulla) un piano dei conti
+      description: |
+        Annulla un piano dei conti (PDC) esistente identificato dalla sua chiave logica univoca
+        composta da codice ufficiale, classe e famiglia.
+        L'operazione non cancella fisicamente il record dal database ma ne cambia lo stato impostando
+        la data di cancellazione, effettuando quindi una cancellazione logica.
+        Prima dell'eliminazione vengono eseguite tutte le verifiche necessarie per assicurare
+        che il conto possa essere eliminato (es. non deve avere legami con altri oggetti del sistema,
+        deve essere un conto foglia, ecc.). L'eliminazione è consentita solo se il conto appartiene
+        all'ente specificato e soddisfa i requisiti di business per l'eliminazione.
+      operationId: deletePdcByTripleKey
+      parameters:
+        - name: codiceUfficiale
+          in: path
+          required: true
+          description: Codice ufficiale del piano dei conti da eliminare (es. '1.1.1', '2.3.4.5', ecc.).
+          schema:
+            type: string
+        - name: codiceClasse
+          in: path
+          required: true
+          description: Codice della classe del piano dei conti da eliminare (es. 'AP', 'SP', ecc.).
+          schema:
+            type: string
+        - name: codiceFamiglia
+          in: path
+          required: true
+          description: Codice della famiglia del piano dei conti da eliminare (es. 'ACCRUAL-UTENTE', ecc.).
+          schema:
+            type: string
+      responses:
+        "204":
+          description: |
+            Piano dei conti eliminato con successo. La risposta indica che l'operazione è stata completata
+            con successo ma non restituisce alcun contenuto. Il conto è stato contrassegnato come cancellato
+            tramite l'impostazione della data di cancellazione e non sarà più visibile nelle ricerche standard.
+        "404":
+          description: |
+            Piano dei conti non trovato. Non esiste un conto con il codice specificato appartenente all'ente indicato,
+            oppure il conto è già stato cancellato in precedenza.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Impossibile eliminare il piano dei conti. Il conto non soddisfa i requisiti per l'eliminazione,
+            ad esempio perché non è un conto foglia (ha sottoconti), oppure perché è coinvolto in altre
+            relazioni che impediscono la sua cancellazione (es. movimenti contabili associati).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: |
+            Eliminazione non consentita. L'utente non ha i permessi necessari per eliminare il piano dei conti
+            o il conto non soddisfa i requisiti di business per l'eliminazione (es. fase operativa del bilancio
+            non consente modifiche, conto non modificabile per motivi di configurazione, ecc.).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante l'eliminazione del piano dei conti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/{codiceUfficiale}/{codiceClasse}/{codiceFamiglia}/relazioni:
+    get:
+      tags:
+        - business
+      summary: Ottiene tutte le relazioni associate a un PdC specifico
+      description: |
+        Recupera un elenco delle relazioni associate a un piano dei conti (PDC) specifico identificato dalla sua chiave logica univoca
+        composta da codice ufficiale, classe e famiglia.
+        La risposta include informazioni dettagliate sui conti collegati attraverso relazioni di tipo FONDO o CORRELAZIONE.
+        E' possibile filtrare i risultati specificando il tipo di relazione tramite il parametro query 'tipo'.
+        Ogni relazione include dettagli come tipo di relazione, classe, tipo, livello, segmento, codice e descrizione del conto collegato.
+      operationId: getPdcRelazioniByKey
+      parameters:
+        - name: codiceUfficiale
+          in: path
+          required: true
+          description: Codice ufficiale del piano dei conti da cui recuperare le relazioni (es. '1.1.1', '2.3.4.5', ecc.).
+          schema:
+            type: string
+        - name: codiceClasse
+          in: path
+          required: true
+          description: Codice della classe del piano dei conti da cui recuperare le relazioni (es. 'AP', 'SP', ecc.).
+          schema:
+            type: string
+        - name: codiceFamiglia
+          in: path
+          required: true
+          description: Codice della famiglia del piano dei conti da cui recuperare le relazioni (es. 'ACCRUAL-UTENTE', ecc.).
+          schema:
+            type: string
+        - name: tipo
+          in: query
+          required: false
+          description: |
+            Tipo di relazione da filtrare. Valori possibili: FONDO, CORRELAZIONE.
+            Se omesso, vengono restituite tutte le relazioni associate al PdC.
+          schema:
+            type: string
+            enum: [FONDO, CORRELAZIONE]
+      responses:
+        "200":
+          description: |
+            Relazioni trovate con successo. La risposta contiene una lista dei conti collegati
+            al PdC specificato attraverso relazioni di tipo FONDO o CORRELAZIONE.
+            Ogni elemento include le informazioni necessarie per visualizzare i dettagli del conto collegato
+            come richiesto dalle sezioni "FONDO" e "CORRELAZIONE DLGS 118" del dettaglio PdC.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdcContoRelazione"
+              examples:
+                pdcRelazioniResponse:
+                  summary: Esempio di risposta con lista di relazioni PDC
+                  value:
+                    - tipoRelazione: "FONDO"
+                      classe: "Entrata/Spesa"
+                      tipo: "Conto Standard"
+                      livello: 3
+                      segmento: "1.1"
+                      codice: "1.1.2"
+                      descrizione: "Conto fondo per entrata primaria"
+                    - tipoRelazione: "CORRELAZIONE"
+                      classe: "Capitale/Passività"
+                      tipo: "Voce di Bilancio"
+                      livello: 3
+                      segmento: "1.2"
+                      codice: "1.2.1"
+                      descrizione: "Conto correlato per entrata primaria"
+        "404":
+          description: |
+            Piano dei conti non trovato. Non esiste un conto con il codice specificato appartenente all'ente indicato,
+            oppure il conto è inattivo, non ricercabile o cancellato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: |
+            Richiesta non valida. Il codice PDC fornito non è valido o non rispetta il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero delle relazioni del piano dei conti.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/classi:
+    get:
+      tags:
+        - business
+      summary: Elenco delle classi dei piani dei conti
+      description: |
+        Recupera l'elenco completo delle classi disponibili per i piani dei conti (PDC) nel sistema.
+        Le classi rappresentano le macrocategorie fondamentali in cui vengono raggruppati i conti contabili
+        in base alla loro natura economica o patrimoniale, come ad esempio 'Entrata/Spesa', 'Capitale/Passività', 'Risultato Economico', ecc.
+        Ogni classe è identificata da un codice univoco e include una descrizione esplicativa del suo significato contabile.
+        Questo endpoint fornisce i valori di riferimento standard utilizzati per categorizzare i conti
+        all'interno del piano dei conti e viene comunemente utilizzato per popolare liste di selezione
+        nell'interfaccia utente o per applicare filtri durante la ricerca e la creazione di nuovi piani dei conti.
+        Le classi sono condivise tra tutti gli enti e rappresentano una struttura di classificazione standardizzata.
+        **Nota:** Questo endpoint restituisce solo le classi che hanno almeno un conto valido per l'anno di bilancio specificato nel JWT.
+      operationId: getPdcClassi
+      parameters:
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista completa delle classi dei piani dei conti disponibili nel sistema.
+            Ogni elemento include tutti i dettagli della classe come codice univoco, descrizione completa
+            e altri attributi rilevanti per la classificazione contabile.
+            Questi valori possono essere utilizzati per comprendere la categoria economica o patrimoniale di un conto,
+            per applicare filtri durante la ricerca o per selezionare la classe appropriata durante la creazione
+            di nuovi piani dei conti.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdcClasse"
+              examples:
+                pdcClassiResponse:
+                  summary: Esempio di risposta con lista completa delle classi dei PDC
+                  value:
+                    - id: 1
+                      codice: "EP"
+                      descrizione: "Entrata/Spesa - Classifica i conti relativi a entrate e spese"
+                    - id: 2
+                      codice: "CP"
+                      descrizione: "Capitale/Passività - Classifica i conti relativi a capitale e passività"
+                    - id: 3
+                      codice: "RE"
+                      descrizione: "Risultato Economico - Classifica i conti relativi al risultato economico"
+        default:
+          description: |
+            Si è verificato un errore imprevisto durante il tentativo di recuperare le classi dei piani dei conti.
+            La risposta contiene dettagli sull'errore che possono essere utili per la diagnosi del problema.
+            Ciò potrebbe indicare un problema interno al sistema o un'anomalia nella gestione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/tipi:
+    get:
+      tags:
+        - business
+      summary: Elenco dei tipi dei piani dei conti
+      description: |
+        Recupera l'elenco completo dei tipi disponibili per i piani dei conti (PDC) nel sistema.
+        I tipi rappresentano le diverse categorie operative in cui vengono classificati i conti contabili
+        in base alla loro funzione specifica all'interno del piano dei conti, come ad esempio 'Conto Standard',
+        'Voce di Bilancio', 'Sezione del Piano dei Conti', 'Sottoconto', ecc.
+        Ogni tipo è identificato da un codice univoco e include una descrizione dettagliata del suo ruolo contabile.
+        Questo endpoint fornisce i valori di riferimento standard utilizzati per definire la natura specifica
+        di un piano dei conti e viene comunemente utilizzato per popolare liste di selezione nell'interfaccia utente
+        o per applicare filtri durante la ricerca e la creazione di nuovi piani dei conti.
+        I tipi sono condivisi tra tutti gli enti e rappresentano una classificazione standardizzata della funzione
+        contabile di ciascun elemento del piano dei conti.
+      operationId: getPdcTipi
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista completa dei tipi dei piani dei conti disponibili nel sistema.
+            Ogni elemento include tutti i dettagli del tipo come codice univoco, descrizione completa
+            e altri attributi rilevanti per la classificazione contabile.
+            Questi valori possono essere utilizzati per comprendere la funzione specifica di un conto,
+            per applicare filtri durante la ricerca o per selezionare il tipo appropriato durante la creazione
+            di nuovi piani dei conti.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdcTipo"
+              examples:
+                pdcTipiResponse:
+                  summary: Esempio di risposta con lista completa dei tipi dei PDC
+                  value:
+                    - id: 1
+                      codice: "CONTO"
+                      descrizione: "Conto Standard - Elemento base del piano dei conti con funzione contabile specifica"
+                    - id: 2
+                      codice: "VOCE"
+                      descrizione: "Voce di Bilancio - Elemento utilizzato per la classificazione analitica dei conti"
+                    - id: 3
+                      codice: "SEZIONE"
+                      descrizione: "Sezione del Piano dei Conti - Raggruppamento logico di conti correlati"
+                    - id: 4
+                      codice: "SOTTOCONTO"
+                      descrizione: "Sottoconto - Conto secondario aggregato sotto un conto principale"
+        default:
+          description: |
+            Si è verificato un errore imprevisto durante il tentativo di recuperare i tipi dei piani dei conti.
+            La risposta contiene dettagli sull'errore che possono essere utili per la diagnosi del problema.
+            Ciò potrebbe indicare un problema interno al sistema o un'anomalia nella gestione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/stati:
+    get:
+      tags:
+        - business
+      summary: Elenco degli stati dei piani dei conti
+      description: |
+        Recupera l'elenco completo degli stati disponibili per i piani dei conti (PDC) nel sistema.
+        Gli stati rappresentano le diverse condizioni operative in cui può trovarsi un conto all'interno
+        del ciclo di vita contabile, come ad esempio 'Attivo', 'Inattivo', 'Sospeso', 'Annullato', ecc.
+        Ogni stato è identificato da un codice univoco e include una descrizione dettagliata delle sue implicazioni
+        operative e contabili. Lo stato di un piano dei conti determina la sua utilizzabilità nei processi contabili
+        e la possibilità di modificarlo, eliminarlo o crearvi sottoconti.
+        Questo endpoint fornisce i valori di riferimento standard utilizzati per definire la condizione attuale
+        di un piano dei conti e viene comunemente utilizzato per popolare liste di selezione nell'interfaccia utente
+        o per applicare filtri durante la ricerca e la creazione di nuovi piani dei conti.
+        Gli stati sono condivisi tra tutti gli enti e rappresentano una classificazione standardizzata
+        della disponibilità operativa di ciascun elemento del piano dei conti.
+      operationId: getPdcStati
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista completa degli stati dei piani dei conti disponibili nel sistema.
+            Ogni elemento include tutti i dettagli dello stato come codice univoco, descrizione completa
+            e altri attributi rilevanti per la classificazione contabile.
+            Questi valori possono essere utilizzati per comprendere la condizione operativa corrente di un conto,
+            per applicare filtri durante la ricerca o per selezionare lo stato appropriato durante la creazione
+            o l'aggiornamento di nuovi piani dei conti.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdcStato"
+              examples:
+                pdcStatiResponse:
+                  summary: Esempio di risposta con lista completa degli stati dei PDC
+                  value:
+                    - id: 1
+                      codice: "ATTIVO"
+                      descrizione: "Conto attivo e pienamente utilizzabile nei processi contabili"
+                    - id: 2
+                      codice: "INATTIVO"
+                      descrizione: "Conto inattivo, non utilizzabile nei processi contabili"
+                    - id: 3
+                      codice: "SOSPESO"
+                      descrizione: "Conto sospeso temporaneamente, non modificabile né utilizzabile"
+                    - id: 4
+                      codice: "ANNULLATO"
+                      descrizione: "Conto annullato, non utilizzabile e non modificabile"
+        default:
+          description: |
+            Si è verificato un errore imprevisto durante il tentativo di recuperare gli stati dei piani dei conti.
+            La risposta contiene dettagli sull'errore che possono essere utili per la diagnosi del problema.
+            Ciò potrebbe indicare un problema interno al sistema o un'anomalia nella gestione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/famiglie:
+    get:
+      tags:
+        - business
+      summary: Elenco delle famiglie dei piani dei conti
+      description: |
+        Recupera l'elenco completo delle famiglie disponibili per i piani dei conti (PDC) nel sistema.
+        Le famiglie rappresentano i principali raggruppamenti logici dei conti in base alla loro funzionalità
+        contabile, ambito di utilizzo o configurazione specifica all'interno del sistema, come ad esempio
+        'ACCRUAL-A' (per conti di entrata), 'ACCRUAL-B' (per conti di uscita), '118' (per conti speciali), ecc.
+        Ogni famiglia è identificata da un codice univoco e include una descrizione dettagliata del suo scopo
+        contabile, oltre ad attributi come la modificabilità e la ricercabilità che influenzano il comportamento
+        dei conti appartenenti a quella famiglia.
+        Le famiglie sono fondamentali per definire le regole di gestione dei conti come la possibilità di
+        modificarli, cancellarli, inserirvi sottoconti e altre restrizioni operative. Inoltre, alcune famiglie
+        possono avere regole specifiche per quanto riguarda la creazione e l'utilizzo dei conti al loro interno.
+        Questo endpoint fornisce i valori di riferimento standard utilizzati per categorizzare e organizzare
+        i piani dei conti in base alle loro caratteristiche operative e di gestione.
+        Le famiglie sono condivise tra tutti gli enti e rappresentano una struttura di classificazione standardizzata
+        che influenza direttamente il comportamento dei conti che vi appartengono.
+      operationId: getPdcFamiglie
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista completa delle famiglie dei piani dei conti disponibili nel sistema.
+            Ogni elemento include tutti i dettagli della famiglia come codice univoco, descrizione completa,
+            indicazione se è modificabile e se è ricercabile, e altri attributi rilevanti per la gestione contabile.
+            Questi valori possono essere utilizzati per comprendere il raggruppamento funzionale di un conto,
+            per applicare filtri durante la ricerca o per selezionare la famiglia appropriata durante la creazione
+            di nuovi piani dei conti, tenendo conto delle regole operative associate a ciascuna famiglia.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PdcFamiglia"
+              examples:
+                pdcFamiglieResponse:
+                  summary: Esempio di risposta con lista completa delle famiglie dei PDC
+                  value:
+                    - id: 1
+                      codice: "ACCRUAL-A"
+                      descrizione: "Famiglia A - Conti di Entrata - Utilizzata per conti relativi a entrate e ricavi"
+                      modificabile: true
+                      ricercabile: true
+                    - id: 2
+                      codice: "ACCRUAL-B"
+                      descrizione: "Famiglia B - Conti di Uscita - Utilizzata per conti relativi a spese e costi"
+                      modificabile: true
+                      ricercabile: true
+                    - id: 3
+                      codice: "118"
+                      descrizione: "Famiglia 118 - Conti Speciali - Conti con regole operative particolari"
+                      modificabile: false
+                      ricercabile: false
+        default:
+          description: |
+            Si è verificato un errore imprevisto durante il tentativo di recuperare le famiglie dei piani dei conti.
+            La risposta contiene dettagli sull'errore che possono essere utili per la diagnosi del problema.
+            Ciò potrebbe indicare un problema interno al sistema o un'anomalia nella gestione della richiesta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /eventi:
+    get:
+      tags:
+        - business
+      summary: Elenco degli eventi contabili
+      description: |
+        Recupera un elenco degli eventi contabili appartenenti all'ente specificato.
+        Gli eventi contabili rappresentano le diverse tipologie di operazioni contabili che possono essere registrate
+        nel sistema come aperture bilancio, variazioni, chiusure, ecc.
+        La risposta include informazioni dettagliate su ogni evento come codice, descrizione e altri attributi rilevanti.
+        Questi eventi sono utilizzati per categorizzare e tracciare le operazioni contabili all'interno del sistema.
+      operationId: getEventi
+      parameters:
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista degli eventi contabili che appartengono all'ente specificato.
+            Ogni elemento include tutti i dettagli dell'evento come codice, descrizione e altri attributi rilevanti.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Evento"
+              examples:
+                eventiResponse:
+                  summary: Esempio di risposta con lista di eventi
+                  value:
+                    - id: 1
+                      codice: "APE_ATT"
+                      descrizione: "Apertura Bilancio Attività"
+                    - id: 2
+                      codice: "VAR_SPE"
+                      descrizione: "Variazione Spese"
+                    - id: 3
+                      codice: "CHI_ENT"
+                      descrizione: "Chiusura Bilancio Entrate"
+        "400":
+          description: |
+            Richiesta non valida. Il codice ente fornito non è valido o non rispetta il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero degli eventi contabili.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /eventi/fonte/{codiceFonte}:
+    get:
+      tags:
+        - business
+      summary: Elenco degli eventi contabili filtrati per fonte
+      description: |
+        Recupera un elenco degli eventi contabili appartenenti all'ente specificato, filtrati in base a una specifica fonte.
+        Questo endpoint supporta il popolamento a cascata delle combo, fornendo solo gli eventi pertinenti alla fonte selezionata.
+      operationId: getEventiByFonte
+      parameters:
+        - name: codiceFonte
+          in: path
+          required: true
+          description: Codice della fonte per cui filtrare gli eventi.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: |
+            Risposta contenente una lista degli eventi contabili filtrati che appartengono all'ente specificato e alla fonte indicata.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Evento"
+        "400":
+          description: |
+            Richiesta non valida. Il codice fonte o il codice ente fornito non sono validi o non rispetta il formato atteso.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: |
+            Nessun evento trovato per la fonte specificata o la fonte non esiste.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Si è verificato un errore imprevisto durante il recupero degli eventi contabili.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali:
+    get:
+      tags:
+        - business
+      summary: ricerca causali
+      operationId: getPagedCausali
+      parameters:
+        - name: filter
+          in: query
+          description: Stringa di filtro per la ricerca delle causali.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: numero di elementi per pagina
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: offset
+          in: query
+          description: offset per paginazione
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        "200":
+          description: lista delle causali filtrate e paginate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedCausale"
+        default:
+          description: errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - business
+      summary: Crea una nuova causale
+      description: |
+        Crea una nuova causale nel sistema con i dettagli forniti, inclusi i conti collegati.
+        Il sistema esegue tutte le validazioni necessarie prima di salvare la nuova causale.
+      operationId: createCausale
+      parameters:
+      requestBody:
+        description: Oggetto contenente i dettagli della nuova causale da creare.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CausaleRequest"
+      responses:
+        "201":
+          description: Causale creata con successo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Causale"
+        "400":
+          description: Richiesta non valida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/{id}:
+    get:
+      tags:
+        - business
+      summary: dettaglio causale per id
+      operationId: getCausaleById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: la causale corrispondente all'id fornito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Causale"
+        "404":
+          description: la causale con l'id fornito non esiste
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - business
+      summary: Aggiorna una causale esistente
+      description: |
+        Aggiorna i dettagli di una causale esistente identificata dal suo id.
+        L'aggiornamento può modificare vari attributi della causale, inclusi i conti collegati.
+      operationId: updateCausale
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Oggetto contenente i dettagli aggiornati della causale.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CausaleRequest"
+      responses:
+        "200":
+          description: Causale aggiornata con successo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Causale"
+        "400":
+          description: Richiesta non valida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Causale non trovata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - business
+      summary: Elimina una causale
+      description: |
+        Elimina (logicamente) una causale dal sistema.
+      operationId: deleteCausale
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Causale eliminata con successo.
+        "404":
+          description: Causale non trovata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: Richiesta non valida (es. la causale non è eliminabile).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/{id}/valida:
+    post:
+      tags:
+        - business
+      summary: Valida una causale
+      description: |
+        Cambia lo stato di una causale da 'Provvisorio' a 'Valido'.
+        L'operazione è consentita solo se la causale è in stato 'Provvisorio'.
+      operationId: validaCausale
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della causale da validare.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Causale validata con successo.
+        "400":
+          description: |
+            Richiesta non valida. La causale potrebbe non essere in uno stato validabile
+            (es. già 'Valido' o 'Annullato').
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Causale non trovata.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/tipi:
+    get:
+      tags:
+        - business
+      summary: elenco dei tipi di causale
+      operationId: getTipiCausale
+      parameters:
+      responses:
+        "200":
+          description: lista dei tipi di causale
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CausaleTipo"
+        default:
+          description: errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/stati:
+    get:
+      tags:
+        - business
+      summary: elenco degli stati della causale
+      operationId: getCausaleStati
+      parameters:
+      responses:
+        "200":
+          description: lista degli stati della causale
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CausaleStato"
+        default:
+          description: errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/evento/{eventoCodice}:
+    get:
+      tags:
+        - business
+      summary: elenco delle causali per evento
+      operationId: getEventiCausale
+      parameters:
+        - name: eventoCodice
+          in: path
+          required: true
+          description: Codice dell'evento per cui recuperare le causali
+          schema:
+            type: string
+        - name: statoCodice
+          in: query
+          required: false
+          description: |
+            Codice dello stato corrente della causale su cui filtrare l'elenco.
+            - V: solo le causali valide
+            - null/assente: le causali in qualunque stato
+          schema:
+            type: string
+      responses:
+        "200":
+          description: lista delle causali associate all'evento specificato
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Causale"
+        default:
+          description: errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /causali/{id}/conti-collegati:
+    get:
+      tags:
+        - business
+      summary: Elenco dei conti collegati a una causale
+      description: Recupera l'elenco dei conti collegati a una specifica causale.
+      operationId: getContiCollegati
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID della causale di cui si vogliono recuperare i conti collegati.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Lista dei conti collegati alla causale.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContoCollegato"
+  /primanota/search:
+    post:
+      tags:
+        - business
+      summary: "Ricerca prime note in base a criteri di filtro"
+      description: |
+        Effettua una ricerca avanzata delle prime note utilizzando criteri di filtro specifici.
+        Questo endpoint permette di applicare filtri complessi utilizzando un oggetto di filtro strutturato
+        che può includere condizioni multiple su diversi campi.
+        La ricerca restituisce una lista paginata e ordinabile delle prime note che soddisfano tutti i criteri specificati.
+        I risultati sono limitati all'ente specificato.
+      operationId: searchPrimeNote
+      parameters:
+        - name: sort
+          in: query
+          description: |
+            Criteri di ordinamento nel formato 'campo,direzione' (es. 'numeroProvvisorio,asc', 'dataRegProvvisoria,desc').
+            I campi disponibili per l'ordinamento sono: numero provvisorio, data registrazione provvisoria/definitiva, stato, ecc.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: |
+            Numero massimo di elementi da restituire per pagina. Valore predefinito: 20.
+            Se si desidera ottenere tutti i risultati possibili, utilizzare il valore speciale -1.
+            Utilizzato per controllare la dimensione della risposta e ottimizzare le prestazioni.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            minimum: -1
+            maximum: 2147483647
+        - name: offset
+          in: query
+          description: |
+            Numero di elementi da saltare prima di iniziare a restituire i risultati.
+            Utilizzato per navigare tra le pagine dei risultati (es. offset=20 per la seconda pagina con limit=20).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+            minimum: 0
+      requestBody:
+        description: |
+          Oggetto contenente i criteri di filtro per la ricerca avanzata delle prime note.
+          Ogni campo nell'oggetto filtro rappresenta una condizione che i risultati devono soddisfare.
+          Tutte le condizioni sono combinate con un operatore logico AND (devono essere soddisfatte contemporaneamente).
+          I filtri disponibili includono: tipo, fonte, evento, causale, stato, numero provvisorio/definitivo, date di registrazione, importi, ecc.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaNotaSearchFilterDTO'
+      responses:
+        '200':
+          description: |
+            Risposta contenente una lista paginata delle prime note che soddisfano tutti i criteri di ricerca specificati.
+            Ogni elemento include tutti i dettagli della prima nota come tipo, fonte, evento, causale, numeri provvisorio/definitivo,
+            date di registrazione, stato, descrizione e informazioni sulle azioni disponibili.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePrimaNotaSearchResultDTO'
+
+  /primanota/export:
+    post:
+      tags:
+        - business
+      summary: Esportazione CSV delle prime note
+      description: |
+        Esporta i risultati della ricerca delle prime note in formato CSV (Comma-Separated Values).
+        L'endpoint accetta gli stessi criteri di filtro dell'endpoint /primanota/search e restituisce un file CSV
+        contenente tutte le prime note che soddisfano i criteri specificati, senza paginazione.
+        Il file CSV è codificato in UTF-8 e utilizza il punto e virgola (;) come separatore, compatibile con Excel italiano.
+        Il file viene scaricato automaticamente dal browser con nome "primanota_export_YYYY-MM-DD.csv".
+      operationId: exportPrimaNotaList
+      parameters:
+        - name: sort
+          in: query
+          description: |
+            Criteri di ordinamento nel formato 'campo,direzione' (es. 'numeroProvvisorio,asc', 'dataRegProvvisoria,desc').
+            I campi disponibili per l'ordinamento sono: numero provvisorio, data registrazione provvisoria/definitiva, stato, ecc.
+          schema:
+            type: string
+      requestBody:
+        description: |
+          Oggetto contenente i criteri di filtro per l'esportazione delle prime note.
+          Ogni campo nell'oggetto filtro rappresenta una condizione che i risultati devono soddisfare.
+          Tutte le condizioni sono combinate con un operatore logico AND (devono essere soddisfatte contemporaneamente).
+          I filtri disponibili includono: tipo, fonte, evento, causale, stato, numero provvisorio/definitivo, date di registrazione, importi, ecc.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaNotaSearchFilterDTO'
+      responses:
+        "200":
+          description: |
+            File CSV contenente i risultati della ricerca esportati.
+  
+  /primanota/{anno}/{numero}:
+    get:
+      tags:
+        - business
+      summary: "Recupera il dettaglio di una singola prima nota per anno e numero"
+      description: |
+        Recupera le informazioni complete di una prima nota specifica identificata dall'anno e dal numero.
+        La risposta include tutti i dettagli della prima nota come tipo, fonte, evento, causale, numeri provvisorio/definitivo,
+        date di registrazione, stato, descrizione, conti collegati, attributi e prime note collegate.
+        L'operazione verifica che la prima nota appartenga all'ente specificato e che sia accessibile dall'utente richiedente.
+      operationId: getPrimaNotaByAnnoAndNumero
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota da recuperare.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota da recuperare.
+          schema:
+            type: integer
+            format: int32
+        - name: fields
+          in: query
+          description: |
+            Elenco di campi specifici da includere nella risposta, separati da virgola (es. 'tipo,fonte,stato,descrizione').
+            Se omesso, vengono restituiti tutti i campi disponibili.
+            Questo parametro permette di ridurre la quantità di dati trasmessi quando sono necessari solo alcuni campi.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |
+            Prima nota trovata con successo. La risposta contiene tutti i dettagli della prima nota richiesta,
+            inclusi tipo, fonte, evento, causale, numeri provvisorio/definitivo, date di registrazione, stato, descrizione,
+            conti collegati, attributi e prime note collegate.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrimaNotaDetailDTO'
+
+    put:
+      tags:
+        - business
+      summary: "Aggiorna una prima nota esistente"
+      description: |
+        Aggiorna una prima nota esistente identificata dall'anno e dal numero.
+        L'operazione modifica i dati della prima nota, inclusi testata, conti collegati e attributi.
+
+        **Condizioni per l'aggiornamento:**
+        - L'utente deve avere il permesso OP-SPE-modificaPrimaNota
+        - L'entità contabile non deve essere in fase PREVISIONE o CHIUSO
+        - La prima nota deve esistere e appartenere all'ente specificato
+        - La prima nota non deve essere in stato ANNULLATA
+        - I campi Tipo, Fonte, Evento, Causale, Numero provvisorio, Numero definitivo, Stato NON sono modificabili
+        - Sono modificabili solo: Descrizione e Data registrazione provvisoria
+
+        **Algoritmo di aggiornamento:**
+        1. Validazione dei dati di input
+        2. Recupero prima nota esistente
+        3. Verifica esistenza e validità dei conti (ALG-003)
+        4. Verifica bilanciamento scrittura (ALG-004)
+        5. Aggiornamento testata (solo campi editabili) con audit (data_modifica, utente_modifica)
+        6. Cancellazione e reinserimento conti collegati (delta update)
+        7. Cancellazione e reinserimento attributi (delta update)
+
+        **Messaggi:**
+        - WEB_OK_0004: Salvataggio effettuato correttamente
+        - WEB_ERR_0001: Errore imprevisto
+        - WEB_ERR_0002: Dato obbligatorio non valorizzato
+        - WEB_ERR_018: Almeno 2 conti con segni diversi
+        - WEB_ERR_019: Totale Dare e Avere devono coincidere
+        - WEB_ERR_020: Stesso conto con segni diversi
+        - WEB_ERR_021: Conto non esistente
+        - WEB_ERR_022: Conto non valido rispetto alla data
+        - WEB_ERR_028: Conto non è foglia
+        - WEB_ERR_0004: Prima nota non trovata
+      operationId: aggiornaPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota da aggiornare.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota da aggiornare.
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaNotaCreateUpdateDTO'
+      responses:
+        '200':
+          description: |
+            Prima nota aggiornata con successo.
+            Messaggio: WEB_OK_0004 - Salvataggio effettuato correttamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrimaNotaDetailDTO'
+        '400':
+          description: |
+            Errore di validazione. Possibili cause:
+            - Campi obbligatori non valorizzati
+            - Conto non esistente o non valido
+            - Scrittura non bilanciata
+            - Tentativo di modificare campi non editabili
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: |
+            Permesso mancante per la modifica della prima nota.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: |
+            Prima nota non trovata per l'anno, numero ed ente specificati.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /flussi/fonti:
+    get:
+      tags:
+        - business
+      summary: Elenco delle fonti disponibili per i flussi
+      operationId: getFontiFlusso
+      parameters:
+      responses:
+        "200":
+          description: Lista delle fonti disponibili.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fonte"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /primanota:
+    post:
+      tags:
+        - business
+      summary: "Inserisce una nuova prima nota"
+      description: |
+        Inserisce una nuova prima nota nel sistema.
+        L'operazione crea una nuova prima nota con i dati forniti, inclusi testata, conti collegati e attributi opzionali.
+
+        **Condizioni per l'inserimento:**
+        - L'utente deve avere il permesso OP-add-primaNota (o OP-SPE-addPrimaNota)
+        - L'ente specificato deve esistere
+        - I dati della testata devono essere completi (tipo, fonte, evento, causale, stato, data)
+        - Devono essere presenti almeno 2 conti con segni diversi (Dare e Avere)
+        - Il totale Dare deve coincidere con il totale Avere (bilanciamento contabile)
+        - Ogni conto deve avere un segno univoco (non può avere sia Dare che Avere)
+
+        **Algoritmo di inserimento:**
+        1. Validazione dei dati di input
+        2. Verifica esistenza e validità dei conti (ALG-003)
+        3. Verifica bilanciamento scrittura (ALG-004)
+        4. Generazione numero provvisorio (se stato = PROVVISORIA)
+        5. Generazione numero definitivo (se stato = DEFINITIVA)
+        6. Salvataggio testata con audit (data_inserimento, utente_inserimento)
+        7. Salvataggio conti collegati
+        8. Salvataggio attributi (se presenti)
+        9. Aggiornamento contatori (se necessario)
+
+        **Messaggi:**
+        - WEB_OK_0004: Salvataggio effettuato correttamente
+        - WEB_ERR_0001: Errore imprevisto
+        - WEB_ERR_0002: Dato obbligatorio non valorizzato
+        - WEB_ERR_018: Almeno 2 conti con segni diversi
+        - WEB_ERR_019: Totale Dare e Avere devono coincidere
+        - WEB_ERR_020: Stesso conto con segni diversi
+        - WEB_ERR_021: Conto non esistente
+        - WEB_ERR_022: Conto non valido rispetto alla data
+        - WEB_ERR_028: Conto non è foglia
+      operationId: inserisciPrimaNota
+      parameters:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaNotaCreateUpdateDTO'
+      responses:
+        '201':
+          description: |
+            Prima nota inserita con successo.
+            Messaggio: WEB_OK_0004 - Salvataggio effettuato correttamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrimaNotaDetailDTO'
+        '400':
+          description: |
+            Errore di validazione. Possibili cause:
+            - Campi obbligatori non valorizzati
+            - Conto non esistente o non valido
+            - Scrittura non bilanciata
+            - Meno di 2 conti con segni diversi
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: |
+            Permesso mancante per l'inserimento di prime note.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /attributi:
+    get:
+      tags:
+        - business
+      summary: "Recupera la lista degli attributi disponibili per un ente"
+      description: |
+        Restituisce la lista degli attributi disponibili per un determinato ente.
+        Gli attributi sono ordinati per descrizione e non includono quelli cancellati.
+
+        **Messaggi:**
+        - WEB_OK_0001: Operazione eseguita con successo
+        - WEB_ERR_0001: Errore imprevisto
+      operationId: getAttributiByEnte
+      parameters:
+      responses:
+        '200':
+          description: |
+            Lista degli attributi recuperata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttributoInfoDTO'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/check-incomplete:
+    get:
+      tags:
+        - business
+      summary: "Verifica se esistono prime note incomplete per l'ente e l'esercizio correnti"
+      operationId: checkIncompletePrimeNote
+      responses:
+        '200':
+          description: "Controllo eseguito"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasIncomplete:
+                    type: boolean
+  /primanota/incomplete:
+    get:
+      tags:
+        - business
+      summary: "Restituisce la lista delle prime note non quadrate (DARE ≠ AVERE) per l'ente corrente"
+      operationId: getIncompletePrimeNote
+      responses:
+        '200':
+          description: "Lista delle prime note non quadrate"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrimaNotaSearchResultDTO'
+        '500':
+          description: "Errore interno del server"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/tipi:
+    get:
+      tags:
+        - business
+      summary: "Restituisce la lista dei possibili tipi di prima nota"
+      operationId: getTipiPrimaNota
+      responses:
+        '200':
+          description: "Lista dei tipi di prima nota"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoPrimaNota'
+  /primanota/fonti:
+    get:
+      tags:
+        - business
+      summary: "Restituisce la lista delle possibili fonti per la prima nota"
+      operationId: getFontiPrimaNota
+      parameters:
+      responses:
+        '200':
+          description: "Lista delle fonti per la prima nota"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FontePrimaNota'
+  /primanota/causali:
+    get:
+      tags:
+        - business
+      summary: "Restituisce la lista delle causali disponibili per la prima nota"
+      operationId: getCausaliPrimaNota
+      parameters:
+      responses:
+        '200':
+          description: "Lista delle causali per la prima nota"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CausalePrimaNota'
+  /primanota/stati:
+    get:
+      tags:
+        - business
+      summary: "Restituisce la lista degli stati possibili per la prima nota"
+      operationId: getStatiPrimaNota
+      responses:
+        '200':
+          description: "Lista degli stati per la prima nota"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatoPrimaNota'
+  /primanota/{anno}/{numero}/conti:
+    get:
+      tags:
+        - business
+      summary: "Recupera i conti collegati a una prima nota specifica (con paginazione e filtro)"
+      description: |
+        Recupera l'elenco dei conti collegati a una prima nota specifica identificata dall'anno e dal numero.
+        I risultati sono restituiti in forma paginata per gestire grandi quantità di dati.
+        È possibile applicare un filtro opzionale per codice conto (ricerca case-insensitive).
+      operationId: getContiPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: limit
+          in: query
+          description: Numero massimo di elementi per pagina.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: offset
+          in: query
+          description: Offset per la paginazione (numero di elementi da saltare).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: codiceConto
+          in: query
+          description: Filtro per codice conto (ricerca case-insensitive).
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Lista paginata dei conti collegati alla prima nota."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedContoCollegatoDTO'
+        '404':
+          description: "Prima nota non trovata."
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /primanota/{anno}/{numero}/conti/totali:
+    get:
+      tags:
+        - business
+      summary: "Recupera i totali generali dei conti collegati a una prima nota specifica"
+      description: |
+        Recupera i totali generali (dare e avere) di tutti i conti collegati a una prima nota specifica.
+        I totali sono calcolati su tutti i conti, indipendentemente da eventuali filtri applicati.
+      operationId: getTotaliContiPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: "Totali generali dei conti collegati."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContiTotaliDTO'
+        '404':
+          description: "Prima nota non trovata."
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /primanota/{anno}/{numero}/attributi:
+    get:
+      tags:
+        - business
+      summary: "Recupera gli attributi collegati a una prima nota specifica (con paginazione)"
+      description: |
+        Recupera l'elenco degli attributi collegati a una prima nota specifica identificata dall'anno e dal numero.
+        I risultati sono restituiti in forma paginata per gestire grandi quantità di dati.
+      operationId: getAttributiPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: limit
+          in: query
+          description: Numero massimo di elementi per pagina.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: offset
+          in: query
+          description: Offset per la paginazione (numero di elementi da saltare).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        '200':
+          description: "Lista paginata degli attributi collegati alla prima nota."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedAttributoCollegatoDTO'
+        '404':
+          description: "Prima nota non trovata."
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /primanota/{anno}/{numero}/collegate:
+    get:
+      tags:
+        - business
+      summary: "Recupera le prime note collegate a una prima nota specifica (con paginazione)"
+      description: |
+        Recupera l'elenco delle prime note collegate a una prima nota specifica identificata dall'anno e dal numero.
+        I risultati sono restituiti in forma paginata per gestire grandi quantità di dati.
+      operationId: getPrimeNoteCollegate
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota.
+          schema:
+            type: integer
+            format: int32
+        - name: limit
+          in: query
+          description: Numero massimo di elementi per pagina.
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: offset
+          in: query
+          description: Offset per la paginazione (numero di elementi da saltare).
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        '200':
+          description: "Lista paginata delle prime note collegate alla prima nota."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPrimaNotaCollegataDTO'
+        '404':
+          description: "Prima nota non trovata."
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/{anno}/{numero}/annulla:
+    post:
+      tags:
+        - business
+      summary: "Annulla una prima nota esistente"
+      description: |
+        Annulla una prima nota identificata dall'anno e dal numero.
+        L'operazione imposta lo stato della prima nota ad 'ANNULLATA' e traccia l'utente che ha richiesto l'operazione.
+        
+        **Condizioni per l'annullamento:**
+        - L'utente deve avere il permesso OP-SPE-annullaPrimaNota
+        - L'entità contabile non deve essere in fase PREVISIONE o CHIUSO
+        - La prima nota deve esistere e appartenere all'ente specificato
+        
+        **Algoritmo di annullamento:**
+        1. Recupero della prima nota per anno, numero ed ente
+        2. Verifica dell'annullabilità (fase entità contabile)
+        3. Chiusura dello stato precedente (fineValidita = data sistema)
+        4. Inserimento nuovo stato 'ANNULLATA' (inizioValidita = data sistema, fineValidita = null)
+        5. Impostazione dataCancellazione e utenteCancellazione
+        
+        **Messaggi:**
+        - WEB_OK_0004: Operazione effettuata con successo
+        - WEB_ERR_0001: Errore imprevisto durante l'operazione
+      operationId: annullaPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota da annullare.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota da annullare.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: |
+            Prima nota annullata con successo.
+            Messaggio: WEB_OK_0004 - Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messaggio:
+                    type: string
+                    example: "WEB_OK_0004 - Prima nota annullata con successo"
+        '400':
+          description: |
+            Errore di validazione. La prima nota non può essere annullata.
+            Possibili cause:
+            - Entità contabile in fase PREVISIONE o CHIUSO
+            - Prima nota già in stato ANNULLATA
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: |
+            Prima nota non trovata per l'anno, numero ed ente specificati.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/{anno}/{numero}/riapri:
+    post:
+      tags:
+        - business
+      summary: "Riapre una prima nota esistente"
+      description: |
+        Riapre una prima nota identificata dall'anno e dal numero.
+        L'operazione riporta lo stato della prima nota da 'DEFINITIVA' a 'PROVVISORIA', 
+        mantenendo il numero definitivo e la data di registrazione definitiva già assegnati.
+
+        **Condizioni per la riapertura:**
+        - L'utente deve avere il permesso OP-SPE-riapriPrimaNota
+        - L'entità contabile non deve essere in fase PREVISIONE o CHIUSO
+        - La prima nota deve essere in stato DEFINITIVA
+
+        **Algoritmo di riapertura:**
+        1. Recupero della prima nota per anno, numero ed ente
+        2. Verifica della riapribilità (fase entità contabile e stato corrente)
+        3. Chiusura dello stato precedente (fineValidita = data sistema)
+        4. Inserimento nuovo stato 'PROVVISORIA' (inizioValidita = data sistema, fineValidita = null)
+        5. Impostazione dataModifica e utenteModifica
+
+        **Messaggi:**
+        - WEB_OK_0004: Operazione effettuata con successo
+        - WEB_CON_0023: Conferma riapertura (messaggio di conferma)
+        - WEB_ERR_0001: Errore imprevisto durante l'operazione
+      operationId: riapriPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota da riaprire.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota da riaprire.
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: |
+            Prima nota riaperta con successo.
+            Messaggio: WEB_OK_0004 - Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messaggio:
+                    type: string
+                    example: "WEB_OK_0004 - Prima nota riaperta con successo"
+        '400':
+          description: |
+            Errore di validazione. La prima nota non può essere riaperta.
+            Possibili cause:
+            - Entità contabile in fase PREVISIONE o CHIUSO
+            - Prima nota non in stato DEFINITIVA
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: |
+            Prima nota non trovata per l'anno, numero ed ente specificati.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/{anno}/{numero}/valida:
+    post:
+      tags:
+        - business
+      summary: "Valida una prima nota esistente"
+      description: |
+        Valida una prima nota identificata dall'anno e dal numero.
+        L'operazione imposta lo stato della prima nota da 'PROVVISORIA' a 'DEFINITIVA' e assegna il numero definitivo se non presente.
+
+        **Condizioni per la validazione:**
+        - L'utente deve avere il permesso OP-SPE-validaPrimaNota
+        - L'entità contabile non deve essere in fase PREVISIONE o CHIUSO
+        - La prima nota deve essere in stato PROVVISORIA
+
+        **Algoritmo di validazione:**
+        1. Recupero della prima nota per anno, numero ed ente
+        2. Verifica dello stato (deve essere PROVVISORIA)
+        3. Verifica fase entità contabile (non PREVISIONE o CHIUSO)
+        4. Verifica esistenza numero progressivo definitivo
+        5. Se non presente, genera nuovo numero definitivo e imposta data registrazione definitiva
+        6. Chiudi lo stato precedente (fineValidita = data sistema)
+        7. Inserimento nuovo stato 'DEFINITIVA' (inizioValidita = data sistema, fineValidita = null)
+
+        **Messaggi:**
+        - WEB_OK_0004: Operazione effettuata con successo
+        - WEB_ERR_0001: Errore imprevisto durante l'operazione
+        - WEB_ERR_0002: Dato obbligatorio non valorizzato
+      operationId: validaPrimaNota
+      parameters:
+        - name: anno
+          in: path
+          required: true
+          description: Anno della prima nota da validare.
+          schema:
+            type: integer
+            format: int32
+        - name: numero
+          in: path
+          required: true
+          description: Numero della prima nota da validare.
+          schema:
+            type: integer
+            format: int32
+        - name: mantieniNumeroDefinitivo
+          in: query
+          required: false
+          description: |
+            Parametro opzionale per gestire la rinumerazione quando il parametro ente VERIFICA_RINUMERAZIONE_PRIME_NOTE = SI.
+            - true: mantiene il numero definitivo esistente
+            - false: riassegna un nuovo numero definitivo
+            - null/assente: prima chiamata, il sistema richiede conferma se necessario
+          schema:
+            type: boolean
+        - name: confermato
+          in: query
+          required: false
+          description: |
+            Parametro opzionale che indica se l'utente ha confermato la validazione generica (WEB_CON_0016).
+            - true: l'utente ha confermato la validazione senza numero definitivo
+            - null/assente: prima chiamata, il sistema richiede conferma tramite WEB_CON_0016
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: |
+            Prima nota validata con successo.
+            Messaggio: WEB_OK_0004 - Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messaggio:
+                    type: string
+                    example: "WEB_OK_0004 - Prima nota validata con successo"
+        '400':
+          description: |
+            Errore di validazione. La prima nota non può essere validata.
+            Possibili cause:
+            - Entità contabile in fase PREVISIONE o CHIUSO
+            - Prima nota non in stato PROVVISORIA
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: |
+            Prima nota non trovata per l'anno, numero ed ente specificati.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: |
+            Richiesta di conferma. L'operazione richiede una conferma da parte dell'utente.
+            Il client deve ripetere la richiesta con il parametro `mantieniNumeroDefinitivo` appropriato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /primanota/valida-massiva:
+    post:
+      tags:
+        - business
+      summary: "Valida multiple prime note"
+      description: |
+        Valida multiple prime note identificate da una lista di anno e numero.
+        L'operazione imposta lo stato di ciascuna prima nota da 'PROVVISORIA' a 'DEFINITIVA'.
+
+        **Condizioni per la validazione massiva:**
+        - L'utente deve avere il permesso OP-SPE-validaPrimeNote
+        - Tutte le prime note devono essere in stato PROVVISORIA
+        - L'entità contabile non deve essere in fase PREVISIONE o CHIUSO
+
+        **Algoritmo di validazione massiva:**
+        1. Per ogni prima nota nella lista:
+           - Recupero della prima nota per anno, numero ed ente
+           - Verifica dello stato (deve essere PROVVISORIA)
+           - Verifica fase entità contabile
+           - Generazione numero definitivo se mancante
+           - Impostazione stato DEFINITIVA
+        2. Se alcune validazioni falliscono, vengono registrate ma le altre continuano
+
+        **Messaggi:**
+        - WEB_OK_0004: Operazione effettuata con successo
+        - WEB_ERR_0001: Errore imprevisto durante l'operazione
+      operationId: validaPrimeNoteMassiva
+      parameters:
+        - name: mantieniNumeri
+          in: query
+          required: false
+          description: |
+            Parametro opzionale per gestire la rinumerazione quando il parametro ente VERIFICA_RINUMERAZIONE_PRIME_NOTE = SI.
+            - true: mantiene i numeri definitivi esistenti
+            - false: riassegna nuovi numeri definitivi
+            - null/assente: prima chiamata, il sistema richiede conferma se necessario
+          schema:
+            type: boolean
+        - name: confermato
+          in: query
+          required: false
+          description: |
+            Parametro opzionale che indica se l'utente ha confermato la validazione massiva generica (WEB_CON_0017).
+            - true: l'utente ha confermato la validazione massiva senza numeri definitivi
+            - null/assente: prima chiamata, il sistema richiede conferma tramite WEB_CON_0017
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        description: Lista di prime note da validare (anno e numero).
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PrimaNotaIdDTO'
+      responses:
+        '200':
+          description: |
+            Prime note validate con successo.
+            Messaggio: WEB_OK_0004 - Operazione effettuata con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messaggio:
+                    type: string
+                    example: "WEB_OK_0004 - Prime note validate con successo"
+        '400':
+          description: |
+            Errore di validazione. Alcune prime note non possono essere validate.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: |
+            Richiesta di conferma. L'operazione richiede una conferma da parte dell'utente.
+            Il client deve ripetere la richiesta con il parametro `mantieniNumeri` appropriato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: |
+            Errore interno del server.
+            Messaggio: WEB_ERR_0001 - Si è verificato un errore imprevisto: <dettaglio errore>
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /modellomif/dati:
+    get:
+      tags:
+        - business
+      summary: Recupera i dati per il modello MEF (MIF)
+      operationId: getDatiModelloMif
+      parameters:
+        - name: anno
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dati per il modello MEF recuperati con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelloMifData'
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /modellomif/anni:
+    get:
+      tags:
+        - business
+      summary: Recupera gli anni delle entità contabili disponibili per l'ente corrente
+      operationId: getAnniModelloMif
+      responses:
+        "200":
+          description: Lista delle entità contabili disponibili
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntitaContabile'
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tipi-file:
+    get:
+      tags:
+        - business
+      summary: Elenco dei tipi di file disponibili per il caricamento
+      operationId: getTipiFile
+      parameters:
+      responses:
+        "200":
+          description: Lista dei tipi di file disponibili.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TipoFile"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/upload:
+    post:
+      tags:
+        - business
+      summary: Carica un file da fonte esterna
+      operationId: uploadFlusso
+      parameters:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                codice:
+                  type: string
+                  description: Codice identificativo del file.
+                  minLength: 1
+                tipoFile:
+                  type: string
+                  description: Tipo di file (es. STATO_PATRIMONIALE).
+                  minLength: 1
+                note:
+                  type: string
+                  description: Eventuali note aggiuntive.
+                file:
+                  type: string
+                  format: binary
+                  description: Il file da caricare.
+              required:
+                - codice
+                - tipoFile
+                - file
+        required: true
+      responses:
+        "200":
+          description: File caricato con successo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File caricato con successo."
+        "400":
+          description: Richiesta non valida. Ad esempio, parametri mancanti o tipo di file non supportato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico del server.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/search:
+    get:
+      tags:
+        - business
+      summary: Ricerca flussi da fonte esterna con filtri e paginazione
+      operationId: searchFlussi
+      parameters:
+        - name: codiceFile
+          in: query
+          description: Filtro per codice del file
+          schema:
+            type: string
+        - name: fonte
+          in: query
+          description: Filtro per fonte del flusso
+          schema:
+            type: string
+        - name: tipoFile
+          in: query
+          description: Filtro per tipo di file
+          schema:
+            type: string
+        - name: dataCaricamento
+          in: query
+          description: Filtro per data di caricamento (formato YYYY-MM-DD)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Numero di elementi per pagina
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: offset
+          in: query
+          description: Offset per paginazione
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        "200":
+          description: Lista dei flussi filtrati e paginati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedFlussoSearchResult"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/export-results:
+    get:
+      tags:
+        - business
+      summary: Esporta i risultati dell'elaborazione di un flusso in formato CSV
+      operationId: exportResults
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso di cui esportare i risultati
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File CSV contenente i risultati dell'elaborazione
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/elabora:
+    post:
+      tags:
+        - business
+      summary: Elabora un flusso specifico da fonte esterna
+      operationId: elaboraFlusso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso da elaborare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Flusso elaborato con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElaboraFlussoResponseDTO"
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}/download:
+    get:
+      tags:
+        - business
+      summary: Scarica un flusso specifico da fonte esterna
+      operationId: downloadFlusso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del flusso da scaricare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File del flusso scaricato con successo
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /flussi/{id}:
+    get:
+      tags:
+        - business
+      summary: Recupera il dettaglio di un flusso da fonte esterna
+      operationId: getFlussoById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID univoco del flusso da recuperare
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dettagli del flusso recuperati con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlussoDetail"
+        "404":
+          description: Flusso non trovato
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - business
+      summary: Elimina un flusso specifico
+      operationId: deleteFlussoById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID univoco del flusso da eliminare
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Flusso eliminato con successo.
+        "404":
+          description: Flusso non trovato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pdc/valida-conto:
+    post:
+      tags:
+        - business
+      summary: "Verifica conto da inserire nella scrittura"
+      description: |
+        Verifica che il conto indicato sia valido per essere inserito in una scrittura contabile.
+        Implementa l'algoritmo ALG-003: Verifica Conto da inserire nella scrittura.
+
+        **Controlli effettuati:**
+        1. Esistenza del conto (WEB_ERR_021)
+        2. Validità rispetto alla data di sistema (WEB_ERR_022)
+        3. Conto foglia - deve avere attributo foglia o foglia_non_foglia valorizzati (WEB_ERR_028)
+
+        **Messaggi di errore:**
+        - WEB_ERR_021: Il conto indicato non esiste
+        - WEB_ERR_022: Il conto indicato non è valido rispetto alla data di sistema
+        - WEB_ERR_028: Il conto indicato non è un conto di dettaglio (foglia)
+      operationId: validaContoDaInserire
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidaContoRequest"
+      responses:
+        "204":
+          description: Conto verificato con successo
+        "400":
+          description: Conto non valido
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Errore generico
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    ValidaContoRequest:
+      type: object
+      required:
+        - codice_conto
+      properties:
+        codice_conto:
+          type: string
+          description: Codice ufficiale del conto da validare
+    Azione:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            ordine:
+              type: integer
+              format: int32
+            path:
+              type: string
+              description: Path dell'azione/permesso
+            gruppo_azione:
+              $ref: '#/components/schemas/GruppoAzione'
+    GruppoAzione:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            azioni:
+              type: array
+              description: Lista delle azioni appartenenti a questo gruppo (valorizzato solo in contesto raggruppato)
+              items:
+                $ref: '#/components/schemas/Azione'
+    Base:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+    BaseCoded:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            codice:
+              type: string
+            descrizione:
+              type: string
+    Soggetto:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            codice_fiscale:
+              type: string
+            codice_fiscale_estero:
+              type: string
+            partita_iva:
+              type: string
+            email:
+              type: string
+            pa:
+              type: boolean
+            istituto_di_credito:
+              type: boolean
+            stato:
+              $ref: '#/components/schemas/SoggettoStato'
+            tipo:
+              $ref: '#/components/schemas/TipoSoggetto'
+            ente:
+              $ref: '#/components/schemas/Ente'
+    SoggettoStato:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    TipoSoggetto:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    Ente:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Base'
+        - type: object
+          properties:
+            codice_fiscale:
+              type: string
+            denominazione:
+              type: string
+    PagedSoggetto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Soggetto'
+        page:
+          type: integer
+          format: int32
+        page_size:
+          type: integer
+          format: int32
+        total_elements:
+          type: integer
+          format: int64
+    AutenticazioneTipo:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            url:
+              type: string
+    CausaleStato:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    ContoCollegato:
+      type: object
+      properties:
+        pdcId: # Renamed from 'pdc', removed 'pdcId' string
+          type: integer
+          format: int64
+          description: ID del Piano dei Conti (PDC) collegato.
+        classe:
+          type: string
+          description: Descrizione Classe conto
+        codice:
+          type: string
+          description: Codice ufficiale conto
+        descrizione:
+          type: string
+        segno:
+          type: string
+          description: "Segno (DARE/AVERE)"
+          enum:
+            - DARE
+            - AVERE
+        tipoImporto:
+          type: string
+          description: "Tipo importo (LORDO, IMPONIBILE, IMPOSTA)"
+          enum:
+            - LORDO
+            - IMPONIBILE
+            - IMPOSTA
+        inizioValidita: # Changed to snake_case
+          type: string
+          format: date
+        fineValidita: # Changed to snake_case
+          type: string
+          format: date
+    CausaleTipo:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    ElaborazioneStato:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            ente:
+              $ref: '#/components/schemas/Ente'
+    FileStato:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            ente:
+              $ref: '#/components/schemas/Ente'
+    PdcFamiglia:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            modificabile:
+              type: boolean
+            ricercabile:
+              type: boolean
+    PdcStato:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            ente:
+              $ref: '#/components/schemas/Ente'
+    Pdc:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+        - type: object
+          properties:
+            codice_ufficiale:
+              type: string
+            codice_completo:
+              type: string
+            descrizione:
+              type: string
+            partita:
+              type: boolean
+            ordine:
+              type: string
+            livello:
+              type: integer
+              format: int32
+            collegamento_bil_itas:
+              type: string
+            fondo_dotazione:
+              type: boolean
+            foglia:
+              type: boolean
+            foglia_non_foglia:
+              type: boolean
+            pdc_padre:
+              $ref: '#/components/schemas/Pdc'
+            pdc_famiglia:
+              $ref: '#/components/schemas/PdcFamiglia'
+            pdc_classe:
+              $ref: '#/components/schemas/PdcClasse'
+            pdc_tipo:
+              $ref: '#/components/schemas/PdcTipo'
+            pdc_stato:
+              $ref: '#/components/schemas/PdcStato'
+            ente:
+              $ref: '#/components/schemas/Ente'
+            inizio_validita:
+              type: string
+              format: date-time
+            fine_validita:
+              type: string
+              format: date-time
+            modificabile:
+              type: boolean
+            eliminabile:
+              type: boolean
+            inseribile_figlio:
+              type: boolean
+            segmento:
+              type: string
+              description: "Codice del segmento del conto (es. ACCRUAL-A)"
+            version:
+              type: integer
+              format: int32
+              description: "Versione per optimistic locking"
+    PdcTreeNode:
+      allOf:
+        - $ref: '#/components/schemas/Pdc'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/PdcTreeNode'
+    PdcTreeResult:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PdcTreeNode'
+    PagedPdc:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pdc'
+        page:
+          type: integer
+          format: int32
+        page_size:
+          type: integer
+          format: int32
+        total_elements:
+          type: integer
+          format: int64
+    PdcClasse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    PdcTipo:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    PdcFilter:
+      type: object
+      description: Parametri di filtro specifici per la ricerca dei Piani dei Conti.
+      properties:
+        famiglia:
+          type: string
+          description: Filtro per famiglia (es. ACCRUAL-A, ACCRUAL-B, 118).
+        codice_evento:
+          type: string
+          description: Filtro per codice dell'evento contabile.
+        pdc_classe_codice:
+          type: string
+          description: Filtro per il codice della classe del PDC (es. 'EP').
+        codice_ufficiale:
+          type: string
+          description: Filtro per codice ufficiale del PDC.
+        pdc_stato_codice:
+          type: string
+          description: Filtro per il codice dello stato del PDC (es. 'ATTIVO').
+        descrizione:
+          type: string
+          description: Filtro per descrizione (match parziale, case-insensitive).
+        livello:
+          type: integer
+          description: Filtro per livello del PDC.
+        modificabile:
+          type: boolean
+          description: Filtro per conti modificabili.
+        pdc_tipo_codice:
+          type: string
+          description: Filtro per il codice del tipo del PDC.
+        collegamento_bil_itas:
+          type: string
+          description: Filtro per codice di bilancio ITAS (collegamento al vecchio sistema).
+    PdcTreeFilter:
+      type: object
+      description: Parametri di filtro specifici per la ricerca dei Piani dei Conti in formato gerarchico.
+      allOf:
+        - $ref: '#/components/schemas/PdcFilter'
+        - type: object
+          properties:
+            codice:
+              type: string
+              description: Filtro per codice del PDC (match parziale, case-insensitive).
+            treeFormat:
+              type: boolean
+              description: Indica se restituire i risultati in formato gerarchico
+    Evento:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+      properties:
+        statoDefaultPrimaNota:
+          type: string
+          description: Codice dello stato di default per le prime note associate a questo evento (es. P=Provvisoria, D=Definitiva)
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        detail:
+          type: object
+        links:
+          type: array
+          items:
+            type: string
+    PagedCausale:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Causale'
+        page:
+          type: integer
+          format: int32
+        page_size:
+          type: integer
+          format: int32
+        total_elements:
+          type: integer
+          format: int64
+    Causale:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        codice:
+          type: string
+        descrizione:
+          type: string
+        inizio_validita:
+          type: string
+          format: date
+        fine_validita:
+          type: string
+          format: date
+        modificabile:
+          type: boolean
+        eliminabile:
+          type: boolean
+        validabile:
+          type: boolean
+        tipo:
+          $ref: '#/components/schemas/CausaleTipo'
+        evento:
+          $ref: '#/components/schemas/Evento'
+        stato:
+          $ref: '#/components/schemas/CausaleStato'
+        ente:
+          $ref: '#/components/schemas/Ente'
+        contiCollegati:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContoCollegato'
+        version:
+          type: integer
+          format: int32
+          description: "Versione per optimistic locking"
+    CausaleRequest:
+      type: object
+      properties:
+        codice:
+          type: string
+          example: "CAUS_TEST_001"
+        descrizione:
+          type: string
+          example: "Causale di test per accrual"
+        inizio_validita: # Changed to snake_case
+          type: string
+          format: date
+          example: "2023-01-01"
+        fine_validita: # Changed to snake_case
+          type: string
+          format: date
+          example: "2023-12-31"
+        tipo:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+        evento:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+        stato:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+        ente:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+          example: {id: 1}
+        contiCollegati:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContoCollegato'
+    PdcContoRelazione:
+      type: object
+      properties:
+        tipoRelazione:
+          type: string
+          description: Tipo di relazione (es. FONDO, CORRELAZIONE)
+        classe:
+          type: string
+          description: Descrizione della classe del conto collegato
+        tipo:
+          type: string
+          description: Descrizione del tipo del conto collegato
+        livello:
+          type: integer
+          format: int32
+          description: Livello gerarchico del conto collegato
+        segmento:
+          type: string
+          description: Codice del segmento del conto collegato
+        codice:
+          type: string
+          description: Codice ufficiale del conto collegato
+        descrizione:
+          type: string
+          description: Descrizione del conto collegato
+    PrimaNotaSearchFilterDTO:
+      type: object
+      properties:
+        codiceTipo:
+          type: string
+          description: Filtro per codice del tipo
+        codiceFonte:
+          type: string
+          description: Filtro per codice della fonte
+        codiceEvento:
+          type: string
+          description: Filtro per codice dell'evento contabile.
+        codiceCausale:
+          type: string
+          description: Filtro per codice della causale.
+        numeroProvvisorio:
+          type: integer
+        numeroDefinitivo:
+          type: integer
+        codiceStato:
+          type: string
+          description: Filtro per codice dello stato.
+        descrizione:
+          type: string
+        codiceConto:
+          type: string
+        descrizioneConto:
+          type: string
+          description: Campo per ricerca conto (non usato per filtro diretto)
+        dataRegProvvisoriaDa:
+          type: string
+        dataRegProvvisoriaA:
+          type: string
+        dataRegDefinitivaDa:
+          type: string
+        dataRegDefinitivaA:
+          type: string
+        importoDa:
+          type: number
+        importoA:
+          type: number
+        soloNonQuadrate:
+          type: boolean
+          description: Se true, restituisce solo le prime note non quadrate (totaleDare != totaleAvere o senza importi)
+    PrimaNotaSearchResultDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        tipo:
+          type: string
+        fonte:
+          type: string
+        evento:
+          type: string
+        causale:
+          type: string
+        numeroProvvisorio:
+          type: integer
+        dataRegProvvisoria:
+          type: string
+          format: date
+        stato:
+          type: string
+        numeroDefinitivo:
+          type: integer
+        dataRegDefinitiva:
+          type: string
+          format: date
+        descrizione:
+          type: string
+        totaleDare:
+          type: number
+          format: double
+        totaleAvere:
+          type: number
+          format: double
+        anno:
+          type: integer
+          format: int32
+        isAggiornabile:
+          type: boolean
+        isAnnullabile:
+          type: boolean
+        isRiapribile:
+          type: boolean
+        isValidabile:
+          type: boolean
+    PagePrimaNotaSearchResultDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrimaNotaSearchResultDTO'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        number:
+          type: integer
+        size:
+          type: integer
+        numberOfElements:
+          type: integer
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PrimaNotaDetailDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        anno:
+          type: integer
+          format: int32
+          description: Anno della prima nota
+        tipo:
+          type: string
+          description: Codice del tipo di prima nota
+        tipoDescrizione:
+          type: string
+          description: Descrizione del tipo di prima nota
+        fonte:
+          type: string
+          description: Codice della fonte contabile
+        fonteDescrizione:
+          type: string
+          description: Descrizione della fonte contabile
+        evento:
+          type: string
+          description: Codice dell'evento contabile
+        eventoDescrizione:
+          type: string
+          description: Descrizione dell'evento contabile
+        causale:
+          type: string
+          description: Codice della causale
+        causaleDescrizione:
+          type: string
+          description: Descrizione della causale
+        numeroProvvisorio:
+          type: integer
+        dataRegProvvisoria:
+          type: string
+          format: date
+        stato:
+          type: string
+          description: Codice dello stato della prima nota
+        statoDescrizione:
+          type: string
+          description: Descrizione dello stato della prima nota
+        numeroDefinitivo:
+          type: integer
+        dataRegDefinitiva:
+          type: string
+          format: date
+        descrizione:
+          type: string
+        conti:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContoCollegatoDTO'
+        attributi:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributoCollegatoDTO'
+        primeNoteCollegate:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrimaNotaCollegataDTO'
+    PrimaNotaCreateUpdateDTO:
+      type: object
+      description: DTO per l'inserimento e l'aggiornamento di una prima nota
+      properties:
+        testata:
+          $ref: '#/components/schemas/PrimaNotaTestataDTO'
+        conti:
+          type: array
+          description: Lista dei conti collegati con importi
+          items:
+            $ref: '#/components/schemas/ContoCollegatoDTO'
+        attributi:
+          type: array
+          description: Lista degli attributi opzionali
+          items:
+            $ref: '#/components/schemas/AttributoCollegatoDTO'
+      required:
+        - testata
+        - conti
+
+    PrimaNotaIdDTO:
+      type: object
+      description: DTO per identificare una prima nota nelle operazioni massive
+      required:
+        - anno
+        - numero
+      properties:
+        anno:
+          type: integer
+          format: int32
+          description: Anno della prima nota
+        numero:
+          type: integer
+          format: int32
+          description: Numero provvisorio della prima nota
+
+    PrimaNotaTestataDTO:
+      type: object
+      description: Testata della prima nota per inserimento/aggiornamento
+      properties:
+        tipo:
+          type: string
+          description: Tipo di prima nota (codice)
+        fonte:
+          type: string
+          description: Fonte contabile (codice)
+        evento:
+          type: string
+          description: Evento contabile (codice)
+        causale:
+          type: string
+          description: Causale (codice)
+        stato:
+          type: string
+          description: Stato della prima nota (PROVVISORIA, DEFINITIVA)
+        dataRegProvvisoria:
+          type: string
+          format: date
+          description: Data registrazione provvisoria
+        descrizione:
+          type: string
+          description: Descrizione della prima nota
+          maxLength: 500
+        annoBilancio:
+          type: integer
+          format: int32
+          description: Anno di bilancio di riferimento
+      required:
+        - tipo
+        - fonte
+        - evento
+        - causale
+        - stato
+        - dataRegProvvisoria
+    ContoCollegatoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64		
+        codice:
+          type: string
+        descrizione:
+          type: string
+        dare:
+          type: number
+          format: double
+        avere:
+          type: number
+          format: double
+    AttributoCollegatoDTO:
+      type: object
+      properties:
+        tipoAttributo:
+          type: string
+          description: Codice del tipo attributo
+        tipoAttributoDescrizione:
+          type: string
+          description: Descrizione del tipo attributo
+        valore:
+          type: string
+        conto:
+          type: string
+    AttributoInfoDTO:
+      type: object
+      properties:
+        codice:
+          type: string
+          description: Codice dell'attributo
+        descrizione:
+          type: string
+          description: Descrizione dell'attributo
+      required:
+        - codice
+        - descrizione
+    TipoFile:
+      type: object
+      properties:
+        codice:
+          type: string
+          description: Codice identificativo del tipo di file
+        descrizione:
+          type: string
+          description: Descrizione del tipo di file
+      required:
+        - codice
+        - descrizione
+
+    FlussoSearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del flusso
+        fonte:
+          type: string
+          description: Fonte del flusso
+        tipo:
+          type: string
+          description: Tipo del flusso
+        codice:
+          type: string
+          description: Codice del flusso
+        nome:
+          type: string
+          description: Nome del flusso
+        dataCaricamento:
+          type: string
+          format: date-time
+          description: Data di caricamento del flusso
+        stato:
+          type: string
+          description: Stato del flusso
+      required:
+        - id
+        - fonte
+        - tipo
+        - codice
+        - nome
+        - dataCaricamento
+        - stato
+
+    PagedFlussoSearchResult:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlussoSearchResult'
+        page:
+          type: integer
+          format: int32
+        page_size:
+          type: integer
+          format: int32
+        total_elements:
+          type: integer
+          format: int64
+
+    FlussoElaboraResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indica se l'elaborazione è avvenuta con successo
+          example: true
+        message:
+          type: string
+          description: Messaggio di esito dell'elaborazione
+          example: "Flusso elaborato con successo."
+
+    ElaboraFlussoResponseDTO:
+      type: object
+      properties:
+        flussoElaboraResponse:
+          $ref: '#/components/schemas/FlussoElaboraResponse'
+        needsConfirmation:
+          type: boolean
+          description: Indica se è necessaria una conferma da parte dell'utente per proseguire
+          example: false
+        confirmationCode:
+          type: string
+          description: Codice identificativo della conferma richiesta
+          example: "CF-12345"
+        confirmationMessage:
+          type: string
+          description: Messaggio da mostrare all'utente per la richiesta di conferma
+          example: "Sono state rilevate anomalie. Vuoi procedere comunque?"
+        resumeToken:
+          type: string
+          description: Token per riprendere l'elaborazione dopo la conferma dell'utente
+          example: "eyJpZCI6IjEyMyIsImFjdGlvbiI6InJlcGhlYXNlIn0="
+        tipoMessaggio:
+          type: string
+          description: Tipo di messaggio da presentare al client (es. CONFIRM, SUCCESS, ERROR)
+          example: "CONFIRM"
+
+    PrimaNotaCollegataDTO:
+      type: object
+      properties:
+        idPrimaNotaCollegata:
+          type: integer
+          format: int64
+          description: Identificativo univoco della prima nota collegata.
+        tipo:
+          type: string
+          description: Tipo della prima nota collegata.
+        fonte:
+          type: string
+          description: Fonte della prima nota collegata.
+        evento:
+          type: string
+          description: Evento della prima nota collegata.
+        causale:
+          type: string
+          description: Causale della prima nota collegata.
+        descrizioneCausale:
+          type: string
+          description: Descrizione della causale.
+        numeroProvvisorio:
+          type: integer
+          description: Numero provvisorio della prima nota collegata.
+        dataRegProvvisoria:
+          type: string
+          format: date
+          description: Data di registrazione provvisoria.
+        numeroDefinitivo:
+          type: integer
+          description: Numero definitivo della prima nota collegata.
+        dataRegDefinitiva:
+          type: string
+          format: date
+          description: Data di registrazione definitiva.
+        stato:
+          type: string
+          description: Stato della prima nota collegata.
+        descrizione:
+          type: string
+          description: Descrizione della prima nota collegata.
+        noteLegame:
+          type: string
+          description: Note del legame tra le prime note.
+        relazione:
+          type: string
+          description: Descrizione della relazione tra le prime note collegate.
+        dataOperazione:
+          type: string
+          format: date
+          description: Data dell'operazione.
+        importo:
+          type: number
+          format: double
+          description: Importo dell'operazione.
+        valuta:
+          type: string
+          description: Valuta dell'operazione.
+      required:
+        - idPrimaNotaCollegata
+        - tipo
+        - fonte
+        - causale
+        - stato
+        - descrizione
+        - dataOperazione
+        - importo
+        - valuta
+    PagedContoCollegatoDTO:
+      type: object
+      description: "Risposta paginata per l'elenco dei conti collegati"
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContoCollegatoDTO'
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    ContiTotaliDTO:
+      type: object
+      description: "Totali generali dei conti collegati (dare e avere)"
+      properties:
+        totaleDare:
+          type: number
+          format: decimal
+          description: "Somma totale dei conti in dare"
+        totaleAvere:
+          type: number
+          format: decimal
+          description: "Somma totale dei conti in avere"
+      required:
+        - totaleDare
+        - totaleAvere
+    PagedAttributoCollegatoDTO:
+      type: object
+      description: "Risposta paginata per l'elenco degli attributi collegati"
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributoCollegatoDTO'
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PagedPrimaNotaCollegataDTO:
+      type: object
+      description: "Risposta paginata per l'elenco delle prime note collegate"
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrimaNotaCollegataDTO'
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    TipoPrimaNota:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    FontePrimaNota:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    CausalePrimaNota:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+    StatoPrimaNota:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseCoded'
+
+    Fonte:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        codice:
+          type: string
+          description: Codice identificativo della fonte
+        descrizione:
+          type: string
+          description: Descrizione della fonte
+      required:
+        - codice
+        - descrizione
+    EsitoElaborazione:
+      type: object
+      properties:
+        dataElaborazione:
+          type: string
+          format: date-time
+          description: Data e ora dell'elaborazione
+        esito:
+          type: string
+          description: Esito dell'elaborazione (es. SUCCESS, ERROR, INFO)
+        messaggio:
+          type: string
+          description: Messaggio descrittivo dell'esito
+      required:
+        - dataElaborazione
+        - esito
+        - messaggio
+
+    FlussoDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID univoco del flusso
+        codice:
+          type: string
+          description: Codice del file
+        nome:
+          type: string
+          description: Nome del file
+        fonte:
+          type: string
+          description: Fonte del flusso
+        tipo:
+          type: string
+          description: Tipo del flusso
+        dataCaricamento:
+          type: string
+          format: date-time
+          description: Data di caricamento del flusso
+        stato:
+          type: string
+          description: Stato del flusso
+        note:
+          type: string
+          description: Note aggiuntive sul flusso
+        esitiElaborazione:
+          type: array
+          items:
+            $ref: '#/components/schemas/EsitoElaborazione'
+          description: Lista degli esiti delle elaborazioni associate al flusso
+      required:
+        - id
+        - codice
+        - nome
+        - fonte
+        - tipo
+        - dataCaricamento
+        - stato
+
+    ModelloMifData:
+      type: object
+      properties:
+        saldiFoglio1:
+          type: array
+          items:
+            $ref: '#/components/schemas/MifSaldo'
+        rettificheFoglio2:
+          type: array
+          items:
+            $ref: '#/components/schemas/MifRettifica'
+        saldiBilancioItas:
+          type: array
+          items:
+            $ref: '#/components/schemas/MifSaldoItas'
+
+    MifSaldo:
+      type: object
+      properties:
+        codiceConto:
+          type: string
+        importo:
+          type: number
+          format: double
+
+    MifRettifica:
+      type: object
+      properties:
+        codiceConto:
+          type: string
+        importo:
+          type: number
+          format: double
+
+    MifSaldoItas:
+      type: object
+      properties:
+        codiceBilancioItas:
+          type: string
+        importo:
+          type: number
+          format: double
+
+    EntitaContabile:
+      type: object
+      properties:
+        anno:
+          type: integer
+        fase:
+          type: string

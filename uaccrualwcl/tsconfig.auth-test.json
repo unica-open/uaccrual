@@ -1,0 +1,25 @@
+/* Test configuration per autenticazione - solo file specifici */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/auth-test",
+    "types": [
+      "jasmine"
+    ]
+  },
+  "include": [
+    "src/app/core/models/auth-provider.type.spec.ts",
+    "src/app/core/models/auth.models.spec.ts",
+    "src/app/core/models/ente.model.spec.ts",
+    "src/app/core/services/auth-context.service.spec.ts",
+    "src/app/core/services/authentication.service.spec.ts",
+    "src/app/core/services/auth.guard.spec.ts",
+    "src/app/core/services/auth.interceptor.spec.ts",
+    "src/app/core/services/multi-ente.interceptor.spec.ts",
+    "src/app/core/services/providers/shibboleth.provider.spec.ts",
+    "src/app/core/services/providers/credentials.provider.spec.ts",
+    "src/app/core/services/providers/session.provider.spec.ts",
+    "src/app/core/services/providers/dev.provider.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

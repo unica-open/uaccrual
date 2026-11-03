@@ -1,0 +1,108 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="px-6 pb-6">
+
+  <div class="border border-border-light dark:border-border-dark rounded-lg mb-6 overflow-hidden">
+    <button type="button" (click)="toggleAccordion()"
+      class="w-full px-4 py-3 text-left font-semibold uppercase text-sm flex items-center justify-between"
+      style="background:var(--accent-soft);color:var(--accent);border-bottom:1px solid var(--border-color)">
+      <span>AGGIUNGI</span>
+      <span class="material-icons text-sm transition-transform duration-200" [ngClass]="{'rotate-180': accordionEspanso}">expand_more</span>
+    </button>
+
+    <div *ngIf="accordionEspanso" class="p-6" style="background:var(--surface)">
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Tipo attributo *</label>
+          <select [(ngModel)]="nuovoTipoAttributo" [disabled]="indiceRigaInModifica >= 0" class="select">
+            <option value="">--- seleziona ---</option>
+            <option *ngFor="let tipo of attributiTipi" [value]="tipo.codice">{{ tipo.descrizione }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Valore *</label>
+          <input type="text" [(ngModel)]="nuovoValoreAttributo" maxlength="500" class="input"/>
+          <div class="flex justify-end mt-1">
+            <span style="font-size:11px;color:var(--fg-subtle)">{{ nuovoValoreAttributo.length || 0 }}/500</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Conto collegato (opzionale)</label>
+          <select [(ngModel)]="nuovoContoCollegato" class="select">
+            <option value="">--- seleziona ---</option>
+            <option *ngFor="let conto of conti" [value]="conto.codice">{{ conto.codice }} - {{ conto.descrizione }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions" style="justify-content:flex-start;border-top:none;margin-top:0;padding-top:8px">
+        <button type="button" class="btn btn-ghost btn-lg" (click)="onAnnullaAttributo()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="onConfermaAttributo()"><span class="material-icons-round" style="font-size:16px">check</span> Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Tipo</th>
+          <th scope="col">Valore</th>
+          <th scope="col">Conto collegato</th>
+          <th class="col-actions" scope="col">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attributo of getAttributiPagina(); let i = index">
+          <td>{{ attributo.tipoAttributoDescrizione || attributo.tipoAttributo }}</td>
+          <td>{{ attributo.valore }}</td>
+          <td>{{ attributo.conto || '-' }}</td>
+          <td class="col-actions">
+            <button *ngIf="isModifica" type="button" class="btn-icon-edit p-1 rounded-full transition-colors" title="Modifica" (click)="modificaAttributo((currentPage * pageSize) + i)">
+              <span class="material-icons text-[20px]">edit</span>
+            </button>
+            <button type="button" class="text-red-500 hover:text-red-700 dark:text-red-400 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Elimina" (click)="rimuoviAttributo((currentPage * pageSize) + i)">
+              <span class="material-icons text-[20px]">delete</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="getAttributiPagina().length === 0">
+          <td colspan="4" style="text-align:center;color:var(--fg-subtle);padding:24px">Nessun attributo inserito. Utilizzare il form "AGGIUNGI" per inserire un attributo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="isModifica && attributi.length > 0" class="pagination" style="margin-top:12px">
+    <div class="pagination-left">
+      <span>Righe per pagina</span>
+      <select class="select" style="width:76px;height:32px" (change)="onPageSizeChange($event)" [value]="pageSize">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+      </select>
+      <span>{{ getDisplayRange() }}</span>
+    </div>
+    <div class="pagination-right">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="previousPage()">
+        <span class="material-icons-round" style="font-size:14px">chevron_left</span>
+      </button>
+      <span style="padding:0 8px;font-size:12px;color:var(--fg-subtle)">Pagina {{ currentPage + 1 }} di {{ getTotalPages() }}</span>
+      <button class="page-btn" [disabled]="isLastPage()" (click)="nextPage()">
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;padding-top:16px;margin-top:12px;border-top:1px dashed var(--border-color)">
+    <a class="back-link" (click)="onIndietro()">
+      <span class="material-icons-round">arrow_back</span> Indietro
+    </a>
+    <div style="flex:1;display:flex;justify-content:flex-end;gap:10px">
+      <button type="button" class="btn btn-ghost btn-lg" (click)="onAnnulla()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+      <button type="button" class="btn btn-secondary btn-lg" (click)="onSalva()"><span class="material-icons-round" style="font-size:16px">save</span> Salva</button>
+      <button type="button" class="btn btn-primary btn-lg" (click)="onSalvaEdEsci()"><span class="material-icons-round" style="font-size:16px">check</span> Salva ed Esci</button>
+    </div>
+  </div>
+</div>

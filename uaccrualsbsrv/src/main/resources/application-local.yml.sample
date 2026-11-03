@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# ===========================================
+# ACCRUALSBSRV - Local Development Configuration
+# ===========================================
+# Configurazione per ambiente di sviluppo locale
+# Questo file viene caricato quando SPRING_PROFILES_ACTIVE=local
+
+# ===========================================
+# SERVER CONFIGURATION
+# ===========================================
+server:
+  port: 20080
+
+# ===========================================
+# DEVELOPMENT AUTHENTICATION
+# ===========================================
+# Abilita autenticazione dev con token base64 (senza JWT)
+# Il frontend invia token dev, il backend lo decodifica e autentica
+dev:
+  auth:
+    enabled: true
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+spring:
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/ACCRUAL
+    username: accrual
+    password: xxxxx
+    driver-class-name: org.postgresql.Driver
+
+
+
+# ===========================================
+# LOGGING CONFIGURATION
+# ===========================================
+logging:
+  level:
+    root: INFO
+    it.csi.accrual.accrualsbsrv: DEBUG
+    org.springframework: WARN
+    org.springframework.boot.actuate: INFO
+    org.hibernate: INFO
+    org.postgresql: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{enteCodice}] [%X{requestId}] %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{enteCodice}] [%X{requestId}] %msg%n"
+  file:
+    name: ${LOG_PATH:C:/logs/accrualsbsrv.log}
+  logback:
+    rollingpolicy:
+      max-size: 10MB
+      max-history: 30

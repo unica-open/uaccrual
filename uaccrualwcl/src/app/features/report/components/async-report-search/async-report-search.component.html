@@ -1,0 +1,95 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page">
+
+  <div *ngIf="message" style="padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px"
+       [style.background]="message.type === 'success' ? 'var(--success-soft)' : message.type === 'error' ? 'var(--danger-soft)' : message.type === 'warning' ? 'var(--warning-soft)' : 'var(--info-soft)'"
+       [style.color]="message.type === 'error' ? 'var(--danger)' : message.type === 'success' ? 'var(--success)' : 'var(--info)'">
+    <span class="material-icons-round" style="font-size:18px;flex-shrink:0">
+      {{ message.type === 'success' ? 'check_circle' : message.type === 'error' ? 'error' : message.type === 'warning' ? 'warning' : 'info' }}
+    </span>
+    <div style="flex:1"><strong>{{ message.title }}</strong> {{ message.text }}</div>
+    <button (click)="onDismissMessage()" style="background:none;border:none;cursor:pointer;color:inherit;padding:4px">
+      <span class="material-icons-round" style="font-size:16px">close</span>
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Filtri di ricerca</h2>
+      </div>
+      <button *ngIf="searchDone" type="button" class="btn btn-ghost btn-sm" (click)="toggleFilters()">
+        <span class="material-icons-round" style="font-size:14px">{{ filtersCollapsed ? 'expand_more' : 'expand_less' }}</span>
+        {{ filtersCollapsed ? 'Espandi filtri' : 'Comprimi filtri' }}
+      </button>
+    </div>
+
+    <div class="card-body" *ngIf="!filtersCollapsed" [@collapseExpand]>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" for="dateFrom">Data Da *</label>
+            <input class="input" id="dateFrom" formControlName="dateFrom" type="date" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="dateTo">Data A *</label>
+            <input class="input" id="dateTo" formControlName="dateTo" type="date" [min]="searchForm.get('dateFrom')?.value" />
+            <span class="field-hint" *ngIf="!dateRangeValid && searchForm.get('dateTo')?.touched" style="color:var(--danger)">La data "A" deve essere successiva o uguale a "Da"</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="stato">Stato</label>
+            <select class="select" id="stato" formControlName="stato">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let option of statiOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="tipoReport">Tipo Report</label>
+            <select class="select" id="tipoReport" formControlName="tipoReport">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let option of tipoReportOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="formato">Formato</label>
+            <select class="select" id="formato" formControlName="formato">
+              <option value="">--- tutti i valori ---</option>
+              <option *ngFor="let option of formatoOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding-top:16px;margin-top:8px;border-top:1px dashed var(--border-color)">
+          <button type="button" class="btn btn-ghost btn-lg" (click)="onReset()"><span class="material-icons-round" style="font-size:16px">close</span> Annulla</button>
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="!dateRangeValid || searchForm.invalid || loading">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="searching || searchDone" [@fadeSlideIn] class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Risultati della ricerca</h2>
+      </div>
+    </div>
+    <div *ngIf="searching" style="display:flex;justify-content:center;padding:40px">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color:var(--accent)"></div>
+    </div>
+    <div *ngIf="!searching && searchDone">
+      <app-async-report-list></app-async-report-list>
+    </div>
+  </div>
+
+  <a class="back-link" style="margin-top:16px" (click)="onBack()">
+    <span class="material-icons-round">arrow_back</span> Indietro
+  </a>
+</main>

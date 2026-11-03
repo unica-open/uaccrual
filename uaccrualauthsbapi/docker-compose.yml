@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+version: '3.8'
+
+services:
+  accrualauthsbapi:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "40380:10380"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JWT_SECRET=accrual-dev-secret-key-for-jwt-token-generation
+      - JWT_EXPIRATION=86400
+      #- SERVER_SERVLET_CONTEXT_PATH=/accrualauthsbapi
+    volumes:
+      - ./src/main/resources/application-docker.yml:/deployments/config/application-docker.yml
+    restart: on-failure
+    depends_on:
+      - mailpit
+    networks:
+      - accrual-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "40381:8025"
+      - "40382:1025"
+    environment:
+      - MP_MAX_MESSAGES=50
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
+    restart: unless-stopped
+    networks:
+      - accrual-network
+
+networks:
+  accrual-network:
+    external: true

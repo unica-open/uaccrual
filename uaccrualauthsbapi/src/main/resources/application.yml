@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+server:
+  servlet:
+    context-path: /accrualauthsbapi  
+
+# Security Configuration - Public Endpoints
+security:
+  public-endpoints:
+    - /api/v1/login
+    - /api/v1/token-login
+    - /api/v1/service-login
+    - /api/v1/shibboleth-login
+    - /api/v1/reset-password
+    - /api/v1/confirm-password-reset
+    - /api/v1/logout
+
+logging:
+  file:
+    name: logs/accrualauthsbapi.log

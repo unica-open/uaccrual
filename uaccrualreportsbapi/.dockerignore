@@ -1,0 +1,40 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Build
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.env.local
+
+# Documentation
+README.md
+docs/
+
+# Tests (optional, keep if you want to run tests in Docker)
+src/test/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore

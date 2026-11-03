@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+version: '3.8'
+
+services:
+  accrualsbsrv:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "40080:10080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_SERVLET_CONTEXT_PATH=/accrualsbsrv
+    volumes:
+      - ./src/main/resources/application-docker.yml:/deployments/config/application-docker.yml
+    restart: unless-stopped
+    networks:
+      - accrual-network
+
+networks:
+  accrual-network:
+    external: true

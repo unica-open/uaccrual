@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+spring:
+  application:
+    name: accrualsbapi
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  servlet:
+    context-path: /accrualsbapi
+
+logging:
+  level:
+    it.csi.accrual: DEBUG
+  file:
+    name: logs/accrualsbapi.log
+
+batch-insert:
+  prima-nota:
+    size: 50
+  prima-nota-importo:
+    size: 100
+  prima-nota-stato:
+    size: 50
+  prima-nota-attributo:
+    size: 50
+  pdc-saldo:
+    size: 50
+  pdc-saldo-prima-nota:
+    size: 50
+
+csv:
+  encoding:
+    default: UTF-8
+    fallback: ISO-8859-1

@@ -1,0 +1,245 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page" *ngIf="causale">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">{{ isViewMode ? 'info' : (isInsertMode ? 'add_circle_outline' : 'edit_note') }}</span>
+        <h2 class="card-title">{{ isViewMode ? 'Dettaglio Causale' : (isInsertMode ? 'Nuova Causale' : 'Dati Causale') }}</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- View mode: dettaglio -->
+      <ng-container *ngIf="isViewMode">
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label">Tipo</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.tipo?.descrizione || '' }}</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Codice</label>
+            <span class="input" style="display:flex;align-items:center;font-family:var(--font-mono)">{{ causale.codice || '' }}</span>
+          </div>
+          <div class="field" style="grid-column:span 2">
+            <label class="field-label">Descrizione</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.descrizione || '' }}</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Evento</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.evento ? (causale.evento.codice + ' - ' + causale.evento.descrizione) : '' }}</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Inizio validità</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.inizio_validita | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Fine validità</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.fine_validita ? (causale.fine_validita | date:'dd/MM/yyyy') : '—' }}</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Stato</label>
+            <span class="input" style="display:flex;align-items:center">{{ causale.stato ? (causale.stato.codice + ' - ' + causale.stato.descrizione) : '' }}</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Edit/Insert mode: form grid -->
+      <ng-container *ngIf="!isViewMode">
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label">Tipo</label>
+            <select class="select" [(ngModel)]="causale.tipo" [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Tipo --</option>
+              <option *ngFor="let tipo of tipiCausale" [ngValue]="tipo">{{ tipo.descrizione }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Codice</label>
+            <input class="input" [(ngModel)]="causale.codice" type="text" placeholder="Codice causale" style="font-family:var(--font-mono)" />
+          </div>
+          <div class="field span-2">
+            <label class="field-label">Descrizione</label>
+            <input class="input" [(ngModel)]="causale.descrizione" type="text" placeholder="Descrizione della causale" />
+          </div>
+          <div class="field">
+            <label class="field-label">Evento</label>
+            <select class="select" [(ngModel)]="causale.evento" [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Evento --</option>
+              <option *ngFor="let evento of eventiCausale" [ngValue]="evento">{{ evento.codice }} - {{ evento.descrizione }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Inizio validità *</label>
+            <input class="input" type="date" [(ngModel)]="causale.inizio_validita" />
+          </div>
+          <div class="field">
+            <label class="field-label">Fine validità</label>
+            <input class="input" type="date" [(ngModel)]="causale.fine_validita" />
+          </div>
+          <div class="field">
+            <label class="field-label">Stato</label>
+            <select class="select" *ngIf="isInsertMode; else statoReadonly" [(ngModel)]="causale.stato" [compareWith]="compareById">
+              <option [ngValue]="null">-- Seleziona Stato --</option>
+              <option *ngFor="let stato of statiCausale" [ngValue]="stato">{{ stato.codice }} - {{ stato.descrizione }}</option>
+            </select>
+            <ng-template #statoReadonly>
+              <input class="input" type="text" readonly [value]="causale.stato ? (causale.stato.codice + ' - ' + causale.stato.descrizione) : ''" />
+            </ng-template>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- SEZIONE AGGIUNGI CONTO (solo modalità insert/edit) -->
+  <div *ngIf="!isViewMode" class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">add_box</span>
+        <h2 class="card-title">Aggiungi Conto Collegato</h2>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="form-grid" style="grid-template-columns: 1fr 1fr auto">
+        <div class="field">
+          <label class="field-label">Codice Conto</label>
+          <input class="input" [(ngModel)]="nuovoConto.codice" placeholder="Codice conto" style="font-family:var(--font-mono)" />
+        </div>
+        <div class="field">
+          <label class="field-label">Descrizione Conto</label>
+          <input class="input" [(ngModel)]="nuovoConto.descrizione" placeholder="Descrizione conto" />
+        </div>
+        <div class="field" style="justify-content:flex-end">
+          <button type="button" class="btn btn-primary btn-lg" (click)="cercaConto()">
+            <span class="material-icons-round" style="font-size:16px">search</span> Cerca
+          </button>
+        </div>
+        <div class="field" style="display:flex;flex-direction:row;align-items:flex-end;gap:8px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="segno" value="DARE" [(ngModel)]="nuovoConto.segno" style="accent-color:var(--accent)" />
+            <span style="font-size:13px;font-weight:600">DARE</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="segno" value="AVERE" [(ngModel)]="nuovoConto.segno" style="accent-color:var(--accent)" />
+            <span style="font-size:13px;font-weight:600">AVERE</span>
+          </label>
+        </div>
+        <div class="field">
+          <label class="field-label">Tipo Importo</label>
+          <select class="select" [(ngModel)]="nuovoConto.tipoImporto">
+            <option>LORDO</option>
+            <option>IMPONIBILE</option>
+            <option>IMPOSTA</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+        <button type="button" class="btn btn-ghost btn-lg" (click)="resetNuovoConto()">
+          <span class="material-icons-round" style="font-size:16px">close</span> Annulla
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="aggiungiConto()">
+          <span class="material-icons-round" style="font-size:16px">check</span>
+          {{ isEditMode && editingContoIndex !== null ? 'Aggiorna' : 'Conferma' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE TABELLA CONTI COLLEGATI -->
+  <div class="card" style="margin-top:20px" *ngIf="!isViewMode || (causale.contiCollegati && causale.contiCollegati.length > 0)">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">account_tree</span>
+        <h2 class="card-title">Conti Collegati</h2>
+      </div>
+      <span class="badge badge-neutral">{{ causale.contiCollegati?.length || 0 }} elementi</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Classe</th>
+            <th scope="col">Conto</th>
+            <th scope="col">Descrizione</th>
+            <th scope="col">Segno</th>
+            <th scope="col">Tipo Importo</th>
+            <th *ngIf="!isViewMode" class="col-actions" scope="col">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let conto of causale.contiCollegati; let i = index">
+            <td>{{ conto.classe }}</td>
+            <td><span class="cell-mono">{{ conto.codice }}</span></td>
+            <td>{{ conto.descrizione }}</td>
+            <td>{{ conto.segno }}</td>
+            <td>{{ conto.tipoImporto }}</td>
+            <td *ngIf="!isViewMode" class="col-actions">
+              <button *ngIf="isEditMode" class="row-action" title="Modifica" (click)="modificaConto(i)">
+                <span class="material-icons-round" style="font-size:15px">edit</span>
+              </button>
+              <button class="row-action" title="Elimina" (click)="rimuoviConto(i)" style="color:var(--danger)">
+                <span class="material-icons-round" style="font-size:15px">delete</span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!causale.contiCollegati || causale.contiCollegati.length === 0">
+            <td [colSpan]="isViewMode ? 5 : 6" style="text-align:center;color:var(--fg-subtle);padding:24px">Nessun conto collegato inserito.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PULSANTI DI AZIONE FINALI -->
+  <div class="form-actions" [style.justify-content]="isViewMode ? 'center' : 'flex-start'">
+    <ng-container *ngIf="isViewMode">
+      <a class="back-link" (click)="onBack()">
+        <span class="material-icons-round">arrow_back</span> Indietro
+      </a>
+      <button *ngIf="canUpdate$ | async" class="btn btn-primary btn-lg" (click)="onModifica()">
+        <span class="material-icons-round" style="font-size:16px">edit</span> Modifica
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!isViewMode">
+      <a class="back-link" (click)="onBack()">
+        <span class="material-icons-round">arrow_back</span> Indietro
+      </a>
+      <div style="flex:1;display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn btn-ghost btn-lg" (click)="onCancel()">
+          <span class="material-icons-round" style="font-size:16px">close</span> Annulla
+        </button>
+        <button class="btn btn-secondary btn-lg" (click)="onSave()">
+          <span class="material-icons-round" style="font-size:16px">save</span> Salva
+        </button>
+        <button class="btn btn-primary btn-lg" (click)="onSaveAndExit()">
+          <span class="material-icons-round" style="font-size:16px">check</span> Salva ed Esci
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</main>
+
+<!-- Modale di Selezione Conto -->
+<div *ngIf="showPdcTreeSearchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+  <div class="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden">
+    <app-pdc-tree-search-modal
+      [searchCodice]="searchCodiceForModal"
+      [searchDescrizione]="searchDescrizioneForModal"
+      [autoSelectSingleResult]="true"
+      (pdcSelected)="onPdcSelected($event)"
+      (close)="onModalClosed()">
+    </app-pdc-tree-search-modal>
+  </div>
+</div>
+
+<div *ngIf="!causale" class="flex flex-col items-center justify-center min-h-[400px] text-primary">
+  <span class="material-icons text-5xl animate-spin mb-4">refresh</span>
+  <p class="font-medium">Caricamento dati causale in corso...</p>
+</div>

@@ -1,0 +1,61 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+// Stili minimi - la maggior parte dello stile è gestita da Tailwind CSS
+// in linea con le altre sezioni del progetto (PDC, PrimaNota)
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+// Custom styling per Material components
+.custom-checkbox,
+.custom-radio {
+  ::ng-deep {
+    .mat-mdc-checkbox-touch-target,
+    .mat-mdc-radio-touch-target {
+      position: relative;
+    }
+    
+    .mdc-checkbox__background,
+    .mdc-radio__background {
+      border-color: var(--primary);
+    }
+  }
+}
+
+.formato-toggle {
+  ::ng-deep {
+    .mat-button-toggle-group {
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    
+    .mat-button-toggle {
+      border: none;
+      
+      &.mat-button-toggle-checked {
+        background-color: var(--primary);
+        color: white;
+      }
+    }
+  }
+}
+
+// Stili per i campi form
+input.mat-input-element,
+mat-select {
+  &.block {
+    width: 100%;
+  }
+}
+
+// Pulsante indietro
+button[mat-icon-button] {
+  &:hover {
+    background-color: rgba(var(--primary-rgb), 0.04);
+  }
+}

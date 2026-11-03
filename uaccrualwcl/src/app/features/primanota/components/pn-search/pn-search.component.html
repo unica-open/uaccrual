@@ -1,0 +1,57 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<main class="page" style="position:relative">
+
+  <div *ngIf="loading$ | async" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;border-radius:12px" class="bg-white/75 dark:bg-gray-900/75">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" style="border-color:var(--accent)"></div>
+  </div>
+
+  <div *ngIf="incompleteWarning$ | async" style="padding:12px 16px;border-radius:10px;margin-bottom:16px;background:var(--warning-soft);color:#b8860b;display:flex;align-items:center;gap:10px">
+    <span class="material-icons-round" style="font-size:18px">warning_amber</span>
+    <strong>ATTENZIONE!</strong> Sono presenti prime note non quadrate. Si prega di verificare.
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Filtri di ricerca</h2>
+      </div>
+      <button *ngIf="searchDone" type="button" class="btn btn-ghost btn-sm" (click)="toggleFilters()">
+        <span class="material-icons-round" style="font-size:14px">{{ filtersCollapsed ? 'expand_more' : 'expand_less' }}</span>
+        {{ filtersCollapsed ? 'Espandi filtri' : 'Comprimi filtri' }}
+      </button>
+    </div>
+
+    <div class="card-body" *ngIf="!filtersCollapsed" [@collapseExpand]>
+      <app-pn-search-filters
+        [initialFilter]="currentFilter"
+        (search)="onSearch($event)"
+        (clear)="onClear()"
+        (indietro)="onBack()">
+      </app-pn-search-filters>
+    </div>
+  </div>
+
+  <div *ngIf="searching || searchDone" [@fadeSlideIn] class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Risultati della ricerca</h2>
+      </div>
+    </div>
+    <div *ngIf="searching" style="display:flex;justify-content:center;padding:40px">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color:var(--accent)"></div>
+    </div>
+    <div *ngIf="!searching && searchDone">
+      <app-pn-search-list></app-pn-search-list>
+    </div>
+  </div>
+
+  <a class="back-link" style="margin-top:16px" (click)="onBack()">
+    <span class="material-icons-round">arrow_back</span> Indietro
+  </a>
+</main>

@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+version: '3.8'
+
+services:
+  accrualreportsbapi:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "40180:10180"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_SERVLET_CONTEXT_PATH=/accrualreportsbapi
+      - JWT_SECRET=accrual-dev-secret-key-for-jwt-token-generation
+      - JWT_EXPIRATION=86400000
+    volumes:
+      - ./src/main/resources/application-docker.yml:/deployments/config/application-docker.yml
+      - ../accrualreport/src:/reports:ro
+    restart: unless-stopped
+    networks:
+      - accrual-network
+
+networks:
+  accrual-network:
+    external: true

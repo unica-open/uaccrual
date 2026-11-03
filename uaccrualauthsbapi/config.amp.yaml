@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+# SPDX-License-Identifier: EUPL-1.2
+
+# Il file config.yml definisce i comportamenti che la pipeline deve adottare sul codice sorgente
+# e sulle unità di installazione per tutte le fasi del rilascio, dalla build al deployment.
+
+productName: uaccrual
+componentName: uaccrualauthsbapi
+stages:
+  build: yes
+build:
+  buildFlow: sequential
+  buildTool: maven
+  buildToolVersion: maven_3_8_1
+  buildEnvironment: jdk_17_0_8
+  buildOptionString: "clean install -Dmaven.test.skip=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B -P ${environment}-${linea_cliente} "
+builds_to_execute:
+  uaccrualauthsbsapi:
+    artifactsToPublish: target/accrualauthsbapi-*.gz

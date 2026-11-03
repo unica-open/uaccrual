@@ -1,0 +1,17 @@
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+
+                                                                                  
+       db                                                                     88  
+      d88b                                                                    88  
+     d8'`8b                                                                   88  
+    d8'  `8b      ,adPPYba,   ,adPPYba,  8b,dPPYba,  88       88  ,adPPYYba,  88  
+   d8YaaaaY8b    a8"     ""  a8"     ""  88P'   "Y8  88       88  ""     `Y8  88  
+  d8""""""""8b   8b          8b          88          88       88  ,adPPPPP88  88  
+ d8'        `8b  "8a,   ,aa  "8a,   ,aa  88          "8a,   ,a88  88,    ,88  88  
+d8'          `8b  `"Ybbd8"'   `"Ybbd8"'  88           `"YbbdP'Y8  `"8bbdP"Y8  88  
+                                                                                  
+                                                                                  
+${application.title} v${application.version}                
+Powered by SpringBoot v${spring-boot.version}               
+                                                            

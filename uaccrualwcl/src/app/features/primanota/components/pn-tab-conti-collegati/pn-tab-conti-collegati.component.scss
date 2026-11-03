@@ -1,0 +1,27 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+/* Stili specifici per PnTabContiCollegatiComponent */
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.overflow-x-auto {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--surface-2);
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    &:hover {
+      background: var(--fg-muted);
+    }
+  }
+}

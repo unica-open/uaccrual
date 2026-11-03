@@ -1,0 +1,22 @@
+{
+  "user": {
+    "username": "dev-user",
+    "displayName": "Utente di Sviluppo",
+    "cognome": "Development",
+    "email": "dev@example.com",
+    "permissions": [
+      "OP-SPE-addPdc",
+      "OP-SPE-updPdc",
+      "OP-SPE-delPdc"
+    ]
+  },
+  "ruolo": "SCRITTURA_COMPLETA",
+  "source": "DEV",
+  "faseBilancio": "APERTO",
+  "annoBilancio": 2025,
+  "enteCodice": "ENTE_TEST",
+  "enteDenominazione": "Ente Test",
+  "availableEnti": [
+    { "codice": "ENTE_TEST", "denominazione": "Ente Test" }
+  ]
+}

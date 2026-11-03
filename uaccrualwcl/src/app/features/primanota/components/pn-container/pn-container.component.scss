@@ -1,0 +1,30 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+ * SPDX-License-Identifier: EUPL-1.2
+ */
+
+/* Stili specifici per PnContainerComponent */
+/* La maggior parte dello styling è gestita da Tailwind CSS direttamente nell'HTML */
+
+/* Tab navigation styles */
+button[role="tab"] {
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+}
+
+/* Loading spinner overlay */
+.absolute.inset-0 {
+  z-index: 50;
+}
+
+/* Snackbar colors */
+.error-snackbar {
+  background-color: #d32f2f !important;
+  color: white !important;
+}
+
+.success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}

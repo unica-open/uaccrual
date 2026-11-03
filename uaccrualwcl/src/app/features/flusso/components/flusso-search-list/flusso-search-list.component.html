@@ -1,0 +1,134 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="page">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Parametri</h2>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="params-block">
+        <ng-container *ngIf="flussoSearchFilters">
+          <ng-container *ngIf="flussoSearchFilters.codiceFile">
+            <span class="chip">
+              <span class="chip-k">Codice</span>
+              <span class="chip-v">{{flussoSearchFilters.codiceFile}}</span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="flussoSearchFilters.fonte">
+            <span class="chip">
+              <span class="chip-k">Fonte</span>
+              <span class="chip-v">{{flussoSearchFilters.fonte}}</span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="flussoSearchFilters.tipoFile">
+            <span class="chip">
+              <span class="chip-k">Tipo</span>
+              <span class="chip-v">{{flussoSearchFilters.tipoFile}}</span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="flussoSearchFilters.dataCaricamento">
+            <span class="chip">
+              <span class="chip-k">Data</span>
+              <span class="chip-v">{{flussoSearchFilters.dataCaricamento | date:'yyyy-MM-dd'}}</span>
+            </span>
+          </ng-container>
+        </ng-container>
+        <span *ngIf="!flussoSearchFilters?.codiceFile && !flussoSearchFilters?.fonte && !flussoSearchFilters?.tipoFile && !flussoSearchFilters?.dataCaricamento" style="color:var(--fg-subtle);font-size:12px;font-style:italic">Nessun filtro applicato</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Elenco risultati</h2>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Fonte</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Codice</th>
+            <th scope="col">Nome file</th>
+            <th scope="col">Data caricamento</th>
+            <th scope="col">Stato</th>
+            <th class="col-actions" scope="col">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let element of dataSource">
+            <td>{{element.fonte}}</td>
+            <td>{{element.tipo}}</td>
+            <td><span class="mono">{{element.codice}}</span></td>
+            <td><span class="mono" style="color:var(--fg-muted)">{{element.nome}}</span></td>
+            <td>
+              <div class="dt-cell">
+                <span class="dt-date">{{element.dataCaricamento | date:'dd/MM/yyyy'}}</span>
+                <span class="dt-time">{{element.dataCaricamento | date:'HH:mm'}}</span>
+              </div>
+            </td>
+            <td>{{ element.stato }}</td>
+            <td class="col-actions">
+              <button class="row-act act-view" title="Visualizza" (click)="onConsulta(element)">
+                <span class="material-icons-round">visibility</span>
+              </button>
+              <button class="row-act act-download" title="Scarica" (click)="onExportOne(element)">
+                <span class="material-icons-round">download</span>
+              </button>
+              <button *ngIf="element.stato === 'Da elaborare' && (canElabFlusso$ | async)" class="row-act act-validate" title="Elabora" (click)="onElabora(element)">
+                <span class="material-icons-round">play_circle</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="pg-left">
+          <span class="pg-meta">Mostra</span>
+          <div class="select-mini">
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+              <option *ngFor="let option of pageSizeOptions" [value]="option">{{option}}</option>
+            </select>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <span class="pg-meta">di <strong>{{ totalElements }}</strong> risultati</span>
+        </div>
+        <div class="pg-right">
+          <span class="pg-range">{{ (currentPage * pageSize) + 1 }}&ndash;{{ Math.min((currentPage + 1) * pageSize, totalElements) }} di {{ totalElements }}</span>
+          <div class="pg-buttons">
+            <button class="pg-btn" [disabled]="currentPage === 0" (click)="onCustomPageChange(0)" title="Prima pagina">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 6-6 6 6 6"/><path d="m19 6-6 6 6 6"/></svg>
+            </button>
+            <button class="pg-btn" [disabled]="currentPage === 0" (click)="onCustomPageChange(currentPage - 1)" title="Precedente">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+            </button>
+            <ng-container *ngFor="let page of getPages()">
+              <button *ngIf="page !== -1" class="pg-btn" [class.is-active]="page === currentPage" (click)="onCustomPageChange(page)">{{ page + 1 }}</button>
+              <span *ngIf="page === -1" style="padding:0 4px;color:var(--fg-subtle)">...</span>
+            </ng-container>
+            <button class="pg-btn" [disabled]="currentPage >= totalPages - 1" (click)="onCustomPageChange(currentPage + 1)" title="Successiva">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="pg-btn" [disabled]="currentPage >= totalPages - 1" (click)="onCustomPageChange(totalPages - 1)" title="Ultima pagina">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 6 6 6-6 6"/><path d="m13 6 6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,24 @@
+productName: siac
+componentName: accrualauthdbimpl
+
+stages:
+  build: yes
+
+build:
+  buildFlow:
+  buildTool:
+  buildToolVersion:
+  buildEnvironment:
+  buildOptionString:
+  buildAntOpts: 
+  mavenSettings: 
+
+jobsToCopyFromList: 
+ 
+targetDir: 
+
+artifactsToArchive: 
+
+builds_to_execute:
+  accrualauthdbimpl:
+    artifactsToPublish:

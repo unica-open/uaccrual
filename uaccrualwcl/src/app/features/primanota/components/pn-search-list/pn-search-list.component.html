@@ -1,0 +1,98 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<div class="page">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">filter_alt</span>
+        <h2 class="card-title">Parametri</h2>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="params-block">
+        <ng-container *ngIf="filter">
+          <ng-container *ngIf="filter.codiceTipo">
+            <span class="chip"><span class="chip-k">Tipo</span><span class="chip-v">{{filter.codiceTipo}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.codiceFonte">
+            <span class="chip"><span class="chip-k">Fonte</span><span class="chip-v">{{filter.codiceFonte}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.codiceEvento">
+            <span class="chip"><span class="chip-k">Evento</span><span class="chip-v">{{filter.codiceEvento}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.codiceCausale">
+            <span class="chip"><span class="chip-k">Causale</span><span class="chip-v">{{filter.codiceCausale}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.numeroProvvisorio">
+            <span class="chip"><span class="chip-k">N. Provv.</span><span class="chip-v">{{filter.numeroProvvisorio}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.numeroDefinitivo">
+            <span class="chip"><span class="chip-k">N. Def.</span><span class="chip-v">{{filter.numeroDefinitivo}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.codiceStato">
+            <span class="chip"><span class="chip-k">Stato</span><span class="chip-v">{{filter.codiceStato}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.descrizione">
+            <span class="chip"><span class="chip-k">Descrizione</span><span class="chip-v">{{filter.descrizione}}</span></span>
+          </ng-container>
+          <ng-container *ngIf="filter.dataRegProvvisoriaDa || filter.dataRegProvvisoriaA">
+            <span class="chip">
+              <span class="chip-k">Data Provv.</span>
+              <span class="chip-v">
+                <ng-container *ngIf="filter.dataRegProvvisoriaDa && filter.dataRegProvvisoriaA">{{filter.dataRegProvvisoriaDa | date:'dd/MM/yyyy'}} – {{filter.dataRegProvvisoriaA | date:'dd/MM/yyyy'}}</ng-container>
+                <ng-container *ngIf="!filter.dataRegProvvisoriaDa && filter.dataRegProvvisoriaA">fino al {{filter.dataRegProvvisoriaA | date:'dd/MM/yyyy'}}</ng-container>
+                <ng-container *ngIf="filter.dataRegProvvisoriaDa && !filter.dataRegProvvisoriaA">dal {{filter.dataRegProvvisoriaDa | date:'dd/MM/yyyy'}}</ng-container>
+              </span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="filter.dataRegDefinitivaDa || filter.dataRegDefinitivaA">
+            <span class="chip">
+              <span class="chip-k">Data Def.</span>
+              <span class="chip-v">
+                <ng-container *ngIf="filter.dataRegDefinitivaDa && filter.dataRegDefinitivaA">{{filter.dataRegDefinitivaDa | date:'dd/MM/yyyy'}} – {{filter.dataRegDefinitivaA | date:'dd/MM/yyyy'}}</ng-container>
+                <ng-container *ngIf="!filter.dataRegDefinitivaDa && filter.dataRegDefinitivaA">fino al {{filter.dataRegDefinitivaA | date:'dd/MM/yyyy'}}</ng-container>
+                <ng-container *ngIf="filter.dataRegDefinitivaDa && !filter.dataRegDefinitivaA">dal {{filter.dataRegDefinitivaDa | date:'dd/MM/yyyy'}}</ng-container>
+              </span>
+            </span>
+          </ng-container>
+          <ng-container *ngIf="filter.soloNonQuadrate">
+            <span class="chip"><span class="chip-k">Solo Non Quadrate</span><span class="chip-v">Sì</span></span>
+          </ng-container>
+        </ng-container>
+        <span *ngIf="!filter?.codiceTipo && !filter?.codiceFonte && !filter?.codiceEvento && !filter?.codiceCausale && !filter?.numeroProvvisorio && !filter?.numeroDefinitivo && !filter?.codiceStato && !filter?.descrizione && !filter?.dataRegProvvisoriaDa && !filter?.dataRegDefinitivaDa && !filter?.soloNonQuadrate" style="color:var(--fg-subtle);font-size:12px;font-style:italic">Nessun filtro applicato</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;overflow:visible">
+    <div class="card-header">
+      <div class="card-header-left">
+        <span class="card-icon material-icons-round">list</span>
+        <h2 class="card-title">Elenco risultati</h2>
+      </div>
+    </div>
+    <app-pn-search-results
+      [results]="dataSource"
+      [totalElements]="totalElements"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [loading]="loading"
+      [filter]="filter"
+      [canInsert]="canInsert"
+      [canValidate]="canValidate"
+      (viewDetail)="onViewDetail($event)"
+      (pageChange)="onPageChange($event)"
+      (massValidate)="onMassValidate($event)"
+      (valida)="onValida($event)"
+      (annulla)="onAnnulla($event)"
+      (riapri)="onRiapri($event)"
+      (insert)="onInsert()"
+      (export)="onExport()">
+    </app-pn-search-results>
+  </div>
+
+</div>

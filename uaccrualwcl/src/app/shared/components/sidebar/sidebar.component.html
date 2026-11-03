@@ -1,0 +1,39 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2026 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
+
+<ng-container *ngIf="(breadcrumbs$ | async) as crumbs">
+  <div class="breadcrumb-bar" *ngIf="crumbs.length > 1">
+    <ng-container *ngFor="let crumb of crumbs; let last = last; let first = first; let i = index">
+
+      <!-- Separatore -->
+      <span *ngIf="i > 0" class="bc-sep">
+        <span class="material-icons-round">chevron_right</span>
+      </span>
+
+      <!-- Home -->
+      <span *ngIf="first" class="bc-item bc-home" (click)="navigateCrumb(crumb)" title="Home">
+        <span class="material-icons-round">home</span>
+      </span>
+
+      <!-- Categoria (route='/') -->
+      <span *ngIf="!first && !last && crumb.route === '/'"
+            class="bc-item bc-category" (click)="navigateCrumb(crumb)">
+        {{ crumb.label }}
+      </span>
+
+      <!-- Pagina intermedia -->
+      <span *ngIf="!first && !last && crumb.route !== '/'"
+            class="bc-item bc-link" (click)="navigateCrumb(crumb)">
+        {{ crumb.label }}
+      </span>
+
+      <!-- Pagina corrente -->
+      <span *ngIf="last" class="bc-item bc-current">
+        {{ crumb.label }}
+      </span>
+
+    </ng-container>
+  </div>
+</ng-container>

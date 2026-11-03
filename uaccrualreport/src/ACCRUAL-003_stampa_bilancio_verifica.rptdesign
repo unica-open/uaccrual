@@ -1,0 +1,2679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.26" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.18.0.v202411161754</property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <property name="excelDisableGrouping">true</property>
+    <property name="excelSingleSheet">false</property>
+    <property name="excelSingleSheetWithPageBreaks">false</property>
+    <parameters>
+        <scalar-parameter name="ente" id="5">
+            <property name="hidden">true</property>
+            <text-property name="promptText">ente_proprietario</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="anno_bilancio" id="6">
+            <text-property name="promptText">Anno</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2025</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="nome_report" id="1101">
+            <property name="hidden">true</property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">ACCRUAL-003</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="TipoStampa" id="1110">
+            <text-property name="promptText">Tipo di Stampa</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">CP</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">CE</property>
+                    <property name="label">Conti Economici</property>
+                </structure>
+                <structure>
+                    <property name="value">CP</property>
+                    <property name="label">Conti Patrimoniali</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="SoloSaldiFinale" id="1111">
+            <text-property name="promptText">Stampa solo i saldi finali</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">NO</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">SI</property>
+                    <property name="label">SI</property>
+                </structure>
+                <structure>
+                    <property name="value">NO</property>
+                    <property name="label">NO</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StampaCodBilItas" id="1112">
+            <text-property name="promptText">Stampa i codici BIL-ITAS1</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">SI</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">SI</property>
+                    <property name="label">SI</property>
+                </structure>
+                <structure>
+                    <property name="value">NO</property>
+                    <property name="label">NO</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StampaSegUtente" id="1440">
+            <text-property name="promptText">Stampa codici del segmento utente</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">SI</value>
+            </simple-property-list>
+            <list-property name="selectionList">
+                <structure>
+                    <property name="value">SI</property>
+                    <property name="label">SI</property>
+                </structure>
+                <structure>
+                    <property name="value">NO</property>
+                    <property name="label">NO</property>
+                </structure>
+            </list-property>
+            <property name="paramType">simple</property>
+            <property name="controlType">radio-button</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StatoPdc" id="1114">
+            <text-property name="promptText">Stato</text-property>
+            <property name="valueType">dynamic</property>
+            <property name="isRequired">true</property>
+            <property name="dataSetName">DataSetStatiPrimeNote</property>
+            <expression name="valueExpr" type="javascript">dataSetRow["prima_nota_stato_codice"]</expression>
+            <expression name="labelExpr" type="javascript">dataSetRow["stato_completo"]</expression>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">T</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">list-box</property>
+            <property name="mustMatch">true</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="DataSourceAccrual" id="4">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">org.postgresql.Driver</property>
+            <property name="odaURL">jdbc:postgresql://10.138.154.6:10124/CON_ACCRUAL</property>
+            <property name="odaUser">accrual</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">bXlwYXNz</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="DataSetEnte" id="15">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">ente_id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ente_id</text-property>
+                    <text-property name="heading">ente_id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ente_codice_univoco</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ente_codice_univoco</text-property>
+                    <text-property name="heading">ente_codice_univoco</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ente_codice_fiscale</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ente_codice_fiscale</text-property>
+                    <text-property name="heading">ente_codice_fiscale</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ente_denominazione</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ente_denominazione</text-property>
+                    <text-property name="heading">ente_denominazione</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_data_ins</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_data_ins</text-property>
+                    <text-property name="heading">gest_data_ins</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_data_upd</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_data_upd</text-property>
+                    <text-property name="heading">gest_data_upd</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_data_del</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_data_del</text-property>
+                    <text-property name="heading">gest_data_del</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_utente_ins</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_utente_ins</text-property>
+                    <text-property name="heading">gest_utente_ins</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_utente_upd</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_utente_upd</text-property>
+                    <text-property name="heading">gest_utente_upd</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">gest_utente_del</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">gest_utente_del</text-property>
+                    <text-property name="heading">gest_utente_del</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">p_ente</property>
+                    <property name="paramName">ente</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">ente_id</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">ente_codice_univoco</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">ente_codice_fiscale</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">ente_denominazione</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">gest_data_ins</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">gest_data_upd</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">gest_data_del</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">gest_utente_ins</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">gest_utente_upd</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">gest_utente_del</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">DataSourceAccrual</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">ente_id</property>
+                    <property name="nativeName">ente_id</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">ente_codice_univoco</property>
+                    <property name="nativeName">ente_codice_univoco</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">ente_codice_fiscale</property>
+                    <property name="nativeName">ente_codice_fiscale</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">ente_denominazione</property>
+                    <property name="nativeName">ente_denominazione</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">gest_data_ins</property>
+                    <property name="nativeName">gest_data_ins</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">gest_data_upd</property>
+                    <property name="nativeName">gest_data_upd</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">gest_data_del</property>
+                    <property name="nativeName">gest_data_del</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">gest_utente_ins</property>
+                    <property name="nativeName">gest_utente_ins</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">gest_utente_upd</property>
+                    <property name="nativeName">gest_utente_upd</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">gest_utente_del</property>
+                    <property name="nativeName">gest_utente_del</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select *
+from accrual_t_ente
+where ente_id = ?
+and gest_data_del IS NULL
+]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="DataSetStatiPrimeNote" id="1188">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">prima_nota_stato_codice</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">prima_nota_stato_codice</text-property>
+                    <text-property name="heading">prima_nota_stato_codice</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">prima_nota_stato_descrizione</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">prima_nota_stato_descrizione</text-property>
+                    <text-property name="heading">prima_nota_stato_descrizione</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">stato_completo</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">stato_completo</text-property>
+                    <text-property name="heading">stato_completo</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">prima_nota_stato_codice</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">prima_nota_stato_descrizione</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">stato_completo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">DataSourceAccrual</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">prima_nota_stato_codice</property>
+                    <property name="nativeName">prima_nota_stato_codice</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">prima_nota_stato_descrizione</property>
+                    <property name="nativeName">prima_nota_stato_descrizione</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">stato_completo</property>
+                    <property name="nativeName">stato_completo</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select dstato.prima_nota_stato_codice, dstato.prima_nota_stato_descrizione,
+	dstato.prima_nota_stato_codice ||' - ' || dstato.prima_nota_stato_descrizione stato_completo
+from accrual_d_prima_nota_stato dstato
+where dstato.prima_nota_stato_codice <> 'A'
+and dstato.gest_data_del IS NULL
+UNION
+select 'T' prima_nota_stato_codice, 'Tutti' prima_nota_stato_descrizione,
+'T - Tutti' stato_completo
+order by prima_nota_stato_codice]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>prima_nota_stato_codice</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>200</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>prima_nota_stato_codice</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>prima_nota_stato_codice</design:label>
+            <design:formattingHints>
+              <design:displaySize>200</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>prima_nota_stato_descrizione</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>500</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>prima_nota_stato_descrizione</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>prima_nota_stato_descrizione</design:label>
+            <design:formattingHints>
+              <design:displaySize>500</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>stato_completo</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>2147483647</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Unknown</design:nullability>
+            <design:uiHints>
+              <design:displayName>stato_completo</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>stato_completo</design:label>
+            <design:formattingHints>
+              <design:displaySize>2147483647</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="DataSetBilancioVerifica" id="1190">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">SaldoPrimaNota</property>
+                    <expression name="expression">if(row["classe_conto"]=="AP" ||row["classe_conto"] =='CE') var Saldo = row["importo_dare"]-row["importo_avere"];&#13;
+else var Saldo = row["importo_avere"] - row["importo_dare"];&#13;
+&#13;
+Saldo</expression>
+                    <property name="dataType">float</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">if(row["classe_conto"]=="AP") var Saldo = row["importo_dare"]-row["importo_avere"];&#13;
+else var Saldo = row["importo_avere"] - row["importo_dare"];&#13;
+&#13;
+Saldo</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">tipo_report</property>
+                    <property name="alias">tipo_report</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">tipo_report</text-property>
+                    <text-property name="heading">tipo_report</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tipo_conto_patrimoniale</property>
+                    <property name="alias">tipo_conto_patrimoniale</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">tipo_conto_patrimoniale</text-property>
+                    <text-property name="heading">tipo_conto_patrimoniale</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">classe_conto</property>
+                    <property name="alias">classe_conto</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">classe_conto</text-property>
+                    <text-property name="heading">classe_conto</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdce_id</property>
+                    <property name="alias">pdce_id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">pdce_id</text-property>
+                    <text-property name="heading">pdce_id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdce_id_padre</property>
+                    <property name="alias">pdce_id_padre</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">pdce_id_padre</text-property>
+                    <text-property name="heading">pdce_id_padre</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdce_code</property>
+                    <property name="alias">pdce_code</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">pdce_code</text-property>
+                    <text-property name="heading">pdce_code</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdce_desc</property>
+                    <property name="alias">pdce_desc</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">pdce_desc</text-property>
+                    <text-property name="heading">pdce_desc</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdce_livello</property>
+                    <property name="alias">pdce_livello</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">pdce_livello</text-property>
+                    <text-property name="heading">pdce_livello</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">livello_mostrato</property>
+                    <property name="alias">livello_mostrato</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">livello_mostrato</text-property>
+                    <text-property name="heading">livello_mostrato</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pdc_collegamento_bil_itas</property>
+                    <property name="alias">pdc_collegamento_bil_itas</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">pdc_collegamento_bil_itas</text-property>
+                    <text-property name="heading">pdc_collegamento_bil_itas</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">importo_dare</property>
+                    <property name="alias">importo_dare</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">importo_dare</text-property>
+                    <text-property name="heading">importo_dare</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">importo_avere</property>
+                    <property name="alias">importo_avere</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">importo_avere</text-property>
+                    <text-property name="heading">importo_avere</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">livello_importo</property>
+                    <property name="alias">livello_importo</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">livello_importo</text-property>
+                    <text-property name="heading">livello_importo</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">prima_nota_id</property>
+                    <property name="alias">prima_nota_id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">prima_nota_id</text-property>
+                    <text-property name="heading">prima_nota_id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tipo_prima_nota</property>
+                    <property name="alias">tipo_prima_nota</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">tipo_prima_nota</text-property>
+                    <text-property name="heading">tipo_prima_nota</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">stato_prima_nota</property>
+                    <property name="alias">stato_prima_nota</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">stato_prima_nota</text-property>
+                    <text-property name="heading">stato_prima_nota</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ordinamento</property>
+                    <property name="alias">ordinamento</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ordinamento</text-property>
+                    <text-property name="heading">ordinamento</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ordinamento_num</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ordinamento_num</text-property>
+                    <text-property name="heading">ordinamento_num</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">display_error</property>
+                    <property name="alias">display_error</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">display_error</text-property>
+                    <text-property name="heading">display_error</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">p_ente</property>
+                    <property name="paramName">ente</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">p_anno</property>
+                    <property name="paramName">anno_bilancio</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">p_tipo_stampa</property>
+                    <property name="paramName">TipoStampa</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">p_stato</property>
+                    <property name="paramName">StatoPdc</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">4</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">p_stampa_seg_utente</property>
+                    <property name="paramName">StampaSegUtente</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                    <property name="position">5</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">tipo_report</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">tipo_conto_patrimoniale</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">classe_conto</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">pdce_id</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">pdce_id_padre</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">pdce_code</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">pdce_desc</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">pdce_livello</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">livello_mostrato</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">pdc_collegamento_bil_itas</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">importo_dare</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">importo_avere</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">livello_importo</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">prima_nota_id</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">tipo_prima_nota</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">stato_prima_nota</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">ordinamento</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">ordinamento_num</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">display_error</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">SaldoPrimaNota</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">DataSourceAccrual</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">tipo_report</property>
+                    <property name="nativeName">tipo_report</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">tipo_conto_patrimoniale</property>
+                    <property name="nativeName">tipo_conto_patrimoniale</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">classe_conto</property>
+                    <property name="nativeName">classe_conto</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">pdce_id</property>
+                    <property name="nativeName">pdce_id</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">pdce_id_padre</property>
+                    <property name="nativeName">pdce_id_padre</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">pdce_code</property>
+                    <property name="nativeName">pdce_code</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">pdce_desc</property>
+                    <property name="nativeName">pdce_desc</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">pdce_livello</property>
+                    <property name="nativeName">pdce_livello</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">livello_mostrato</property>
+                    <property name="nativeName">livello_mostrato</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">pdc_collegamento_bil_itas</property>
+                    <property name="nativeName">pdc_collegamento_bil_itas</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">importo_dare</property>
+                    <property name="nativeName">importo_dare</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">importo_avere</property>
+                    <property name="nativeName">importo_avere</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">livello_importo</property>
+                    <property name="nativeName">livello_importo</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">prima_nota_id</property>
+                    <property name="nativeName">prima_nota_id</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">tipo_prima_nota</property>
+                    <property name="nativeName">tipo_prima_nota</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">stato_prima_nota</property>
+                    <property name="nativeName">stato_prima_nota</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">ordinamento</property>
+                    <property name="nativeName">ordinamento</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">ordinamento_num</property>
+                    <property name="nativeName">ordinamento_num</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">display_error</property>
+                    <property name="nativeName">display_error</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select *
+from "accrual_rep003_stampa_bilancio_verifica"(?,?,?,?,?)]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <DataSetParameters>
+    <parameter>
+      <design:ParameterDefinition>
+        <design:inOutMode>In</design:inOutMode>
+        <design:attributes>
+          <design:identifier>
+            <design:name></design:name>
+            <design:position>5</design:position>
+          </design:identifier>
+          <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+          <design:precision>0</design:precision>
+          <design:scale>0</design:scale>
+          <design:nullability>Unknown</design:nullability>
+        </design:attributes>
+      </design:ParameterDefinition>
+    </parameter>
+  </DataSetParameters>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
+            <property name="orientation">landscape</property>
+            <property name="headerHeight">0.5in</property>
+            <page-header>
+                <grid id="1102">
+                    <property name="fontFamily">"Times New Roman"</property>
+                    <property name="width">11.135in</property>
+                    <property name="dataSet">DataSetEnte</property>
+                    <list-property name="boundDataColumns">
+                        <structure>
+                            <property name="name">ente_id</property>
+                            <text-property name="displayName">ente_id</text-property>
+                            <expression name="expression" type="javascript">dataSetRow["ente_id"]</expression>
+                            <property name="dataType">integer</property>
+                        </structure>
+                        <structure>
+                            <property name="name">ente_denominazione</property>
+                            <text-property name="displayName">ente_denominazione</text-property>
+                            <expression name="expression" type="javascript">dataSetRow["ente_denominazione"]</expression>
+                            <property name="dataType">string</property>
+                        </structure>
+                    </list-property>
+                    <column id="1103"/>
+                    <row id="1104">
+                        <cell id="1105">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">center</property>
+                            <data id="1108">
+                                <property name="resultSetColumn">ente_denominazione</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="1106">
+                        <cell id="1107">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">center</property>
+                            <text id="1109">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">params["TipoStampa"].value=='CE'</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">auto</property>
+                                <text-property name="content"><![CDATA[BILANCIO DI VERIFICA - CONTI PATRIMONIALI]]></text-property>
+                            </text>
+                            <text id="1273">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">params["TipoStampa"].value=='CP'</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="contentType">auto</property>
+                                <text-property name="content"><![CDATA[BILANCIO DI VERIFICA - CONTI ECONOMICI]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="1357">
+                    <property name="width">11.03125in</property>
+                    <column id="1358">
+                        <property name="width">9.333333333333334in</property>
+                    </column>
+                    <column id="1359">
+                        <property name="width">1.6979166666666667in</property>
+                    </column>
+                    <row id="1360">
+                        <cell id="1361">
+                            <text id="3">
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="1362">
+                            <grid id="1374">
+                                <property name="width">1.6354166666666667in</property>
+                                <column id="1375">
+                                    <property name="width">0.8020833333333334in</property>
+                                </column>
+                                <column id="1376">
+                                    <property name="textAlign">center</property>
+                                    <property name="width">0.2916666666666667in</property>
+                                </column>
+                                <column id="1377">
+                                    <property name="width">0.5416666666666666in</property>
+                                </column>
+                                <row id="1378">
+                                    <cell id="1379">
+                                        <auto-text id="1380">
+                                            <property name="textAlign">right</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="1381">
+                                        <text id="1382">
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="1383">
+                                        <auto-text id="1384">
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table name="TableContiPatrimoniali" id="1191">
+            <property name="fontFamily">"Times New Roman"</property>
+            <property name="width">11.135416666666666in</property>
+            <property name="dataSet">DataSetBilancioVerifica</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr" type="javascript">params["TipoStampa"].value=="CE"</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">tipo_report</property>
+                    <text-property name="displayName">tipo_report</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_report"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">tipo_conto_patrimoniale</property>
+                    <text-property name="displayName">tipo_conto_patrimoniale</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_conto_patrimoniale"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_id</property>
+                    <text-property name="displayName">pdce_id</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_id"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_code</property>
+                    <text-property name="displayName">pdce_code</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_code"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_desc</property>
+                    <text-property name="displayName">pdce_desc</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_desc"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_livello</property>
+                    <text-property name="displayName">pdce_livello</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_livello"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">livello_mostrato</property>
+                    <text-property name="displayName">livello_mostrato</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["livello_mostrato"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">importo_dare</property>
+                    <text-property name="displayName">importo_dare</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["importo_dare"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">importo_avere</property>
+                    <text-property name="displayName">importo_avere</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["importo_avere"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">livello_importo</property>
+                    <text-property name="displayName">livello_importo</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["livello_importo"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">prima_nota_id</property>
+                    <text-property name="displayName">prima_nota_id</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["prima_nota_id"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">tipo_prima_nota</property>
+                    <text-property name="displayName">tipo_prima_nota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_prima_nota"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">stato_prima_nota</property>
+                    <text-property name="displayName">stato_prima_nota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["stato_prima_nota"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ordinamento</property>
+                    <text-property name="displayName">ordinamento</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ordinamento"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">display_error</property>
+                    <text-property name="displayName">display_error</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["display_error"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TotPnAutomConto</property>
+                    <text-property name="displayName">TotPnAutomConto</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GruppoConto</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">//il controllo sul tipo prima nota viene inserito qui e non nel filter condition perche'&#13;
+//nel caso nessun record soddisfi la condizione il campo restituisce NULL e anche mettendo il&#13;
+//controllo nell'opzione MAP in Excel non funziona.&#13;
+if(row["tipo_prima_nota"]=='A') row["SaldoPrimaNota"];&#13;
+else 0;</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotPnManualeConto</property>
+                    <text-property name="displayName">TotPnManualeConto</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GruppoConto</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">//il controllo sul tipo prima nota viene inserito qui e non nel filter condition perche'&#13;
+//nel caso nessun record soddisfi la condizione il campo restituisce NULL e anche mettendo il&#13;
+//controllo nell'opzione MAP in Excel non funziona.&#13;
+if(row["tipo_prima_nota"]=='M') row["SaldoPrimaNota"];&#13;
+else 0;</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalePnConto</property>
+                    <text-property name="displayName">TotalePnConto</text-property>
+                    <expression name="expression" type="javascript">row["TotPnAutomConto"]+row["TotPnManualeConto"]</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">pdc_collegamento_bil_itas</property>
+                    <text-property name="displayName">pdc_collegamento_bil_itas</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdc_collegamento_bil_itas"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">classe_conto</property>
+                    <text-property name="displayName">classe_conto</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["classe_conto"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_id_padre</property>
+                    <text-property name="displayName">pdce_id_padre</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_id_padre"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">SaldoPrimaNota</property>
+                    <text-property name="displayName">SaldoPrimaNota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["SaldoPrimaNota"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">ordinamento_num</property>
+                    <text-property name="displayName">ordinamento_num</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ordinamento_num"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["tipo_report"]</expression>
+                    <simple-property-list name="value1">
+                        <value>'CONTI_PATRIMONIALI'</value>
+                    </simple-property-list>
+                    <property name="updateAggregation">true</property>
+                </structure>
+            </list-property>
+            <column id="1204">
+                <property name="width">1.1041666666666667in</property>
+            </column>
+            <column id="1210">
+                <property name="width">0.6666666666666666in</property>
+            </column>
+            <column id="1214">
+                <property name="width">4.166666666666667in</property>
+            </column>
+            <column id="1218">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["StampaCodBilItas"].value=="NO"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">2.0729166666666665in</property>
+            </column>
+            <column id="1222">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["SoloSaldiFinale"].value=="SI"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <column id="1205">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["SoloSaldiFinale"].value=="SI"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <column id="1206">
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <header>
+                <row id="1404">
+                    <property name="verticalAlign">middle</property>
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">docx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">html</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">ods</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">odt</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pdf</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">postscript</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pptx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="1405">
+                        <property name="colSpan">7</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text-data id="1420">
+                            <property name="dataSet">DataSetEnte</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">ente_id</property>
+                                    <text-property name="displayName">ente_id</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["ente_id"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">ente_denominazione</property>
+                                    <text-property name="displayName">ente_denominazione</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["ente_denominazione"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">row["ente_denominazione"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                </row>
+                <row id="1412">
+                    <property name="verticalAlign">middle</property>
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">docx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">html</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">ods</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">odt</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pdf</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">postscript</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pptx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="1413">
+                        <property name="colSpan">7</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1421">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[BILANCIO DI VERIFICA - CONTI PATRIMONIALI]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+                <row id="1192">
+                    <property name="verticalAlign">middle</property>
+                    <cell id="1193">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1223">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Conti]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1207">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1224">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Livello]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1211">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1225">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Descrizione]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1215">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1226">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Codice Bil-ITAS1]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1219">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1227">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Tot (PN automatiche)]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1194">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1228">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Tot (PN manuali)]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1195">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1229">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Totale]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+            </header>
+            <group id="1230">
+                <property name="groupName">GruppoTipoContoPatrimoniale</property>
+                <expression name="keyExpr" type="javascript">row["tipo_conto_patrimoniale"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["tipo_conto_patrimoniale"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <property name="pageBreakBefore">always-excluding-first</property>
+                <list-property name="sort">
+                    <structure>
+                        <expression name="key" type="javascript">row["tipo_conto_patrimoniale"]</expression>
+                        <property name="direction">asc</property>
+                        <property name="strength">-1</property>
+                    </structure>
+                </list-property>
+                <header>
+                    <row id="1231">
+                        <cell id="1232">
+                            <property name="colSpan">7</property>
+                            <property name="rowSpan">1</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1265">
+                                <property name="fontWeight">bold</property>
+                                <property name="resultSetColumn">tipo_conto_patrimoniale</property>
+                            </data>
+                        </cell>
+                    </row>
+                </header>
+            </group>
+            <group id="1248">
+                <property name="groupName">GruppoConto</property>
+                <expression name="keyExpr" type="javascript">row["tipo_conto_patrimoniale"]+row["pdce_id"]</expression>
+                <property name="hideDetail">false</property>
+                <list-property name="sort">
+                    <structure>
+                        <expression name="key" type="javascript">row["ordinamento_num"]</expression>
+                        <property name="direction">asc</property>
+                        <property name="strength">-1</property>
+                    </structure>
+                </list-property>
+                <header>
+                    <row id="1249">
+                        <cell id="1250">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1269">
+                                <property name="textAlign">left</property>
+                                <property name="resultSetColumn">pdce_code</property>
+                            </data>
+                        </cell>
+                        <cell id="1251">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1267">
+                                <property name="resultSetColumn">livello_mostrato</property>
+                            </data>
+                        </cell>
+                        <cell id="1252">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1268">
+                                <property name="resultSetColumn">pdce_desc</property>
+                            </data>
+                        </cell>
+                        <cell id="1253">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1313">
+                                <list-property name="visibility">
+                                    <structure>
+                                        <property name="format">all</property>
+                                        <expression name="valueExpr" type="javascript">params["StampaCodBilItas"].value=="NO"</expression>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">pdc_collegamento_bil_itas</property>
+                            </data>
+                        </cell>
+                        <cell id="1254">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1270">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <property name="resultSetColumn">TotPnAutomConto</property>
+                            </data>
+                        </cell>
+                        <cell id="1255">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1271">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <list-property name="mapRules">
+                                    <structure>
+                                        <expression name="testExpr" type="javascript">row["TotPnManualeConto"]</expression>
+                                        <property name="operator">is-null</property>
+                                        <text-property name="display">0,00</text-property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">TotPnManualeConto</property>
+                            </data>
+                        </cell>
+                        <cell id="1256">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1272">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <property name="resultSetColumn">TotalePnConto</property>
+                            </data>
+                        </cell>
+                    </row>
+                </header>
+            </group>
+            <footer>
+                <row id="1200">
+                    <cell id="1201"/>
+                    <cell id="1209"/>
+                    <cell id="1213"/>
+                    <cell id="1217"/>
+                    <cell id="1221"/>
+                    <cell id="1202"/>
+                    <cell id="1203"/>
+                </row>
+            </footer>
+        </table>
+        <table name="TableContiEconomici" id="1274">
+            <property name="width">11.135416666666666in</property>
+            <property name="dataSet">DataSetBilancioVerifica</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr" type="javascript">params["TipoStampa"].value=="CP"</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">tipo_report</property>
+                    <text-property name="displayName">tipo_report</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_report"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">tipo_conto_patrimoniale</property>
+                    <text-property name="displayName">tipo_conto_patrimoniale</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_conto_patrimoniale"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_id</property>
+                    <text-property name="displayName">pdce_id</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_id"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_id_padre</property>
+                    <text-property name="displayName">pdce_id_padre</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_id_padre"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_code</property>
+                    <text-property name="displayName">pdce_code</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_code"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_desc</property>
+                    <text-property name="displayName">pdce_desc</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_desc"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdce_livello</property>
+                    <text-property name="displayName">pdce_livello</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdce_livello"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">livello_mostrato</property>
+                    <text-property name="displayName">livello_mostrato</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["livello_mostrato"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">pdc_collegamento_bil_itas</property>
+                    <text-property name="displayName">pdc_collegamento_bil_itas</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["pdc_collegamento_bil_itas"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">importo_dare</property>
+                    <text-property name="displayName">importo_dare</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["importo_dare"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">importo_avere</property>
+                    <text-property name="displayName">importo_avere</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["importo_avere"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">livello_importo</property>
+                    <text-property name="displayName">livello_importo</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["livello_importo"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">prima_nota_id</property>
+                    <text-property name="displayName">prima_nota_id</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["prima_nota_id"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">tipo_prima_nota</property>
+                    <text-property name="displayName">tipo_prima_nota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tipo_prima_nota"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">stato_prima_nota</property>
+                    <text-property name="displayName">stato_prima_nota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["stato_prima_nota"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">ordinamento</property>
+                    <text-property name="displayName">ordinamento</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ordinamento"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">display_error</property>
+                    <text-property name="displayName">display_error</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["display_error"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TotPnAutomConto</property>
+                    <text-property name="displayName">TotPnAutomConto</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GruppoConto</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">//il controllo sul tipo prima nota viene inserito qui e non nel filter condition perche'&#13;
+//nel caso nessun record soddisfi la condizione il campo restituisce NULL e anche mettendo il&#13;
+//controllo nell'opzione MAP in Excel non funziona.&#13;
+if(row["tipo_prima_nota"]=='A') row["SaldoPrimaNota"];&#13;
+else 0;</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotPnManualeConto</property>
+                    <text-property name="displayName">TotPnManualeConto</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>GruppoConto</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">//il controllo sul tipo prima nota viene inserito qui e non nel filter condition perche'&#13;
+//nel caso nessun record soddisfi la condizione il campo restituisce NULL e anche mettendo il&#13;
+//controllo nell'opzione MAP in Excel non funziona.&#13;
+if(row["tipo_prima_nota"]=='M') row["SaldoPrimaNota"];&#13;
+else 0;</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalePnConto</property>
+                    <text-property name="displayName">TotalePnConto</text-property>
+                    <expression name="expression" type="javascript">row["TotPnAutomConto"]+row["TotPnManualeConto"]</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">classe_conto</property>
+                    <text-property name="displayName">classe_conto</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["classe_conto"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">SaldoPrimaNota</property>
+                    <text-property name="displayName">SaldoPrimaNota</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["SaldoPrimaNota"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">ordinamento_num</property>
+                    <text-property name="displayName">ordinamento_num</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ordinamento_num"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <column id="1287">
+                <property name="width">1.1041666666666667in</property>
+            </column>
+            <column id="1293">
+                <property name="width">0.6666666666666666in</property>
+            </column>
+            <column id="1297">
+                <property name="width">4.166666666666667in</property>
+            </column>
+            <column id="1301">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["StampaCodBilItas"].value=="NO"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">2.0729166666666665in</property>
+            </column>
+            <column id="1305">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["SoloSaldiFinale"].value=="SI"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <column id="1288">
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">params["SoloSaldiFinale"].value=="SI"</expression>
+                    </structure>
+                </list-property>
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <column id="1289">
+                <property name="width">1.0416666666666667in</property>
+            </column>
+            <header>
+                <row id="1423">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">docx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">html</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">ods</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">odt</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pdf</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">postscript</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pptx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="1424">
+                        <property name="colSpan">7</property>
+                        <property name="rowSpan">1</property>
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text-data id="1439">
+                            <property name="dataSet">DataSetEnte</property>
+                            <list-property name="boundDataColumns">
+                                <structure>
+                                    <property name="name">ente_id</property>
+                                    <text-property name="displayName">ente_id</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["ente_id"]</expression>
+                                    <property name="dataType">integer</property>
+                                </structure>
+                                <structure>
+                                    <property name="name">ente_denominazione</property>
+                                    <text-property name="displayName">ente_denominazione</text-property>
+                                    <expression name="expression" type="javascript">dataSetRow["ente_denominazione"]</expression>
+                                    <property name="dataType">string</property>
+                                </structure>
+                            </list-property>
+                            <expression name="valueExpr">row["ente_denominazione"]</expression>
+                            <property name="contentType">html</property>
+                        </text-data>
+                    </cell>
+                </row>
+                <row id="1431">
+                    <list-property name="visibility">
+                        <structure>
+                            <property name="format">docx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">html</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">ods</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">odt</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pdf</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">postscript</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                        <structure>
+                            <property name="format">pptx</property>
+                            <expression name="valueExpr" type="javascript">true</expression>
+                        </structure>
+                    </list-property>
+                    <cell id="1432">
+                        <property name="colSpan">7</property>
+                        <property name="rowSpan">1</property>
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1422">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[BILANCIO DI VERIFICA - CONTI ECONOMICI]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+                <row id="1275">
+                    <cell id="1276">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1306">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Conti]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1290">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1307">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Livello]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1294">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1308">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Descrizione]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1298">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1309">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Codice Bil-ITAS1]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1302">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1310">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Tot (PN automatiche)]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1277">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1311">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Tot (PN manuali)]]></text-property>
+                        </text>
+                    </cell>
+                    <cell id="1278">
+                        <property name="fontFamily">"Times New Roman"</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <text id="1312">
+                            <property name="contentType">auto</property>
+                            <text-property name="content"><![CDATA[Totale]]></text-property>
+                        </text>
+                    </cell>
+                </row>
+            </header>
+            <group id="1331">
+                <property name="groupName">GruppoConto</property>
+                <expression name="keyExpr" type="javascript">row["pdce_id"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">row["pdce_id"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <list-property name="sort">
+                    <structure>
+                        <expression name="key" type="javascript">row["ordinamento_num"]</expression>
+                        <property name="direction">asc</property>
+                        <property name="strength">-1</property>
+                    </structure>
+                </list-property>
+                <header>
+                    <row id="1332">
+                        <cell id="1333">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1349">
+                                <property name="resultSetColumn">pdce_code</property>
+                            </data>
+                        </cell>
+                        <cell id="1334">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1350">
+                                <property name="resultSetColumn">livello_mostrato</property>
+                            </data>
+                        </cell>
+                        <cell id="1335">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1351">
+                                <property name="resultSetColumn">pdce_desc</property>
+                            </data>
+                        </cell>
+                        <cell id="1336">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1352">
+                                <property name="resultSetColumn">pdc_collegamento_bil_itas</property>
+                            </data>
+                        </cell>
+                        <cell id="1337">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1354">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <list-property name="mapRules">
+                                    <structure>
+                                        <expression name="testExpr" type="javascript">row["TotPnAutomConto"]</expression>
+                                        <property name="operator">is-null</property>
+                                        <text-property name="display">0,00</text-property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">TotPnAutomConto</property>
+                            </data>
+                        </cell>
+                        <cell id="1338">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1355">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <list-property name="mapRules">
+                                    <structure>
+                                        <expression name="testExpr" type="javascript">row["TotPnManualeConto"]</expression>
+                                        <property name="operator">is-null</property>
+                                        <text-property name="display">0,00</text-property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">TotPnManualeConto</property>
+                            </data>
+                        </cell>
+                        <cell id="1339">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <data id="1356">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Times New Roman"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textDecoration">normal</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Currency</property>
+                                    <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">visible</property>
+                                <property name="resultSetColumn">TotalePnConto</property>
+                            </data>
+                        </cell>
+                    </row>
+                </header>
+            </group>
+            <footer>
+                <row id="1283">
+                    <cell id="1284"/>
+                    <cell id="1292"/>
+                    <cell id="1296"/>
+                    <cell id="1300"/>
+                    <cell id="1304"/>
+                    <cell id="1285"/>
+                    <cell id="1286"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>
