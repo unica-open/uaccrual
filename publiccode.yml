@@ -1,0 +1,125 @@
+publiccodeYmlVersion: 0.5.0
+name: UNICA uaccrual
+applicationSuite: UNICA
+url: https://github.com/unica-open/uaccrual
+landingURL: https://github.com/unica-open/uaccrual.git
+softwareVersion: 1.0.0
+releaseDate: 2026-11-03
+logo: unicaaccrual.png
+platforms:
+  - web
+categories:
+  - budgeting
+  - erp
+organisation:
+  uri: urn:x-italian-pa:csi_piem
+usedBy:
+  - Regione Piemonte
+  - Regione Sicilia
+  - Città Metropolitana di Torino
+  - Consiglio Regionale Piemonte
+  - Agenzia Interregionale Fiume Po
+  - Agenzia Regionale Piemontese per le Erogazioni in Agricoltura
+  - Ente di Gestione delle Aree Protette dell'Appennino Piemontese
+  - Comune di Palermo
+  - Comune di Genova
+  - Comune di Reggio Calabria
+  - Comune di Ravenna
+  - Comune di Modena
+  - Città Metropolitana di Roma
+  - Città Metropolitana Reggio Calabria
+  - Comune di Imola
+  - Comune di Quarto
+  - Comune di Frattamaggiore
+  - Comune di Capurso
+developmentStatus: stable
+softwareType: standalone/web
+intendedAudience:
+  countries:
+    - IT
+  scope:
+    - local-authorities
+description:
+  it:
+    genericName: Gestione Amministrativo Contabile
+    shortDescription: UNICA Accrual è il modulo della suite UNICA dedicato alla
+      contabilità economico-patrimoniale della PA
+    longDescription: >
+      ### Sistema Informativo per la contabilità Economico-Patrimoniale per gli
+      Enti
+
+      UNICA Accrual è il modulo dell’ecosistema open source UNICA dedicato alla
+      gestione della contabilità economico-patrimoniale della Pubblica
+      Amministrazione.
+    features:
+      - Predisposizione del Bilancio di Previsione
+      - Predisposizione degli allegati normativi previsti per il bilancio di
+        previsione
+      - Gestione dell'Esercizio Provvisorio
+      - Gestione dei capitoli di diversi esercizi finanziari
+      - Gestione delle variazioni al Bilancio durante le varie fasi
+        dell'esercizio finanziario
+      - Gestione dei movimenti contabili di entrata e di spesa
+      - Predisposizione del Rendiconto della gestione
+      - Predisposizione degli allegati normativi previsti per rendiconto di
+        gestione
+      - Estrazione dei dati per la Dichiarazione del Modello 770
+      - Gestione residui separata da gestione competenza e cassa
+      - Gestione delle carte contabili e della relativa regolarizzazione
+      - Gestione dei documenti, a loro volta composti da frontespizio, quote,
+        beneficiario
+      - Gestione di atti di liquidazione
+      - Gestione dei flussi automatici
+      - Gestione della contabilità generale e delle prime note, e gestione
+        separata contabilità sanitaria
+      - Gestione della cassa economale
+    videos:
+      - 
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: CSI Piemonte
+  repoOwner: CSI Piemonte
+  authorsFile: AUTHORS.txt
+maintenance:
+  type: internal
+  contacts:
+    - name: Barbara Malano
+      email: barbara.malano@csi.it
+    - name: Antonino Cicala
+      email: antonino.cicala@csi.it
+    - name: Massimo Molino
+      email: massimo.molino@csi.it
+    - name: Massimiliano Purpura
+      email: massimiliano.purpura@csi.it
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - it
+dependsOn:
+  open:
+    - name: Java Runtime
+      version: "17"
+      optional: false
+    - name: Spring boot
+      version: 3.4.1
+      optional: false
+    - name: PostgreSQL
+      version: "15"
+      optional: false
+    - name: Apache HTTP Server
+      version: "2.4"
+      optional: false
+IT:
+  countryExtensionVersion: "0.2"
+  conforme:
+    lineeGuidaDesign: true
+    modelloInteroperabilita: true
+    misureMinimeSicurezza: true
+    gdpr: true
+  piattaforme:
+    spid: false
+    cie: false
+    anpr: false
+    pagopa: false
+  riuso:
+    codiceIPA: csi_piem
