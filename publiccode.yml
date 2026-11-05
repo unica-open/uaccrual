@@ -1,8 +1,8 @@
 publiccodeYmlVersion: 0.5.0
 name: UNICA accrual
 applicationSuite: UNICA
-url: https://github.com/unica-open/uaccrual
-landingURL: https://github.com/unica-open/uaccrual.git
+url: https://github.com/unica-open/uaccrual.git
+landingURL: https://github.com/unica-open/uaccrual
 softwareVersion: 1.0.0
 releaseDate: 2026-11-03
 logo: unicaaccrual.png
@@ -94,6 +94,9 @@ dependsOn:
     - name: Apache HTTP Server
       version: "2.4"
       optional: false
+organisation:
+  uri: 'urn:x-italian-pa:csi_piem'
+  name: CSI PIEMONTE
 IT:
   countryExtensionVersion: "0.2"
   conforme:
