@@ -11,8 +11,6 @@ platforms:
 categories:
   - budgeting
   - erp
-organisation:
-  uri: urn:x-italian-pa:csi_piem
 usedBy:
   - Regione Piemonte
   - Regione Sicilia
@@ -58,8 +56,6 @@ description:
       - Popolamento del modello di raccordo
       - Gestione dei Conti accrual
       - Gestione delle causali
-    videos:
-      - 
 legal:
   license: EUPL-1.2
   mainCopyrightOwner: CSI Piemonte
@@ -97,7 +93,7 @@ dependsOn:
 organisation:
   uri: 'urn:x-italian-pa:csi_piem'
   name: CSI PIEMONTE
-IT:
+it:
   countryExtensionVersion: "0.2"
   conforme:
     lineeGuidaDesign: true
