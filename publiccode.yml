@@ -52,7 +52,12 @@ description:
       gestione della contabilità economico-patrimoniale della Pubblica
       Amministrazione.
     features:
-      - 
+      - Acquisizione e ricerca flusso di alimentazione
+      - Ricerca e gestione della prima nota
+      - Elaborazione e ricerca Report
+      - Popolamento del modello di raccordo
+      - Gestione dei Conti accrual
+      - Gestione delle causali
     videos:
       - 
 legal:
