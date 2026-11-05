@@ -1,0 +1,109 @@
+publiccodeYmlVersion: 0.5.0
+name: UNICA accrual
+applicationSuite: UNICA
+url: https://github.com/unica-open/uaccrual.git
+landingURL: https://github.com/unica-open/uaccrual
+softwareVersion: 1.0.0
+releaseDate: 2026-11-03
+logo: unicaaccrual.png
+platforms:
+  - web
+categories:
+  - budgeting
+  - erp
+usedBy:
+  - Regione Piemonte
+  - Regione Sicilia
+  - Città Metropolitana di Torino
+  - Consiglio Regionale Piemonte
+  - Agenzia Interregionale Fiume Po
+  - Agenzia Regionale Piemontese per le Erogazioni in Agricoltura
+  - Ente di Gestione delle Aree Protette dell'Appennino Piemontese
+  - Comune di Palermo
+  - Comune di Genova
+  - Comune di Reggio Calabria
+  - Comune di Ravenna
+  - Comune di Modena
+  - Città Metropolitana di Roma
+  - Città Metropolitana Reggio Calabria
+  - Comune di Imola
+  - Comune di Quarto
+  - Comune di Frattamaggiore
+  - Comune di Capurso
+developmentStatus: stable
+softwareType: standalone/web
+intendedAudience:
+  countries:
+    - IT
+  scope:
+    - local-authorities
+description:
+  it:
+    genericName: Gestione Amministrativo Contabile
+    shortDescription: UNICA Accrual è il modulo della suite UNICA dedicato alla
+      contabilità economico-patrimoniale della PA
+    longDescription: >
+      ### Sistema Informativo per la contabilità Economico-Patrimoniale per gli
+      Enti
+
+      UNICA Accrual è il modulo dell’ecosistema open source UNICA dedicato alla
+      gestione della contabilità economico-patrimoniale della Pubblica
+      Amministrazione.
+    features:
+      - Acquisizione e ricerca flusso di alimentazione
+      - Ricerca e gestione della prima nota
+      - Elaborazione e ricerca Report
+      - Popolamento del modello di raccordo
+      - Gestione dei Conti accrual
+      - Gestione delle causali
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: CSI Piemonte
+  repoOwner: CSI Piemonte
+  authorsFile: AUTHORS.txt
+maintenance:
+  type: internal
+  contacts:
+    - name: Barbara Malano
+      email: barbara.malano@csi.it
+    - name: Antonino Cicala
+      email: antonino.cicala@csi.it
+    - name: Massimo Molino
+      email: massimo.molino@csi.it
+    - name: Massimiliano Purpura
+      email: massimiliano.purpura@csi.it
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - it
+dependsOn:
+  open:
+    - name: Java Runtime
+      version: "17"
+      optional: false
+    - name: Spring boot
+      version: 3.4.1
+      optional: false
+    - name: PostgreSQL
+      version: "15"
+      optional: false
+    - name: Apache HTTP Server
+      version: "2.4"
+      optional: false
+organisation:
+  uri: 'urn:x-italian-pa:csi_piem'
+  name: CSI PIEMONTE
+it:
+  countryExtensionVersion: "0.2"
+  conforme:
+    lineeGuidaDesign: true
+    modelloInteroperabilita: true
+    misureMinimeSicurezza: true
+    gdpr: true
+  piattaforme:
+    spid: false
+    cie: false
+    anpr: false
+    pagopa: false
+  riuso:
+    codiceIPA: csi_piem
