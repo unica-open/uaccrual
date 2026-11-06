@@ -46,36 +46,7 @@ description:
       ### Sistema Informativo per la contabilità Economico-Patrimoniale per gli
       Enti
 
-      UNICA Accrual è il modulo dell’ecosistema open source UNICA dedicato alla gestione della contabilità economico-patrimoniale della Pubblica Amministrazione.
- La soluzione nasce per accompagnare gli enti pubblici nel percorso di transizione verso il nuovo modello contabile previsto dalla riforma Accrual.
- Il sistema è progettato in coerenza con i nuovi principi contabili ITAS (Italian Accounting Standards).
- L'obiettivo è superare una gestione frammentata delle informazioni, mettendo in relazione contabilità, patrimonio e processi amministrativi.
- UNICA Accrual consente infatti di integrare i dati provenienti dai diversi processi gestionali dell'ente all'interno di un modello contabile unitario.
- La piattaforma supporta la rilevazione delle operazioni nel sistema di contabilità economico-patrimoniale.
- Gestisce le scritture economico-patrimoniali e il relativo ciclo di elaborazione e controllo.
- Le scritture possono essere alimentate automaticamente dai sistemi integrati oppure inserite manualmente quando necessario.
- Il sistema permette inoltre di governare gli stati delle scritture, dalla bozza fino alla validazione definitiva o allo scarto.
- UNICA Accrual supporta anche la gestione delle rettifiche e delle integrazioni contabili necessarie alla corretta determinazione dei valori economici e patrimoniali.
- Un ruolo centrale è svolto dalle funzionalità di riconciliazione, che consentono di verificare la coerenza tra le differenti fonti informative.
- In questo modo le operazioni contabili possono essere ricondotte ai processi amministrativi che le hanno originate.
- Particolare attenzione è dedicata all'integrazione con le informazioni relative al patrimonio e ai beni dell'ente.
- La componente Inventari costituisce infatti una delle basi informative rilevanti per la gestione Accrual all'interno dell'ecosistema UNICA.
- L'integrazione permette di migliorare la coerenza tra eventi gestionali, rilevazioni contabili e consistenza patrimoniale.
- UNICA Accrual supporta inoltre le operazioni di chiusura contabile previste dal nuovo modello.
- Le informazioni elaborate confluiscono negli strumenti di rendicontazione messi a disposizione dalla soluzione.
- Il sistema consente di produrre giornale, mastrini, prospetti conformi ai principi ITAS e report.
- Ciò permette di rafforzare la qualità e la completezza dell'informazione economico-patrimoniale dell'ente.
- La tracciabilità delle operazioni costituisce un ulteriore elemento qualificante della soluzione.
- Ogni registrazione può essere collegata alle informazioni amministrative che ne descrivono origine e caratteristiche.
- Questo approccio contribuisce a rendere i dati contabili maggiormente verificabili e controllabili.
- La soluzione punta inoltre ad aumentare la comparabilità e la trasparenza delle informazioni prodotte dagli enti pubblici.
- UNICA Accrual non opera come applicativo isolato, ma come componente di un ecosistema più ampio.
- Nella suite UNICA interagisce con Contabilia, Inventari, Acquisti, Fatture e Reporting, secondo un disegno unitario di dati, processi e servizi.
- Questo consente di affrontare la trasformazione contabile evitando una gestione per silos applicativi.
- Il modello di evoluzione della soluzione è inoltre basato su una Community Open Source, nella quale competenze funzionali, metodologiche e tecnologiche concorrono allo sviluppo della suite.
- La community può contribuire attraverso codice, documentazione, test, requisiti, casi di conformità e proposte evolutive.
- In questo modo UNICA Accrual rappresenta non soltanto uno strumento per rispondere ai nuovi obblighi contabili, ma una piattaforma condivisa per accompagnare l'evoluzione della contabilità pubblica.
- Il risultato è un modello orientato a trasformare l'adempimento normativo in una maggiore capacità dell'ente di conoscere, controllare e rendicontare la propria situazione economica e patrimoniale.
+      UNICA Accrual è il modulo open source della suite UNICA dedicato alla gestione della contabilità economico-patrimoniale della Pubblica Amministrazione, progettato per accompagnare gli enti nella transizione verso il nuovo modello contabile Accrual e i principi ITAS. La soluzione integra dati contabili, patrimonio e processi amministrativi, supportando la gestione delle scritture economico-patrimoniali, delle prime note, delle rettifiche e delle integrazioni contabili. Consente la riconciliazione delle informazioni provenienti dai diversi sistemi gestionali, la gestione delle operazioni di chiusura e la produzione di giornale, mastrini, prospetti e report. Integrato con gli altri moduli della suite UNICA, contribuisce a migliorare qualità, tracciabilità, coerenza e trasparenza delle informazioni economiche e patrimoniali degli enti pubblici.
     features:
       - Acquisizione e ricerca flusso di alimentazione
       - Ricerca e gestione della prima nota
